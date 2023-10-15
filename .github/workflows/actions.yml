@@ -1,0 +1,8 @@
+name: Test
+on: [push, pull_request]
+jobs:
+    Explore-GitHub-Actions:
+      runs-on: node:18-bullseye
+      steps:
+        - run: npm ci
+        - run: npm test
