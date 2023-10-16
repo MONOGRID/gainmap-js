@@ -2,25 +2,11 @@
 <html lang="en">
 
 <head>
-  <title>three.js webgl - geometries</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-  <style>
-    body {
-      font-family: Monospace;
-      background-color: #000;
-      margin: 0px;
-      overflow: hidden;
-    }
-  </style>
 </head>
 
 <body>
-
-
-  <input type="file" name="file" class="file" />
-  <canvas id="canvas"></canvas>
-
   <script type="importmap">
     {
       "imports": {
@@ -35,7 +21,7 @@
     import { WebGLRenderer } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
 
-    window.start = async (url = 'chcaus2-bloom.exr', mimeType = 'image/webp', quality = 0.9) => {
+    window.encode = async (url = 'chcaus2-bloom.exr', mimeType = 'image/webp', quality = 0.9) => {
       const loader = new EXRLoader()
       const exr = await loader.loadAsync(`https://local/${url}`)
       return encode(exr, mimeType, quality)

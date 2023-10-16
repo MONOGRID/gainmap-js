@@ -8,5 +8,5 @@
     "checkJs": false,
     "types": ["jest-extended"]
   },
-  "exclude": ["dist", "jest.config.js"]
+  "exclude": ["dist", "jest.config.cjs", "release.config.cjs"]
 }

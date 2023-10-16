@@ -1,8 +1,12 @@
 name: Test
 on: [push, pull_request]
 jobs:
-    Explore-GitHub-Actions:
+    Test-And-Release:
       runs-on: node:18-bullseye
       steps:
         - run: npm ci
         - run: npm test
+        - run: npx semantic-release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

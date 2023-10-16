@@ -33,13 +33,20 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.5",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.0.0",
+    "@semantic-release/git": "github:semantic-release/git",
     "@semantic-release/github": "^9.2.1",
+    "@semantic-release/npm": "^11.0.0",
+    "@semantic-release/release-notes-generator": "^12.0.0",
     "@types/jest": "^29.5.5",
     "@types/node": "^20.8.4",
     "@types/three": "^0.157.0",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "babel-jest": "^29.7.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.10.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.19.1",
@@ -60,5 +67,10 @@
   },
   "peerDependencies": {
     "three": "^0.157.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }

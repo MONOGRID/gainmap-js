@@ -5,7 +5,7 @@ import { getTestbed } from './common'
 test('encodes', async () => {
   const page = await getTestbed()
 
-  const result = await page.evaluate('start()')
+  const result = await page.evaluate('encode()')
 
   expect(result).toMatchObject({
     sdr: { width: 512, height: 512, data: new Uint8Array() },
