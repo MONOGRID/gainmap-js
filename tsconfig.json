@@ -4,9 +4,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "allowJs": true,
-    "checkJs": false,
-    "types": ["jest-extended"]
+    "lib": ["ES2022", "DOM"]
   },
-  "exclude": ["dist", "jest.config.cjs", "release.config.cjs"]
+  "exclude": ["dist"]
 }

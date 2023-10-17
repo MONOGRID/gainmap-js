@@ -1,26 +1,78 @@
-import { expect, test } from '@jest/globals'
+import 'jest-extended'
 
+import { describe, expect, it } from '@jest/globals'
+import { existsSync } from 'fs'
+import { mkdir, writeFile } from 'fs/promises'
+import path from 'path'
+import { ACESFilmicToneMapping, NoToneMapping } from 'three'
+
+import { encode } from '../src'
 import { getTestbed } from './common'
 
-test('encodes', async () => {
-  const page = await getTestbed()
+describe('encoder', () => {
+  it.concurrent.each([
+    { file: 'chcaus2-bloom.exr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'chcaus2-bloom.exr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'chcaus2-bloom.exr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
 
-  const result = await page.evaluate('encode()')
+    { file: 'chcaus2-bloom.hdr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'chcaus2-bloom.hdr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'chcaus2-bloom.hdr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
 
-  expect(result).toMatchObject({
-    sdr: { width: 512, height: 512, data: new Uint8Array() },
-    gainMap: { width: 512, height: 512, data: new Uint8Array() }
-    // fullDisplayBoost: [number, number, number];
-    // gainMapMin: [number, number, number];
-    // gainMapMax: [number, number, number];
-    // mapGamma: number;
-    // offsetHdr: number;
-    // offsetSdr: number;
-    // hdrCapacityMin: [...];
-    // hdrCapacityMax: [...];
-  })
+    { file: 'chcaus2-bloom.exr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'chcaus2-bloom.exr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'chcaus2-bloom.exr', format: 'png', quality: 0.7, tonemapping: NoToneMapping },
 
-  // if (result && typeof result === 'object' && 'gainMap' in result) {
-  //   console.log(result.gainMap)
-  // }
+    { file: 'chcaus2-bloom.hdr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'chcaus2-bloom.hdr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'chcaus2-bloom.hdr', format: 'png', quality: 0.7, tonemapping: NoToneMapping }
+  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
+    // we need to launch puppetteer with a
+    // custom written "testbed.html" page
+    // because our encoder works by
+    // rendering the SDR image with THREEjs
+    // which only works in webgl (not here in node where we test)
+    const { page, pageError, pageLog } = await getTestbed()
+
+    const result = await page.evaluate(`
+      encode(
+        '${file}',
+        'image/${format === 'jpg' ? 'jpeg' : format}',
+        ${quality},
+        ${tonemapping}
+    )`) as Awaited<ReturnType<typeof encode>>
+
+    expect(pageError).not.toBeCalled()
+    expect(pageLog).not.toBeCalled()
+
+    // we receive Arrays because puppetteer can't transfer Uint8Array data
+    result.gainMap.data = Uint8Array.from(result.gainMap.data)
+    result.sdr.data = Uint8Array.from(result.sdr.data)
+
+    expect(result.gainMapMin).toBeArrayOfSize(3)
+    expect(result.gainMapMax).toBeArrayOfSize(3)
+    expect(result.hdrCapacityMin).toBeArrayOfSize(3)
+    expect(result.hdrCapacityMax).toBeArrayOfSize(3)
+    expect(result.fullDisplayBoost).toBeArrayOfSize(3)
+
+    expect(result.mapGamma).toBeNumber()
+    expect(result.offsetHdr).toBeNumber()
+    expect(result.offsetSdr).toBeNumber()
+
+    expect(result.gainMap).toBeObject()
+    expect(result.gainMap.data).toBeInstanceOf(Uint8Array)
+    expect(result.gainMap.width).toBeNumber()
+    expect(result.gainMap.height).toBeNumber()
+
+    expect(result.sdr).toBeObject()
+    expect(result.sdr.data).toBeInstanceOf(Uint8Array)
+    expect(result.sdr.width).toBeNumber()
+    expect(result.sdr.height).toBeNumber()
+
+    if (!existsSync(path.join(__dirname, './results'))) {
+      await mkdir(path.join(__dirname, './results/'))
+    }
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-output.${format}`), Buffer.from(result.sdr.data))
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-gainmap.${format}`), Buffer.from(result.gainMap.data))
+  }, 20000)
 })

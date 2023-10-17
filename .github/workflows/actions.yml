@@ -2,8 +2,12 @@ name: Test
 on: [push, pull_request]
 jobs:
     Test-And-Release:
-      runs-on: node:18-bullseye
+      runs-on: ubuntu-latest
       steps:
+        - uses: actions/checkout@v3
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 18
         - run: npm ci
         - run: npm test
         - run: npx semantic-release

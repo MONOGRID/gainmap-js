@@ -18,13 +18,20 @@
   </script>
   <script type="module">
     import { encode } from 'gainmap-js';
-    import { WebGLRenderer } from 'three'
+    import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
+    import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
-    window.encode = async (url = 'chcaus2-bloom.exr', mimeType = 'image/webp', quality = 0.9) => {
-      const loader = new EXRLoader()
-      const exr = await loader.loadAsync(`https://local/${url}`)
-      return encode(exr, mimeType, quality)
+    window.encode = async (url, outMimeType = 'image/jpeg', outQuality = 0.9, sdrToneMapping = ACESFilmicToneMapping) => {
+      let loader
+      if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
+      if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
+      const image = await loader.loadAsync(`https://local/${url}`)
+      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: true })
+      // Uint8Arrays can't be transferred outside puppetteer
+      result.gainMap.data = Array.from(result.gainMap.data)
+      result.sdr.data = Array.from(result.sdr.data)
+      return result
     }
 
   </script>

@@ -23,6 +23,7 @@ export default defineConfig({
     file: main,
     name: main,
     ...settings,
+    globals: { three: 'three' },
     format: 'cjs',
     plugins: [
       isProduction && terser()
@@ -30,11 +31,13 @@ export default defineConfig({
   }, {
     file: module,
     ...settings,
+    globals: { three: 'three' },
     name,
     format: 'es'
   }, {
     file: browser,
     ...settings,
+    globals: { three: 'three' },
     name,
     format: 'umd'
   }],
@@ -46,7 +49,7 @@ export default defineConfig({
     typescript({
       declaration: true,
       declarationDir: '',
-      exclude: ['rollup.config.ts']
+      include: ['src/**/*.ts']
     }),
     commonjs({
       include: 'node_modules/**',
