@@ -5,16 +5,13 @@ import {
   NoColorSpace,
   RepeatWrapping,
   RGBAFormat,
-  UVMapping,
-  WebGLRenderer
+  UVMapping
 } from 'three'
-import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
-import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
 import { encodeBuffers } from './encode-utils/encode-buffers'
 import { convertImageBufferToMimetype } from './encode-utils/encode-mimetype'
 import { renderSDR } from './encode-utils/render-sdr'
+import { EncodeParameters } from './types'
 /**
  *
  * @param image
@@ -22,7 +19,7 @@ import { renderSDR } from './encode-utils/render-sdr'
  * @param quality
  * @param renderer
  */
-export const encode = async (image: EXR | RGBE | LogLuv | DataTexture, outMimeType: 'image/png' | 'image/jpeg' | 'image/webp' = 'image/webp', quality = 0.95, renderer?: WebGLRenderer) => {
+export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY }: EncodeParameters) => {
   let tex: DataTexture
   let imageData: Float32Array | Uint16Array | Uint8ClampedArray | Uint8Array
   let imageWidth: number
@@ -52,27 +49,33 @@ export const encode = async (image: EXR | RGBE | LogLuv | DataTexture, outMimeTy
       'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
     )
   }
-  const rawSdr = renderSDR(tex, ACESFilmicToneMapping, renderer)
+
+  const rawSdr = renderSDR(tex, sdrToneMapping === undefined ? ACESFilmicToneMapping : sdrToneMapping, renderer)
 
   // console.log('[encodeGainMap]: encoding gainmap on worker')
   const encodingResult = await encodeBuffers({
     hdr: imageData,
     sdr: rawSdr,
     width: imageWidth,
-    height: imageHeight
+    height: imageHeight,
+    mapGamma,
+    maxContentBoost,
+    minContentBoost
   })
 
   // console.log('[encodeGainMap]: encoding images with worker')
   const [sdr, gainMap] = await Promise.all([
     convertImageBufferToMimetype({
       source: new ImageData(rawSdr, imageWidth, imageHeight),
-      outMimeType,
-      quality
+      outMimeType: outMimeType || 'image/jpeg',
+      outQuality,
+      flipY
     }),
     convertImageBufferToMimetype({
       source: new ImageData(encodingResult.gainMap, imageWidth, imageHeight),
-      outMimeType,
-      quality
+      outMimeType: outMimeType || 'image/jpeg',
+      outQuality,
+      flipY
     })
   ])
 

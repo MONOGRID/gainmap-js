@@ -1,4 +1,7 @@
-import { WebGLRenderer } from 'three'
+import { DataTexture, ToneMapping, WebGLRenderer } from 'three'
+import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
+import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
+import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
 export type GainMapMetadata = {
   /**
@@ -46,6 +49,18 @@ export type GainMapMetadata = {
   maxDisplayBoost: [number, number, number]
 }
 
+export type EncodeParameters = {
+  image: EXR | RGBE | LogLuv | DataTexture,
+  outMimeType?: 'image/png' | 'image/jpeg' | 'image/webp'
+  outQuality?: number
+  renderer?: WebGLRenderer,
+  maxContentBoost?: number
+  minContentBoost?: number
+  mapGamma?: number
+  sdrToneMapping?: ToneMapping,
+  flipY?: boolean
+}
+
 export type EncodeBuffersParameters = {
   sdr: Uint8Array | Uint8ClampedArray
   hdr: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
@@ -60,7 +75,8 @@ export type EncodeMimetypeParameters = {
   source: Uint8Array | Uint8ClampedArray | ImageData
   sourceMimeType?: string
   outMimeType: 'image/png' | 'image/jpeg' | 'image/webp'
-  quality?: number
+  outQuality?: number,
+  flipY?: boolean
 }
 
 export type DecodeParameters = {

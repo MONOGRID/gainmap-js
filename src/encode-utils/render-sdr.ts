@@ -62,6 +62,8 @@ export const renderSDR = (tex: DataTexture, toneMapping: ToneMapping = ACESFilmi
   _renderer.clear(true, true, true)
   _renderer.toneMapping = toneMapping
   _renderer.outputColorSpace = SRGBColorSpace
+  // _renderer.debug.checkShaderErrors = true
+  // _renderer.debug.onShaderError()
 
   plane.scale.y = 1
   plane.material.map = tex
@@ -102,7 +104,7 @@ export const renderSDR = (tex: DataTexture, toneMapping: ToneMapping = ACESFilmi
 
   if (renderError) {
     cleanup({ renderer: _renderer, renderTarget, destroyRenderer })
-    throw new Error('An error occurred while retrieving texture pixels: ' + renderError)
+    throw new Error('An error occurred while rendering the SDR image: ' + renderError)
   }
 
   const out = new Uint8ClampedArray(width * height * 4)

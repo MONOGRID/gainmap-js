@@ -12,9 +12,9 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
   const sdrColor = new Color()
   const hdrColor = new Color()
 
-  const minMaxConentBoost = 1.0001
+  const minMaxContentBoost = 1.0001
 
-  const _maxContentBoost = maxContentBoost !== undefined ? new Color(maxContentBoost, maxContentBoost, maxContentBoost) : new Color(minMaxConentBoost, minMaxConentBoost, minMaxConentBoost)
+  const _maxContentBoost = maxContentBoost !== undefined ? new Color(maxContentBoost, maxContentBoost, maxContentBoost) : new Color(minMaxContentBoost, minMaxContentBoost, minMaxContentBoost)
   const _minContentBoost = minContentBoost !== undefined ? new Color(minContentBoost, minContentBoost, minContentBoost) : new Color(1, 1, 1)
   const maxVal = new Color(0, 0, 0)
   const _mapGamma = mapGamma !== undefined ? mapGamma : 1
@@ -33,9 +33,9 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
 
       hdrColor.convertSRGBToLinear()
 
-      _maxContentBoost.r = Math.max(_maxContentBoost.r, hdrColor.r, minMaxConentBoost)
-      _maxContentBoost.g = Math.max(_maxContentBoost.g, hdrColor.g, minMaxConentBoost)
-      _maxContentBoost.b = Math.max(_maxContentBoost.b, hdrColor.b, minMaxConentBoost)
+      _maxContentBoost.r = Math.max(_maxContentBoost.r, hdrColor.r, minMaxContentBoost)
+      _maxContentBoost.g = Math.max(_maxContentBoost.g, hdrColor.g, minMaxContentBoost)
+      _maxContentBoost.b = Math.max(_maxContentBoost.b, hdrColor.b, minMaxContentBoost)
       // _minContentBoost = Math.min(_minContentBoost, Math.max(Yhdr, 1))
     }
   }
