@@ -12,11 +12,10 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
   const sdrColor = new Color()
   const hdrColor = new Color()
 
-  const minMaxContentBoost = 1.0001
+  const minMaxContentBoost = 1.0001 // avoid maxContentBoost of 1 (NO HDR) , which could cause problems
 
   const _maxContentBoost = maxContentBoost !== undefined ? new Color(maxContentBoost, maxContentBoost, maxContentBoost) : new Color(minMaxContentBoost, minMaxContentBoost, minMaxContentBoost)
   const _minContentBoost = minContentBoost !== undefined ? new Color(minContentBoost, minContentBoost, minContentBoost) : new Color(1, 1, 1)
-  const maxVal = new Color(0, 0, 0)
   const _mapGamma = mapGamma !== undefined ? mapGamma : 1
 
   const offsetSdr = 1 / 64
@@ -31,7 +30,7 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
         DataUtils.fromHalfFloat(hdr[i + 2])
       )
 
-      hdrColor.convertSRGBToLinear()
+      // hdrColor.convertSRGBToLinear()
 
       _maxContentBoost.r = Math.max(_maxContentBoost.r, hdrColor.r, minMaxContentBoost)
       _maxContentBoost.g = Math.max(_maxContentBoost.g, hdrColor.g, minMaxContentBoost)
@@ -58,11 +57,8 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
       DataUtils.fromHalfFloat(hdr[i + 1]),
       DataUtils.fromHalfFloat(hdr[i + 2])
     )
-    maxVal.r = Math.max(maxVal.r, hdrColor.r)
-    maxVal.g = Math.max(maxVal.g, hdrColor.g)
-    maxVal.b = Math.max(maxVal.b, hdrColor.b)
 
-    hdrColor.convertSRGBToLinear()
+    // hdrColor.convertSRGBToLinear()
 
     const pixelGainR = (hdrColor.r + offsetHdr) / (sdrColor.r + offsetSdr)
     const pixelGainG = (hdrColor.g + offsetHdr) / (sdrColor.g + offsetSdr)
@@ -94,14 +90,7 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
   // console.log('[GainMap] Max Original val', maxVal)
 
   return {
-    /**
-     * GainMap encoded in 3 Channels (R, G, B)
-     */
     gainMap,
-    /**
-     * use this value as `maxDisplayBoost` if the HDR needs to be restored to its original maximum value
-     */
-    fullDisplayBoost: [maxVal.r, maxVal.g, maxVal.b] as [number, number, number],
     gainMapMin: [mapMinLog2.r, mapMinLog2.g, mapMinLog2.b] as [number, number, number],
     gainMapMax: [mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b] as [number, number, number],
     mapGamma: _mapGamma,
