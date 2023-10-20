@@ -1,53 +1,45 @@
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
-import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
 import { defineConfig } from 'rollup'
+import copy from 'rollup-plugin-copy'
 import license from 'rollup-plugin-license'
 
 import pkgJSON from './package.json' assert { type: 'json' }
 
-const { author, browser, main, name, version } = pkgJSON
+const { author, name, version } = pkgJSON
 
 const settings = {
-  globals: { three: 'three' }
+  globals: {
+    three: 'three'
+  }
 }
 
 export default defineConfig({
-  input: './src/index.ts',
+  input: ['./src/index.ts', './src/libultrahdr.ts'],
   output: [
     {
-      file: main,
-      name: main,
-      ...settings,
-      format: 'cjs',
-      plugins: [
-        terser()
-      ]
-    },
-    {
-      dir: 'dist/esm',
+      dir: 'dist',
       ...settings,
       name,
       format: 'es',
       preserveModules: true,
       preserveModulesRoot: 'src'
-    },
-    {
-      file: browser,
-      ...settings,
-      name,
-      format: 'umd'
     }
   ],
   external: ['three'],
 
   plugins: [
     json(),
+    copy({
+      targets: [
+        { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist/libultrahdr-wasm/build' }
+      ]
+    }),
     typescript({
       declaration: true,
-      declarationDir: 'dist/esm',
+      declarationDir: 'dist',
       include: ['src/**/*.ts']
     }),
     resolve(),
