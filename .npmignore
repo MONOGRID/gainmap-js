@@ -1,0 +1,10 @@
+.*
+*.config.*
+*.tgz
+tests
+tsconfig.json
+src
+libultrahdr-wasm/**/*
+!libultrahdr-wasm/build/*.ts
+!libultrahdr-wasm/build/*.js
+!libultrahdr-wasm/build/*.wasm

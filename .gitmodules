@@ -1,0 +1,3 @@
+[submodule "libultrahdr-wasm"]
+	path = libultrahdr-wasm
+	url = git@github.com:MONOGRID/libultrahdr-wasm.git

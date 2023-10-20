@@ -5,11 +5,48 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
+        - uses: mymindstorm/setup-emsdk@v11
+
+        - uses: actions/setup-python@v4
+          with:
+            python-version: '3.10'
+
+        - uses: BSFishy/pip-action@v1
+          with:
+            packages: |
+              meson
+              ninja
+
+        - name: Overwrite file
+          uses: "DamianReeves/write-file-action@master"
+          with:
+            path: libultrahdr-wasm/em.txt
+            write-mode: overwrite
+            contents: |
+              [binaries]
+              c = 'emcc'
+              cpp = 'em++'
+              ar = 'emar'
+              nm = 'emnm'
+
+              [host_machine]
+              system = 'emscripten'
+              cpu_family = 'wasm32'
+              cpu = 'wasm32'
+              endian = 'little'
+
+        - run: |
+            cd libultrahdr-wasm
+            meson setup build --cross-file=em.txt
+            meson compile -C build
+
         - uses: actions/setup-node@v3
           with:
             node-version: 18
+
         - run: npm ci
         - run: npm test
+        - run: npm run build
         - run: npx semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

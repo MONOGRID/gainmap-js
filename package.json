@@ -6,6 +6,26 @@
   "module": "dist/esm/index.js",
   "browser": "dist/gainmap-js.umd.js",
   "types": "dist/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/esm/index.d.ts"
+    },
+    "./wasm": {
+      "import": "./libultrahdr-wasm/build/libultrahdr-esm.js",
+      "types": "./libultrahdr-wasm/build/libultrahdr.d.ts"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/esm/index.d.ts"
+      ],
+      "wasm": [
+        "./libultrahdr-wasm/build/libultrahdr.d.ts"
+      ]
+    }
+  },
 
   "scripts": {
     "build": "rollup -c",
