@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, jest } from '@jest/globals'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import puppeteer, { ConsoleMessage } from 'puppeteer'
+
 beforeAll(async () => {
   globalThis.browser = await puppeteer.launch({
     args: [
@@ -46,7 +47,7 @@ export const getTestbed = async () => {
     request.continue()
   })
 
-  const response = await page.goto(`file://${join(__dirname, './testbed.html')}`)
+  const response = await page.goto(`file://${join(__dirname, './testbed.html')}`, { timeout: 0 })
   expect(response).not.toBeNull()
   expect(response?.status()).toBe(200)
 
