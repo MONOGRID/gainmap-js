@@ -11,7 +11,7 @@ import {
 import { encodeBuffers } from './encode-utils/encode-buffers'
 import { convertImageBufferToMimetype } from './encode-utils/encode-mimetype'
 import { renderSDR } from './encode-utils/render-sdr'
-import { EncodeParameters } from './types'
+import { EncodeParameters, EncodeRawResult } from './types'
 /**
  *
  * @param image
@@ -83,5 +83,5 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamm
     ...encodingResult,
     sdr,
     gainMap
-  }
+  } as EncodeRawResult
 }

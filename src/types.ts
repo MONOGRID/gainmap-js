@@ -61,6 +61,26 @@ export type EncodeParameters = {
   flipY?: boolean
 }
 
+export type EncodeRawResult = {
+  sdr: {
+    data: Uint8Array
+    width: number
+    height: number
+  }
+  gainMap: {
+    data: Uint8Array
+    width: number
+    height: number
+  }
+  gainMapMin: [number, number, number]
+  gainMapMax: [number, number, number]
+  mapGamma: number
+  offsetHdr: number
+  offsetSdr: number
+  hdrCapacityMin: [number, number, number]
+  hdrCapacityMax: [number, number, number]
+}
+
 export type EncodeBuffersParameters = {
   sdr: Uint8Array | Uint8ClampedArray
   hdr: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
@@ -84,8 +104,8 @@ export type DecodeParameters = {
   gainMap: ImageBitmap
   renderer?: WebGLRenderer,
   decodeAsRenderTarget?: undefined | false
- } & GainMapMetadata
+} & GainMapMetadata
 
 export type DecodeAsRenderTargetParameters = Omit<DecodeParameters, 'decodeAsRenderTarget'> & {
   decodeAsRenderTarget: true
- }
+}
