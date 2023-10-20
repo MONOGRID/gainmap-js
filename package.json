@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gainmap",
   "main": "dist/gainmap-js.min.js",
-  "module": "dist/gainmap-js.esm.js",
+  "module": "dist/esm/index.js",
   "browser": "dist/gainmap-js.umd.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/esm/index.d.ts",
+
   "scripts": {
-    "build": "NODE_ENV=production rollup -c",
+    "build": "rollup -c",
     "dev": "rollup -c -w",
     "test": "jest",
     "pretest": "npm run build"

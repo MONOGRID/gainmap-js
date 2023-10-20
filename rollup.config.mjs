@@ -1,4 +1,3 @@
-// rollup.config.js
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
@@ -7,50 +6,51 @@ import typescript from '@rollup/plugin-typescript'
 import { defineConfig } from 'rollup'
 import license from 'rollup-plugin-license'
 
-import { author, browser, main, module, name, version } from './package.json'
+import pkgJSON from './package.json' assert { type: 'json' }
 
-const isProduction = process.env.NODE_ENV === 'production'
+const { author, browser, main, name, version } = pkgJSON
 
 const settings = {
-  // globals: {
-  //   ms: 'ms'
-  // }
+  globals: { three: 'three' }
 }
 
 export default defineConfig({
   input: './src/index.ts',
-  output: [{
-    file: main,
-    name: main,
-    ...settings,
-    globals: { three: 'three' },
-    format: 'cjs',
-    plugins: [
-      isProduction && terser()
-    ]
-  }, {
-    file: module,
-    ...settings,
-    globals: { three: 'three' },
-    name,
-    format: 'es'
-  }, {
-    file: browser,
-    ...settings,
-    globals: { three: 'three' },
-    name,
-    format: 'umd'
-  }],
+  output: [
+    {
+      file: main,
+      name: main,
+      ...settings,
+      format: 'cjs',
+      plugins: [
+        terser()
+      ]
+    },
+    {
+      dir: 'dist/esm',
+      ...settings,
+      name,
+      format: 'es',
+      preserveModules: true,
+      preserveModulesRoot: 'src'
+    },
+    {
+      file: browser,
+      ...settings,
+      name,
+      format: 'umd'
+    }
+  ],
   external: ['three'],
 
   plugins: [
     json(),
-    resolve(),
     typescript({
       declaration: true,
-      declarationDir: '',
+      declarationDir: 'dist/esm',
       include: ['src/**/*.ts']
     }),
+    resolve(),
     commonjs({
       include: 'node_modules/**',
       extensions: ['.js'],

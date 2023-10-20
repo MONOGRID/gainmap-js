@@ -1,9 +1,14 @@
 {
   "compilerOptions": {
     "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noErrorTruncation": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true,
+    "target": "ES2022",
     "lib": ["ES2022", "DOM"]
   },
   "exclude": ["dist"]
