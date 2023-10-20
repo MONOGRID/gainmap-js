@@ -5,6 +5,8 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v3
+          with:
+            submodules: recursive
         - uses: mymindstorm/setup-emsdk@v11
 
         - uses: actions/setup-python@v4
