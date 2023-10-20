@@ -1,0 +1,28 @@
+import { describe, expect, it } from '@jest/globals'
+import { existsSync } from 'fs'
+import { mkdir, writeFile } from 'fs/promises'
+import path from 'path'
+
+import { getTestbed } from './common'
+
+describe('wasm', () => {
+  it('appends an encoding result to a jpeg', async () => {
+    const { page, pageError } = await getTestbed()
+
+    const result = await page.evaluate(`
+      encodeJPEGMetadata(
+        'memorial.exr',
+        'image/jpeg'
+    )`) as Awaited<number[]>
+
+    expect(pageError).not.toBeCalled()
+    // expect(pageLog).not.toBeCalled()
+
+    const jpeg = Uint8Array.from(result)
+
+    if (!existsSync(path.join(__dirname, './results'))) {
+      await mkdir(path.join(__dirname, './results/'))
+    }
+    await writeFile(path.join(__dirname, './results/result-embedded.jpg'), Buffer.from(jpeg))
+  })
+})

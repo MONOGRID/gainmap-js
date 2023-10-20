@@ -7,9 +7,6 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "moduleResolution": "NodeNext",
-    "module": "NodeNext",
-    "target": "ES2015"
+    "esModuleInterop": true
   }
 }

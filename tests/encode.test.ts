@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
 import { ACESFilmicToneMapping, NoToneMapping } from 'three'
 
-import { encode } from '../src'
+import { EncodeRawResult } from '../src'
 import { getTestbed } from './common'
 
 describe('encoder', () => {
@@ -40,7 +40,7 @@ describe('encoder', () => {
         'image/${format === 'jpg' ? 'jpeg' : format}',
         ${quality},
         ${tonemapping}
-    )`) as Awaited<ReturnType<typeof encode>>
+    )`) as Awaited<EncodeRawResult>
 
     expect(pageError).not.toBeCalled()
     expect(pageLog).not.toBeCalled()
