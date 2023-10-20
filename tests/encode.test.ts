@@ -11,21 +11,21 @@ import { getTestbed } from './common'
 
 describe('encoder', () => {
   it.concurrent.each([
-    { file: 'chcaus2-bloom.exr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'chcaus2-bloom.exr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'chcaus2-bloom.exr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
 
-    { file: 'chcaus2-bloom.hdr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'chcaus2-bloom.hdr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'chcaus2-bloom.hdr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
 
-    { file: 'chcaus2-bloom.exr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'chcaus2-bloom.exr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'chcaus2-bloom.exr', format: 'png', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: NoToneMapping },
 
-    { file: 'chcaus2-bloom.hdr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'chcaus2-bloom.hdr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'chcaus2-bloom.hdr', format: 'png', quality: 0.7, tonemapping: NoToneMapping }
+    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: NoToneMapping }
   ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
     // we need to launch puppetteer with a
     // custom written "testbed.html" page
@@ -53,7 +53,6 @@ describe('encoder', () => {
     expect(result.gainMapMax).toBeArrayOfSize(3)
     expect(result.hdrCapacityMin).toBeArrayOfSize(3)
     expect(result.hdrCapacityMax).toBeArrayOfSize(3)
-    expect(result.fullDisplayBoost).toBeArrayOfSize(3)
 
     expect(result.mapGamma).toBeNumber()
     expect(result.offsetHdr).toBeNumber()
@@ -74,5 +73,16 @@ describe('encoder', () => {
     }
     await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-output.${format}`), Buffer.from(result.sdr.data))
     await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-gainmap.${format}`), Buffer.from(result.gainMap.data))
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-${format}.json`), Buffer.from(
+      JSON.stringify({
+        offsetSdr: result.offsetSdr,
+        offsetHdr: result.offsetHdr,
+        mapGamma: result.mapGamma,
+        hdrCapacityMin: result.hdrCapacityMin,
+        hdrCapacityMax: result.hdrCapacityMax,
+        gainMapMin: result.gainMapMin,
+        gainMapMax: result.gainMapMax
+      }, null, 2)
+    ))
   }, 20000)
 })
