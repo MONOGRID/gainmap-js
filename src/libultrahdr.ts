@@ -4,6 +4,8 @@ import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
 import { EncodeRawResult } from './types'
 
 let library: MainModule | undefined
+
+export type LibultraHDRModule = MainModule
 /**
  *
  * @returns
