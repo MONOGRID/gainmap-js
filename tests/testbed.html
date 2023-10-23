@@ -29,7 +29,8 @@
       if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
-      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: true })
+      image.flipY = false
+      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
       // Uint8Arrays can't be transferred outside puppetteer
       result.gainMap.data = Array.from(result.gainMap.data)
       result.sdr.data = Array.from(result.sdr.data)
@@ -41,7 +42,8 @@
       if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
-      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: true })
+      image.flipY = false
+      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader})
 
       const jpeg = await encodeJPEGMetadata(result)
       // Uint8Arrays can't be transferred outside puppetteer

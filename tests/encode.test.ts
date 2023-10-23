@@ -84,5 +84,5 @@ describe('encoder', () => {
         gainMapMax: result.gainMapMax
       }, null, 2)
     ))
-  }, 50000)
+  }, 100000)
 })

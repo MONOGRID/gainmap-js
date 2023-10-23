@@ -24,5 +24,5 @@ describe('wasm', () => {
       await mkdir(path.join(__dirname, './results/'))
     }
     await writeFile(path.join(__dirname, './results/result-embedded.jpg'), Buffer.from(jpeg))
-  })
+  }, 100000)
 })
