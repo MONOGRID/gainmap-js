@@ -2,13 +2,13 @@
 module.exports = {
   preset: 'ts-jest/presets/js-with-ts',
   setupFilesAfterEnv: ['jest-extended/all'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
-  transformIgnorePatterns: ['node_modules/(?!(three))'],
+  // moduleNameMapper: {
+  //   '^(\\.{1,2}/.*)\\.js$': '$1'
+  // },
+  transformIgnorePatterns: [
+    'node_modules/(?!(three|image-info-extractor))'
+  ],
   transform: {
-    // '^.+\\.jsx?$': 'babel-jest', // Adding this line solved the issue
-    '^.+\\.[tj]sx?$': 'ts-jest' // to process js/ts with `ts-jest`
-    // '^.+\\.tsx?$': 'ts-jest'
+    '^.+\\.[tj]s[xm]?$': ['ts-jest', { tsconfig: 'tests/tsconfig.json' }]
   }
 }
