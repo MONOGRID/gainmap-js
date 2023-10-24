@@ -25,6 +25,16 @@
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
     import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
 
+    const getArrayBuffer = (file) => {
+      return new Promise((resolve, reject) => {
+        var fr = new FileReader();
+        fr.onload = () => {
+          resolve(fr.result);
+        }
+        fr.readAsArrayBuffer(file);
+      })
+    }
+
     window.encode = async (url, outMimeType = 'image/jpeg', outQuality = 0.9, sdrToneMapping = ACESFilmicToneMapping) => {
       let loader
       if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
@@ -44,7 +54,7 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader})
+      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
 
       const jpeg = await encodeJPEGMetadata(result)
       // Uint8Arrays can't be transferred outside puppetteer
@@ -67,7 +77,32 @@
       // return Array.from(jpeg)
     }
 
+    document.getElementById('hdr').onchange = async (e) => {
+      const file = e.target.files[0]
+      const buf = new Uint8Array(await getArrayBuffer(file))
+
+      let loader
+      if (file.name.indexOf('.exr') !== -1) loader = new EXRLoader()
+      if (file.name.indexOf('.hdr') !== -1) loader = new RGBELoader()
+      const image = await loader.parse(buf)
+      const result = await encode({ image, outMimeType: 'image/jpeg', flipY: loader instanceof EXRLoader })
+
+      encodeJPEGMetadata(result)
+    }
+
+    document.getElementById('gainmap').onchange = async (e) => {
+      const file = e.target.files[0]
+      const buf = new Uint8Array(await getArrayBuffer(file))
+      console.log(await decodeJPEGMetadata(buf))
+    }
+
   </script>
+  <div>
+    HDR: <input type="file" id="hdr" />
+  </div>
+  <div>
+    GAINMAP: <input type="file" id="gainmap" />
+  </div>
 </body>
 
 </html>
