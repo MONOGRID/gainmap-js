@@ -35,3 +35,14 @@ export const encodeJPEGMetadata = async (encodingResult: EncodeRawResult) => {
     encodingResult.hdrCapacityMax.reduce((p, n) => p + n, 0) / encodingResult.hdrCapacityMax.length
   ) as Uint8Array
 }
+/**
+ *
+ * @param file
+ * @returns
+ */
+export const decodeJPEGMetadata = async (file: Uint8Array) => {
+  const lib = await getLibrary()
+  const result = lib.extractJpegR(file, file.length)
+  if (!result.success) throw new Error(result.errorMessage)
+  return result
+}
