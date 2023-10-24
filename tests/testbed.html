@@ -93,7 +93,9 @@
     document.getElementById('gainmap').onchange = async (e) => {
       const file = e.target.files[0]
       const buf = new Uint8Array(await getArrayBuffer(file))
-      console.log(await decodeJPEGMetadata(buf))
+      const result = await decodeJPEGMetadata(buf)
+
+      console.log(result)
     }
 
   </script>
