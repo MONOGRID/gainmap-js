@@ -17,15 +17,15 @@ const settings = {
 }
 
 export default defineConfig({
-  input: ['./src/index.ts', './src/libultrahdr.ts'],
+  input: ['./src/index.ts', './src/libultrahdr.ts', './src/worker/worker.ts', './src/worker/worker-interface.ts'],
   output: [
     {
       dir: 'dist',
       ...settings,
       name,
-      format: 'es',
-      preserveModules: true,
-      preserveModulesRoot: 'src'
+      format: 'es'
+      // preserveModules: true,
+      // preserveModulesRoot: 'src'
     }
   ],
   external: ['three'],
@@ -34,7 +34,7 @@ export default defineConfig({
     json(),
     copy({
       targets: [
-        { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist/libultrahdr-wasm/build' }
+        { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist' }
       ]
     }),
     typescript({

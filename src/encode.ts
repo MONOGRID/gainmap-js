@@ -12,6 +12,8 @@ import { encodeBuffers } from './encode-utils/encode-buffers'
 import { convertImageBufferToMimetype } from './encode-utils/encode-mimetype'
 import { renderSDR } from './encode-utils/render-sdr'
 import { EncodeParameters, EncodeRawResult } from './types'
+
+export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
 /**
  *
  * @param image
@@ -19,7 +21,7 @@ import { EncodeParameters, EncodeRawResult } from './types'
  * @param quality
  * @param renderer
  */
-export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY }: EncodeParameters) => {
+export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY, withWorker }: EncodeParameters) => {
   let tex: DataTexture
   let imageData: Float32Array | Uint16Array | Uint8ClampedArray | Uint8Array
   let imageWidth: number
@@ -50,18 +52,34 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamm
     )
   }
 
-  const rawSdr = renderSDR(tex, sdrToneMapping === undefined ? ACESFilmicToneMapping : sdrToneMapping, renderer)
+  let rawSdr = renderSDR(tex, sdrToneMapping === undefined ? ACESFilmicToneMapping : sdrToneMapping, renderer)
 
-  // console.log('[encodeGainMap]: encoding gainmap on worker')
-  const encodingResult = await encodeBuffers({
-    hdr: imageData,
-    sdr: rawSdr,
-    width: imageWidth,
-    height: imageHeight,
-    mapGamma,
-    maxContentBoost,
-    minContentBoost
-  })
+  let encodingResult: Awaited<ReturnType<typeof encodeBuffers>>
+  if (withWorker) {
+    const res = await withWorker.encodeGainmapBuffers({
+      hdr: imageData,
+      sdr: rawSdr,
+      width: imageWidth,
+      height: imageHeight,
+      mapGamma,
+      maxContentBoost,
+      minContentBoost
+    })
+    // reassign back transferables
+    imageData = res.hdr
+    rawSdr = res.sdr
+    encodingResult = res
+  } else {
+    encodingResult = await encodeBuffers({
+      hdr: imageData,
+      sdr: rawSdr,
+      width: imageWidth,
+      height: imageHeight,
+      mapGamma,
+      maxContentBoost,
+      minContentBoost
+    })
+  }
 
   // console.log('[encodeGainMap]: encoding images with worker')
   const [sdr, gainMap] = await Promise.all([
@@ -82,6 +100,7 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamm
   return {
     ...encodingResult,
     sdr,
+    hdr: { data: imageData, width: imageWidth, height: imageHeight },
     gainMap
   } as EncodeRawResult
 }

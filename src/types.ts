@@ -3,6 +3,8 @@ import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
+import { WorkerInterfaceImplementation } from './worker/worker-types'
+
 export type GainMapMetadata = {
   /**
    * This is the gamma to apply to the stored map values.
@@ -59,10 +61,16 @@ export type EncodeParameters = {
   mapGamma?: number
   sdrToneMapping?: ToneMapping,
   flipY?: boolean
+  withWorker?: WorkerInterfaceImplementation
 }
 
 export type EncodeRawResult = {
   sdr: {
+    data: Uint8Array
+    width: number
+    height: number
+  }
+  hdr: {
     data: Uint8Array
     width: number
     height: number
@@ -82,7 +90,7 @@ export type EncodeRawResult = {
 }
 
 export type EncodeBuffersParameters = {
-  sdr: Uint8Array | Uint8ClampedArray
+  sdr: Uint8ClampedArray
   hdr: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
   width: number
   height: number
