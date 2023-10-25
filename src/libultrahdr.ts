@@ -36,20 +36,21 @@ export const encodeJPEGMetadata = async (encodingResult: EncodeRawResult) => {
   ) as Uint8Array
 }
 
-const getAttribute = (description: Element, name: string) => {
-  let returnValue: string | string[]
+const getAttribute = (description: Element, name: string, defaultValue?: string) => {
+  let returnValue: string | [string, string, string]
   const parsedValue = description.attributes.getNamedItem(name)?.nodeValue
   if (!parsedValue) {
     const node = description.getElementsByTagName(name)[0]
     if (node) {
       const values = node.getElementsByTagName('rdf:li')
       if (values.length === 3) {
-        returnValue = Array.from(values).map(v => v.innerHTML)
+        returnValue = Array.from(values).map(v => v.innerHTML) as [string, string, string]
       } else {
-        throw new Error('Incomplete gainmap metadata')
+        throw new Error(`Gainmap metadata contains an array of items for ${name} but its length is not 3`)
       }
     } else {
-      throw new Error('Incomplete gainmap metadata')
+      if (defaultValue) return defaultValue
+      else throw new Error(`Can't find ${name} in gainmap metadata`)
     }
   } else {
     returnValue = parsedValue
@@ -72,30 +73,30 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const xmldocuemnt = parser.parseFromString(result.metadata as string, 'text/xml')
   const description = xmldocuemnt.getElementsByTagName('rdf:Description')[0]
 
-  const gainmapMin = getAttribute(description, 'hdrgm:GainMapMin')
+  const gainMapMin = getAttribute(description, 'hdrgm:GainMapMin', '0')
+  const gainMapMax = getAttribute(description, 'hdrgm:GainMapMax')
 
-  const gainmapMax = getAttribute(description, 'hdrgm:GainMapMax')
+  let gamma = description.attributes.getNamedItem('hdrgm:Gamma')?.nodeValue
+  if (!gamma) gamma = '1'
 
-  const gamma = description.attributes.getNamedItem('hdrgm:Gamma')?.nodeValue
-  if (!gamma) throw new Error('Incomplete gainmap metadata')
-  const offsetSDR = description.attributes.getNamedItem('hdrgm:OffsetSDR')?.nodeValue
-  if (!offsetSDR) throw new Error('Incomplete gainmap metadata')
-  const offsetHDR = description.attributes.getNamedItem('hdrgm:OffsetHDR')?.nodeValue
-  if (!offsetHDR) throw new Error('Incomplete gainmap metadata')
+  let offsetSDR = description.attributes.getNamedItem('hdrgm:OffsetSDR')?.nodeValue
+  if (!offsetSDR) offsetSDR = '0.015625'
+  let offsetHDR = description.attributes.getNamedItem('hdrgm:OffsetHDR')?.nodeValue
+  if (!offsetHDR) offsetHDR = '0.015625'
 
-  const hdrCapacityMin = getAttribute(description, 'hdrgm:HDRCapacityMin')
+  const hdrCapacityMin = getAttribute(description, 'hdrgm:HDRCapacityMin', '0')
   const hdrCapacityMax = getAttribute(description, 'hdrgm:HDRCapacityMax')
 
   return {
     ...result,
     parsedMetadata: {
-      gainmapMin: Array.isArray(gainmapMin) ? gainmapMin.map(v => parseFloat(v)) : parseFloat(gainmapMin),
-      gainmapMax: Array.isArray(gainmapMax) ? gainmapMax.map(v => parseFloat(v)) : parseFloat(gainmapMax),
-      gamma: parseFloat(gamma),
+      gainMapMin: Array.isArray(gainMapMin) ? gainMapMin.map(v => parseFloat(v)) as [number, number, number] : parseFloat(gainMapMin),
+      gainMapMax: Array.isArray(gainMapMax) ? gainMapMax.map(v => parseFloat(v)) as [number, number, number] : parseFloat(gainMapMax),
+      mapGamma: parseFloat(gamma),
       offsetSDR: parseFloat(offsetSDR),
       offsetHDR: parseFloat(offsetHDR),
-      hdrCapacityMin: Array.isArray(hdrCapacityMin) ? hdrCapacityMin.map(v => parseFloat(v)) : parseFloat(hdrCapacityMin),
-      hdrCapacityMax: Array.isArray(hdrCapacityMax) ? hdrCapacityMax.map(v => parseFloat(v)) : parseFloat(hdrCapacityMax)
+      hdrCapacityMin: Array.isArray(hdrCapacityMin) ? hdrCapacityMin.map(v => parseFloat(v)) as [number, number, number] : parseFloat(hdrCapacityMin),
+      hdrCapacityMax: Array.isArray(hdrCapacityMax) ? hdrCapacityMax.map(v => parseFloat(v)) as [number, number, number] : parseFloat(hdrCapacityMax)
     }
   }
 }
