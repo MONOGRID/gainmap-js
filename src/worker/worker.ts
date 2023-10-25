@@ -1,4 +1,3 @@
-/* eslint-disable no-case-declarations */
 // @ts-expect-error untyped lib
 import registerPromiseWorker from 'promise-worker-transferable/register'
 
