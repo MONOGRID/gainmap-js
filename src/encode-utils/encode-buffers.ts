@@ -1,12 +1,12 @@
 import { Color, DataUtils } from 'three'
 
-import { EncodeBuffersParameters } from '../types'
+import { EncodeBuffersParameters, GainMapMetadata } from '../types'
 /**
  *
  * @param params
  * @returns
  */
-export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minContentBoost, mapGamma }: EncodeBuffersParameters) => {
+export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minContentBoost, gamma }: EncodeBuffersParameters) => {
   const originalChannels = sdr.length / width / height
 
   const sdrColor = new Color()
@@ -16,10 +16,10 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
 
   const _maxContentBoost = maxContentBoost !== undefined ? new Color(maxContentBoost, maxContentBoost, maxContentBoost) : new Color(minMaxContentBoost, minMaxContentBoost, minMaxContentBoost)
   const _minContentBoost = minContentBoost !== undefined ? new Color(minContentBoost, minContentBoost, minContentBoost) : new Color(1, 1, 1)
-  const _mapGamma = mapGamma !== undefined ? mapGamma : 1
+  const _mapGamma = gamma !== undefined ? gamma as [number, number, number] : [1, 1, 1] as [number, number, number]
 
-  const offsetSdr = 1 / 64
-  const offsetHdr = 1 / 64
+  const offsetSdr = [1 / 64, 1 / 64, 1 / 64] as [number, number, number]
+  const offsetHdr = [1 / 64, 1 / 64, 1 / 64] as [number, number, number]
 
   if (maxContentBoost === undefined) {
     // calculate them
@@ -60,9 +60,9 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
 
     // hdrColor.convertSRGBToLinear()
 
-    const pixelGainR = (hdrColor.r + offsetHdr) / (sdrColor.r + offsetSdr)
-    const pixelGainG = (hdrColor.g + offsetHdr) / (sdrColor.g + offsetSdr)
-    const pixelGainB = (hdrColor.b + offsetHdr) / (sdrColor.b + offsetSdr)
+    const pixelGainR = (hdrColor.r + offsetHdr[0]) / (sdrColor.r + offsetSdr[0])
+    const pixelGainG = (hdrColor.g + offsetHdr[1]) / (sdrColor.g + offsetSdr[1])
+    const pixelGainB = (hdrColor.b + offsetHdr[2]) / (sdrColor.b + offsetSdr[2])
 
     const logRecoveryR = (Math.log2(pixelGainR) - mapMinLog2.r) / (mapMaxLog2.r - mapMinLog2.r)
     const logRecoveryG = (Math.log2(pixelGainG) - mapMinLog2.g) / (mapMaxLog2.g - mapMinLog2.g)
@@ -72,9 +72,9 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
     const clampedRecoveryG = Math.max(0.0, Math.min(1.0, logRecoveryG))
     const clampedRecoveryB = Math.max(0.0, Math.min(1.0, logRecoveryB))
 
-    const recoveryR = Math.pow(clampedRecoveryR, _mapGamma)
-    const recoveryG = Math.pow(clampedRecoveryG, _mapGamma)
-    const recoveryB = Math.pow(clampedRecoveryB, _mapGamma)
+    const recoveryR = Math.pow(clampedRecoveryR, _mapGamma[0])
+    const recoveryG = Math.pow(clampedRecoveryG, _mapGamma[1])
+    const recoveryB = Math.pow(clampedRecoveryB, _mapGamma[2])
 
     const encodedRecoveryR = Math.floor(recoveryR * 255.0 + 0.5)
     const encodedRecoveryG = Math.floor(recoveryG * 255.0 + 0.5)
@@ -88,15 +88,18 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
     sdrWithGainMapAlphaIndex += 4
   }
   // console.log('[GainMap] Max Original val', maxVal)
+  const metadata: GainMapMetadata = {
+    gainMapMin: [mapMinLog2.r, mapMinLog2.g, mapMinLog2.b],
+    gainMapMax: [mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b],
+    gamma: _mapGamma,
+    offsetHdr,
+    offsetSdr,
+    hdrCapacityMin: Math.min(Math.max(0, mapMinLog2.r), Math.max(0, mapMinLog2.g), Math.max(0, mapMinLog2.b)),
+    hdrCapacityMax: Math.max(mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b)
+  }
 
   return {
     gainMap,
-    gainMapMin: [mapMinLog2.r, mapMinLog2.g, mapMinLog2.b] as [number, number, number],
-    gainMapMax: [mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b] as [number, number, number],
-    mapGamma: _mapGamma,
-    offsetHdr,
-    offsetSdr,
-    hdrCapacityMin: [Math.max(0, mapMinLog2.r), Math.max(0, mapMinLog2.g), Math.max(0, mapMinLog2.b)] as [number, number, number],
-    hdrCapacityMax: [mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b] as [number, number, number]
+    ...metadata
   }
 }

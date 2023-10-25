@@ -55,12 +55,12 @@ void main() {
 const fragmentShader = `
 uniform sampler2D sdr;
 uniform sampler2D gainMap;
-uniform float mapGamma;
-uniform float offsetHdr;
-uniform float offsetSdr;
+uniform vec3 gamma;
+uniform vec3 offsetHdr;
+uniform vec3 offsetSdr;
 uniform vec3 gainMapMin;
 uniform vec3 gainMapMax;
-uniform vec3 weightFactor;
+uniform float weightFactor;
 
 varying vec2 vUv;
 
@@ -70,9 +70,9 @@ void main() {
   vec3 recovery = texture2D(gainMap, vUv).rgb;
 
   vec3 logRecovery = vec3(
-    pow(recovery.r, mapGamma),
-    pow(recovery.g, mapGamma),
-    pow(recovery.b, mapGamma)
+    pow(recovery.r, gamma.r),
+    pow(recovery.g, gamma.g),
+    pow(recovery.b, gamma.b)
   );
 
   vec3 logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery;
@@ -82,7 +82,7 @@ void main() {
 }
 `
 
-export const decode = <T extends DecodeParameters | DecodeAsRenderTargetParameters>({ sdr, gainMap, mapGamma, hdrCapacityMin, hdrCapacityMax, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost, renderer, decodeAsRenderTarget }: T): T extends DecodeParameters ? Uint16Array : WebGLRenderTarget => {
+export const decode = <T extends DecodeParameters | DecodeAsRenderTargetParameters>({ sdr, gainMap, gamma, hdrCapacityMin, hdrCapacityMax, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost, renderer, decodeAsRenderTarget }: T): T extends DecodeParameters ? Uint16Array : WebGLRenderTarget => {
   let _renderer = renderer
   let destroyRenderer = false
   if (!_renderer) {
@@ -124,17 +124,13 @@ export const decode = <T extends DecodeParameters | DecodeAsRenderTargetParamete
     uniforms: {
       sdr: { value: sdrTexture },
       gainMap: { value: gainMapTexture },
-      mapGamma: { value: 1.0 / mapGamma },
-      offsetHdr: { value: offsetHdr },
-      offsetSdr: { value: offsetSdr },
+      gamma: { value: new Vector3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]) },
+      offsetHdr: { value: new Vector3(offsetHdr[0], offsetHdr[1], offsetHdr[2]) },
+      offsetSdr: { value: new Vector3(offsetSdr[0], offsetSdr[1], offsetSdr[2]) },
       gainMapMin: { value: new Vector3(gainMapMin[0], gainMapMin[1], gainMapMin[2]) },
       gainMapMax: { value: new Vector3(gainMapMax[0], gainMapMax[1], gainMapMax[2]) },
       weightFactor: {
-        value: new Vector3(
-          (Math.log2(maxDisplayBoost[0]) - hdrCapacityMin[0]) / (hdrCapacityMax[0] - hdrCapacityMin[0]),
-          (Math.log2(maxDisplayBoost[1]) - hdrCapacityMin[1]) / (hdrCapacityMax[1] - hdrCapacityMin[1]),
-          (Math.log2(maxDisplayBoost[2]) - hdrCapacityMin[2]) / (hdrCapacityMax[2] - hdrCapacityMin[2])
-        )
+        value: (Math.log2(maxDisplayBoost) - hdrCapacityMin) / (hdrCapacityMax - hdrCapacityMin)
       }
     },
     blending: NoBlending,

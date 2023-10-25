@@ -1,7 +1,7 @@
 import { MainModule } from '../libultrahdr-wasm/build/libultrahdr'
 // @ts-expect-error untyped
 import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
-import { EncodeRawResult } from './types'
+import { EncodeRawResult, GainMapMetadata } from './types'
 
 let library: MainModule | undefined
 
@@ -30,9 +30,11 @@ export const encodeJPEGMetadata = async (encodingResult: EncodeRawResult) => {
     encodingResult.gainMap.data, encodingResult.gainMap.data.length,
     encodingResult.gainMapMax.reduce((p, n) => p + n, 0) / encodingResult.gainMapMax.length,
     encodingResult.gainMapMin.reduce((p, n) => p + n, 0) / encodingResult.gainMapMin.length,
-    encodingResult.mapGamma, encodingResult.offsetSdr, encodingResult.offsetHdr,
-    encodingResult.hdrCapacityMin.reduce((p, n) => p + n, 0) / encodingResult.hdrCapacityMin.length,
-    encodingResult.hdrCapacityMax.reduce((p, n) => p + n, 0) / encodingResult.hdrCapacityMax.length
+    encodingResult.gamma.reduce((p, n) => p + n, 0) / encodingResult.gamma.length,
+    encodingResult.offsetSdr.reduce((p, n) => p + n, 0) / encodingResult.offsetSdr.length,
+    encodingResult.offsetHdr.reduce((p, n) => p + n, 0) / encodingResult.offsetHdr.length,
+    encodingResult.hdrCapacityMin,
+    encodingResult.hdrCapacityMax
   ) as Uint8Array
 }
 
@@ -76,27 +78,29 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const gainMapMin = getAttribute(description, 'hdrgm:GainMapMin', '0')
   const gainMapMax = getAttribute(description, 'hdrgm:GainMapMax')
 
-  let gamma = description.attributes.getNamedItem('hdrgm:Gamma')?.nodeValue
-  if (!gamma) gamma = '1'
+  const gamma = getAttribute(description, 'hdrgm:Gamma', '1')
 
-  let offsetSDR = description.attributes.getNamedItem('hdrgm:OffsetSDR')?.nodeValue
-  if (!offsetSDR) offsetSDR = '0.015625'
-  let offsetHDR = description.attributes.getNamedItem('hdrgm:OffsetHDR')?.nodeValue
-  if (!offsetHDR) offsetHDR = '0.015625'
+  const offsetSDR = getAttribute(description, 'hdrgm:OffsetSDR', '0.015625')
+  const offsetHDR = getAttribute(description, 'hdrgm:OffsetHDR', '0.015625')
 
-  const hdrCapacityMin = getAttribute(description, 'hdrgm:HDRCapacityMin', '0')
-  const hdrCapacityMax = getAttribute(description, 'hdrgm:HDRCapacityMax')
+  let hdrCapacityMin = description.attributes.getNamedItem('hdrgm:HDRCapacityMin')?.nodeValue
+  if (!hdrCapacityMin) hdrCapacityMin = '0'
+
+  const hdrCapacityMax = description.attributes.getNamedItem('hdrgm:HDRCapacityMax')?.nodeValue
+  if (!hdrCapacityMax) throw new Error('Incomplete gainmap metadata')
+
+  const parsedMetadata: GainMapMetadata = {
+    gainMapMin: Array.isArray(gainMapMin) ? gainMapMin.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(gainMapMin), parseFloat(gainMapMin), parseFloat(gainMapMin)],
+    gainMapMax: Array.isArray(gainMapMax) ? gainMapMax.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(gainMapMax), parseFloat(gainMapMax), parseFloat(gainMapMax)],
+    gamma: Array.isArray(gamma) ? gamma.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(gamma), parseFloat(gamma), parseFloat(gamma)],
+    offsetSdr: Array.isArray(offsetSDR) ? offsetSDR.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(offsetSDR), parseFloat(offsetSDR), parseFloat(offsetSDR)],
+    offsetHdr: Array.isArray(offsetHDR) ? offsetHDR.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(offsetHDR), parseFloat(offsetHDR), parseFloat(offsetHDR)],
+    hdrCapacityMin: parseFloat(hdrCapacityMin),
+    hdrCapacityMax: parseFloat(hdrCapacityMax)
+  }
 
   return {
     ...result,
-    parsedMetadata: {
-      gainMapMin: Array.isArray(gainMapMin) ? gainMapMin.map(v => parseFloat(v)) as [number, number, number] : parseFloat(gainMapMin),
-      gainMapMax: Array.isArray(gainMapMax) ? gainMapMax.map(v => parseFloat(v)) as [number, number, number] : parseFloat(gainMapMax),
-      mapGamma: parseFloat(gamma),
-      offsetSDR: parseFloat(offsetSDR),
-      offsetHDR: parseFloat(offsetHDR),
-      hdrCapacityMin: Array.isArray(hdrCapacityMin) ? hdrCapacityMin.map(v => parseFloat(v)) as [number, number, number] : parseFloat(hdrCapacityMin),
-      hdrCapacityMax: Array.isArray(hdrCapacityMax) ? hdrCapacityMax.map(v => parseFloat(v)) as [number, number, number] : parseFloat(hdrCapacityMax)
-    }
+    parsedMetadata
   }
 }

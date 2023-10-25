@@ -51,12 +51,12 @@ describe('encoder', () => {
 
     expect(result.gainMapMin).toBeArrayOfSize(3)
     expect(result.gainMapMax).toBeArrayOfSize(3)
-    expect(result.hdrCapacityMin).toBeArrayOfSize(3)
-    expect(result.hdrCapacityMax).toBeArrayOfSize(3)
+    expect(result.hdrCapacityMin).toBeNumber()
+    expect(result.hdrCapacityMax).toBeNumber()
 
-    expect(result.mapGamma).toBeNumber()
-    expect(result.offsetHdr).toBeNumber()
-    expect(result.offsetSdr).toBeNumber()
+    expect(result.gamma).toBeArrayOfSize(3)
+    expect(result.offsetHdr).toBeArrayOfSize(3)
+    expect(result.offsetSdr).toBeArrayOfSize(3)
 
     expect(result.gainMap).toBeObject()
     expect(result.gainMap.data).toBeInstanceOf(Uint8Array)
@@ -77,7 +77,7 @@ describe('encoder', () => {
       JSON.stringify({
         offsetSdr: result.offsetSdr,
         offsetHdr: result.offsetHdr,
-        mapGamma: result.mapGamma,
+        gamma: result.gamma,
         hdrCapacityMin: result.hdrCapacityMin,
         hdrCapacityMax: result.hdrCapacityMax,
         gainMapMin: result.gainMapMin,

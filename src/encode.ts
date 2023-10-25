@@ -21,7 +21,7 @@ export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
  * @param quality
  * @param renderer
  */
-export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY, withWorker }: EncodeParameters) => {
+export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY, withWorker }: EncodeParameters) => {
   let tex: DataTexture
   let imageData: Float32Array | Uint16Array | Uint8ClampedArray | Uint8Array
   let imageWidth: number
@@ -61,7 +61,7 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamm
       sdr: rawSdr,
       width: imageWidth,
       height: imageHeight,
-      mapGamma,
+      gamma,
       maxContentBoost,
       minContentBoost
     })
@@ -75,7 +75,7 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, mapGamm
       sdr: rawSdr,
       width: imageWidth,
       height: imageHeight,
-      mapGamma,
+      gamma,
       maxContentBoost,
       minContentBoost
     })
