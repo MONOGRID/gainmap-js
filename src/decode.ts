@@ -68,15 +68,8 @@ varying vec2 vUv;
 void main() {
   vec3 rgb = texture2D(sdr, vUv).rgb;
   vec3 recovery = texture2D(gainMap, vUv).rgb;
-
-  vec3 logRecovery = vec3(
-    pow(recovery.r, gamma.r),
-    pow(recovery.g, gamma.g),
-    pow(recovery.b, gamma.b)
-  );
-
+  vec3 logRecovery = pow(recovery, gamma);
   vec3 logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery;
-
   vec3 hdrColor = (rgb + offsetSdr) * exp2(logBoost * weightFactor) - offsetHdr;
   gl_FragColor = vec4(hdrColor, 1.0);
 }
