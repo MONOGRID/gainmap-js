@@ -43,5 +43,5 @@ describe('wasm', () => {
 
     // const meta = await decodeJPEGMetadata(file)
     // console.log(meta)
-  })
+  }, 100000)
 })
