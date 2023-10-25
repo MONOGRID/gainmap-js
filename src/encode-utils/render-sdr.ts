@@ -1,5 +1,4 @@
 import {
-  ACESFilmicToneMapping,
   DataTexture,
   Group,
   LinearFilter,
@@ -10,7 +9,6 @@ import {
   RGBAFormat,
   Scene,
   SRGBColorSpace,
-  ToneMapping,
   UnsignedByteType,
   WebGLRenderer,
   WebGLRenderTarget
@@ -39,7 +37,7 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer }: { renderer: WebGLR
  * @param tex
  * @param toneMapping
  */
-export const renderSDR = (tex: DataTexture, toneMapping: ToneMapping = ACESFilmicToneMapping, renderer?: WebGLRenderer) => {
+export const renderSDR = (tex: DataTexture, renderer?: WebGLRenderer) => {
   let _renderer = renderer
   let destroyRenderer = false
   if (!_renderer) {
@@ -56,12 +54,12 @@ export const renderSDR = (tex: DataTexture, toneMapping: ToneMapping = ACESFilmi
   const width = tex.image.width
   const height = tex.image.height
 
-  const originalToneMapping = _renderer.toneMapping
-  const originalColorSpace = _renderer.outputColorSpace
+  // const originalToneMapping = _renderer.toneMapping
+  // const originalColorSpace = _renderer.outputColorSpace
 
   _renderer.clear(true, true, true)
-  _renderer.toneMapping = toneMapping
-  _renderer.outputColorSpace = SRGBColorSpace
+  // _renderer.toneMapping = toneMapping
+  // _renderer.outputColorSpace = SRGBColorSpace
   // _renderer.debug.checkShaderErrors = true
   // _renderer.debug.onShaderError()
 
@@ -99,8 +97,8 @@ export const renderSDR = (tex: DataTexture, toneMapping: ToneMapping = ACESFilmi
   }
   renderedObjectContainer.remove(plane)
 
-  _renderer.toneMapping = originalToneMapping
-  _renderer.outputColorSpace = originalColorSpace
+  // _renderer.toneMapping = originalToneMapping
+  // _renderer.outputColorSpace = originalColorSpace
 
   if (renderError) {
     cleanup({ renderer: _renderer, renderTarget, destroyRenderer })

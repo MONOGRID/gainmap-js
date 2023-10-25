@@ -1,4 +1,4 @@
-import { DataTexture, ToneMapping, WebGLRenderer } from 'three'
+import { DataTexture, WebGLRenderer } from 'three'
 import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
@@ -54,7 +54,6 @@ export type EncodeParameters = {
   maxContentBoost?: number
   minContentBoost?: number
   gamma?: [number, number, number]
-  sdrToneMapping?: ToneMapping,
   flipY?: boolean
   withWorker?: WorkerInterfaceImplementation
 }

@@ -1,5 +1,4 @@
 import {
-  ACESFilmicToneMapping,
   DataTexture,
   LinearFilter,
   NoColorSpace,
@@ -21,7 +20,7 @@ export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
  * @param quality
  * @param renderer
  */
-export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, maxContentBoost, minContentBoost, sdrToneMapping, flipY, withWorker }: EncodeParameters) => {
+export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, maxContentBoost, minContentBoost, flipY, withWorker }: EncodeParameters) => {
   let tex: DataTexture
   let imageData: Float32Array | Uint16Array | Uint8ClampedArray | Uint8Array
   let imageWidth: number
@@ -52,7 +51,7 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, 
     )
   }
 
-  let rawSdr = renderSDR(tex, sdrToneMapping === undefined ? ACESFilmicToneMapping : sdrToneMapping, renderer)
+  let rawSdr = renderSDR(tex, renderer)
 
   let encodingResult: Awaited<ReturnType<typeof encodeBuffers>>
   if (withWorker) {
