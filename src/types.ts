@@ -47,8 +47,18 @@ export type GainMapMetadata = {
 }
 
 export type EncodeParametersBase = {
+  /**
+   * Input image for encoding, must be an HDR image
+   */
   image: EXR | RGBE | LogLuv | DataTexture,
+  /**
+   * Optional WebGLRenderer, will be created and destroyed on demand
+   * if not provided.
+   */
   renderer?: WebGLRenderer,
+  /**
+   *
+   */
   maxContentBoost?: number
   minContentBoost?: number
   gamma?: [number, number, number]
