@@ -4,24 +4,24 @@ import {
   LinearFilter,
   LinearMipMapLinearFilter,
   Mesh,
-  NoBlending,
   NoColorSpace,
   NoToneMapping,
   OrthographicCamera,
   PlaneGeometry,
   RGBAFormat,
   Scene,
-  ShaderMaterial,
   SRGBColorSpace,
   Texture,
   UnsignedByteType,
   UVMapping,
-  Vector3,
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
 
-import { DecodeAsRenderTargetParameters, DecodeParameters } from './types'
+import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
+import { DecodeToDataArrayParameters, DecodeToRenderTargetParameters } from './types'
+
+export { GainMapDecoderMaterial }
 
 const instantiateRenderer = () => {
   const renderer = new WebGLRenderer()
@@ -33,128 +33,115 @@ const instantiateRenderer = () => {
   return renderer
 }
 
-const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { renderer: WebGLRenderer, renderTarget?: WebGLRenderTarget, destroyRenderer: boolean, material: ShaderMaterial }) => {
-  material.dispose()
-  renderer.setRenderTarget(null)
+const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { renderer?: WebGLRenderer, renderTarget?: WebGLRenderTarget, destroyRenderer?: boolean, material?: GainMapDecoderMaterial }) => {
+  if (material) {
+    material.uniforms.sdr.value.dispose()
+    material.uniforms.gainMap.value.dispose()
+    material.dispose()
+  }
+
   if (destroyRenderer) {
-    renderer.dispose()
-    renderer.forceContextLoss()
+    renderer?.dispose()
+    renderer?.forceContextLoss()
   }
   renderTarget?.dispose()
 }
+/**
+ *
+ * @param params
+ * @returns
+ */
+export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters) => {
+  const { sdr, gainMap, renderer } = params
 
-const vertexShader = `
-varying vec2 vUv;
-
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`
-
-const fragmentShader = `
-uniform sampler2D sdr;
-uniform sampler2D gainMap;
-uniform vec3 gamma;
-uniform vec3 offsetHdr;
-uniform vec3 offsetSdr;
-uniform vec3 gainMapMin;
-uniform vec3 gainMapMax;
-uniform float weightFactor;
-
-varying vec2 vUv;
-
-
-void main() {
-  vec3 rgb = texture2D(sdr, vUv).rgb;
-  vec3 recovery = texture2D(gainMap, vUv).rgb;
-  vec3 logRecovery = pow(recovery, gamma);
-  vec3 logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery;
-  vec3 hdrColor = (rgb + offsetSdr) * exp2(logBoost * weightFactor) - offsetHdr;
-  gl_FragColor = vec4(hdrColor, 1.0);
-}
-`
-
-export const decode = <T extends DecodeParameters | DecodeAsRenderTargetParameters>({ sdr, gainMap, gamma, hdrCapacityMin, hdrCapacityMax, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost, renderer, decodeAsRenderTarget }: T): T extends DecodeParameters ? Uint16Array : WebGLRenderTarget => {
-  let _renderer = renderer
-  let destroyRenderer = false
-  if (!_renderer) {
-    _renderer = instantiateRenderer()
-    destroyRenderer = true
-  }
   const scene = new Scene()
 
-  const orthographicCamera = new OrthographicCamera()
-  orthographicCamera.position.set(0, 0, 10)
-  orthographicCamera.left = -0.5
-  orthographicCamera.right = 0.5
-  orthographicCamera.top = 0.5
-  orthographicCamera.bottom = -0.5
-  orthographicCamera.updateProjectionMatrix()
-
-  let renderError: string | undefined
+  const camera = new OrthographicCamera()
+  camera.position.set(0, 0, 10)
+  camera.left = -0.5
+  camera.right = 0.5
+  camera.top = 0.5
+  camera.bottom = -0.5
+  camera.updateProjectionMatrix()
 
   const renderTarget = new WebGLRenderTarget(sdr.width, sdr.height, {
     type: HalfFloatType,
     colorSpace: NoColorSpace,
     format: RGBAFormat,
     magFilter: LinearFilter,
-    minFilter: decodeAsRenderTarget ? LinearMipMapLinearFilter : LinearFilter,
+    minFilter: LinearMipMapLinearFilter,
     depthBuffer: false,
     stencilBuffer: false,
-    generateMipmaps: decodeAsRenderTarget
+    generateMipmaps: true
   })
-  _renderer.setRenderTarget(renderTarget)
 
   const sdrTexture = new Texture(sdr, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, SRGBColorSpace)
   sdrTexture.needsUpdate = true
   const gainMapTexture = new Texture(gainMap, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, NoColorSpace)
   gainMapTexture.needsUpdate = true
 
-  const material = new ShaderMaterial({
-    vertexShader,
-    fragmentShader,
-    uniforms: {
-      sdr: { value: sdrTexture },
-      gainMap: { value: gainMapTexture },
-      gamma: { value: new Vector3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]) },
-      offsetHdr: { value: new Vector3(offsetHdr[0], offsetHdr[1], offsetHdr[2]) },
-      offsetSdr: { value: new Vector3(offsetSdr[0], offsetSdr[1], offsetSdr[2]) },
-      gainMapMin: { value: new Vector3(gainMapMin[0], gainMapMin[1], gainMapMin[2]) },
-      gainMapMax: { value: new Vector3(gainMapMax[0], gainMapMax[1], gainMapMax[2]) },
-      weightFactor: {
-        value: (Math.log2(maxDisplayBoost) - hdrCapacityMin) / (hdrCapacityMax - hdrCapacityMin)
-      }
-    },
-    blending: NoBlending,
-    depthTest: false,
-    depthWrite: false
+  const material = new GainMapDecoderMaterial({
+    ...params,
+    sdr: sdrTexture,
+    gainMap: gainMapTexture
   })
-
-  // material = new MeshBasicMaterial({ map: gainMapTexture })
 
   const plane = new Mesh(new PlaneGeometry(), material)
   plane.geometry.computeBoundingBox()
   scene.add(plane)
 
+  /**
+   * Render the gainmap after changing its parameters
+   */
+  const render = () => {
+    renderer.setRenderTarget(renderTarget)
+    try {
+      renderer.render(scene, camera)
+    } catch (e) {
+      renderer.setRenderTarget(null)
+      throw new Error('An error occurred while rendering the gainmap: ' + e)
+    }
+    renderer.setRenderTarget(null)
+  }
+
   try {
-    _renderer.render(scene, orthographicCamera)
+    render()
   } catch (e) {
-    renderError = `${e}`
-  }
-  scene.remove(plane)
-
-  if (renderError) {
-    cleanup({ renderer: _renderer, renderTarget, destroyRenderer, material })
-    throw new Error('An error occurred while rendering gainmap: ' + renderError)
+    cleanup({ renderTarget, material })
+    throw e
   }
 
-  if (decodeAsRenderTarget) {
-    cleanup({ renderer: _renderer, destroyRenderer, material })
-    return renderTarget as T extends DecodeParameters ? Uint16Array : WebGLRenderTarget
+  return {
+    renderTarget,
+    material,
+    render
   }
+}
+/**
+ *
+ * @param params
+ * @returns
+ */
+export const decode = (params: DecodeToDataArrayParameters) => {
+  let _renderer = params.renderer
+  let destroyRenderer = false
+  if (!_renderer) {
+    _renderer = instantiateRenderer()
+    destroyRenderer = true
+  }
+
+  let decodeResult: ReturnType<typeof decodeToRenderTarget>
+
+  try {
+    decodeResult = decodeToRenderTarget({ ...params, renderer: _renderer })
+  } catch (e) {
+    cleanup({ renderer: _renderer, destroyRenderer })
+    throw e
+  }
+  const { renderTarget, material } = decodeResult
+
   const out = new Uint16Array(renderTarget.width * renderTarget.height * 4)
   _renderer.readRenderTargetPixels(renderTarget, 0, 0, renderTarget.width, renderTarget.height, out)
   cleanup({ renderer: _renderer, renderTarget, destroyRenderer, material })
-  return out as T extends DecodeParameters ? Uint16Array : WebGLRenderTarget
+  return out
 }

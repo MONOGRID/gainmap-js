@@ -136,11 +136,10 @@ export type EncodeMimetypeParameters = {
   sourceMimeType: string
 })
 
-export type DecodeParameters = {
+export type DecodeToDataArrayParameters = {
   sdr: ImageBitmap
   gainMap: ImageBitmap
   renderer?: WebGLRenderer,
-  decodeAsRenderTarget?: undefined | false
   /**
    * The maximum available boost supported by a display, at a given point in time.
    * This value can change over time based on device settings and other factors,
@@ -149,6 +148,6 @@ export type DecodeParameters = {
   maxDisplayBoost: number
 } & GainMapMetadata
 
-export type DecodeAsRenderTargetParameters = Omit<DecodeParameters, 'decodeAsRenderTarget'> & {
-  decodeAsRenderTarget: true
+export type DecodeToRenderTargetParameters = Omit<DecodeToDataArrayParameters, 'renderer'> & {
+  renderer: WebGLRenderer
 }
