@@ -10,17 +10,17 @@ import {
 import { encodeBuffers } from './encode-utils/encode-buffers'
 import { convertImageBufferToMimetype } from './encode-utils/encode-mimetype'
 import { renderSDR } from './encode-utils/render-sdr'
-import { EncodeParameters, EncodeRawResult } from './types'
+import { EncodeParameters, EncodeParametersWithMimetype, GainmapEncodeResult, GainmapEncodeResultRaw } from './types'
 
 export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
 /**
  *
- * @param image
- * @param outMimeType
- * @param quality
- * @param renderer
+ * @param params
+ * @returns
  */
-export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, maxContentBoost, minContentBoost, flipY, withWorker }: EncodeParameters) => {
+export const encode = async <T extends EncodeParameters>(params: T): Promise<T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw> => {
+  const { image, renderer, gamma, maxContentBoost, minContentBoost, withWorker } = params
+
   let tex: DataTexture
   let imageData: Float32Array | Uint16Array | Uint8ClampedArray | Uint8Array
   let imageWidth: number
@@ -80,26 +80,34 @@ export const encode = async ({ image, outMimeType, outQuality, renderer, gamma, 
     })
   }
 
-  // console.log('[encodeGainMap]: encoding images with worker')
-  const [sdr, gainMap] = await Promise.all([
-    convertImageBufferToMimetype({
-      source: new ImageData(rawSdr, imageWidth, imageHeight),
-      outMimeType: outMimeType || 'image/jpeg',
-      outQuality,
-      flipY
-    }),
-    convertImageBufferToMimetype({
-      source: new ImageData(encodingResult.gainMap, imageWidth, imageHeight),
-      outMimeType: outMimeType || 'image/jpeg',
-      outQuality,
-      flipY
-    })
-  ])
+  if ('outMimeType' in params) {
+    const { outMimeType, outQuality, flipY } = params
+    const [sdr, gainMap] = await Promise.all([
+      convertImageBufferToMimetype({
+        source: new ImageData(rawSdr, imageWidth, imageHeight),
+        outMimeType,
+        outQuality,
+        flipY
+      }),
+      convertImageBufferToMimetype({
+        source: new ImageData(encodingResult.gainMap, imageWidth, imageHeight),
+        outMimeType,
+        outQuality,
+        flipY
+      })
+    ])
 
-  return {
-    ...encodingResult,
-    sdr,
-    hdr: { data: imageData, width: imageWidth, height: imageHeight },
-    gainMap
-  } as EncodeRawResult
+    return {
+      ...encodingResult,
+      sdr,
+      hdr: { data: imageData, width: imageWidth, height: imageHeight },
+      gainMap
+    } as GainmapEncodeResult as T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw
+  } else {
+    return {
+      ...encodingResult,
+      sdr: rawSdr,
+      hdr: { data: imageData, width: imageWidth, height: imageHeight }
+    } as GainmapEncodeResultRaw as T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw
+  }
 }

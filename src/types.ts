@@ -46,30 +46,63 @@ export type GainMapMetadata = {
 
 }
 
-export type EncodeParameters = {
+export type EncodeParametersBase = {
   image: EXR | RGBE | LogLuv | DataTexture,
-  outMimeType?: 'image/png' | 'image/jpeg' | 'image/webp'
-  outQuality?: number
   renderer?: WebGLRenderer,
   maxContentBoost?: number
   minContentBoost?: number
   gamma?: [number, number, number]
-  flipY?: boolean
   withWorker?: WorkerInterfaceImplementation
 }
 
-export type EncodeRawResult = {
+export type EncodeParametersWithMimetype = EncodeParametersBase & {
+  outMimeType: 'image/png' | 'image/jpeg' | 'image/webp'
+  outQuality?: number
+  flipY?: boolean
+}
+
+export type EncodeParameters = EncodeParametersBase | EncodeParametersWithMimetype
+
+export type GainmapEncodeResult = {
+  /**
+   * Buffer containing an encoded image with a mimeType
+   */
   sdr: {
     data: Uint8Array
     width: number
     height: number
   }
+  /**
+   * Original HDR RAW RGBA Data passed back
+   */
   hdr: {
     data: Uint8Array
     width: number
     height: number
   }
+  /**
+   * Buffer containing an encoded image with a mimeType
+   */
   gainMap: {
+    data: Uint8Array
+    width: number
+    height: number
+  }
+} & GainMapMetadata
+
+export type GainmapEncodeResultRaw = {
+  /**
+   * RAW RGBA data
+   */
+  sdr: Uint8ClampedArray
+  /**
+   * RAW RGBA data
+   */
+  gainMap: Uint8ClampedArray
+  /**
+   * Original HDR RAW RGBA Data passed back
+   */
+  hdr: {
     data: Uint8Array
     width: number
     height: number
@@ -87,12 +120,21 @@ export type EncodeBuffersParameters = {
 }
 
 export type EncodeMimetypeParameters = {
-  source: Uint8Array | Uint8ClampedArray | ImageData
-  sourceMimeType?: string
   outMimeType: 'image/png' | 'image/jpeg' | 'image/webp'
   outQuality?: number,
   flipY?: boolean
-}
+} & ({
+  /**
+   * RAW RGBA Image Data
+   */
+  source: ImageData
+} | {
+  /**
+   * Encoded Image Data with a mimeType
+   */
+  source: Uint8Array | Uint8ClampedArray
+  sourceMimeType: string
+})
 
 export type DecodeParameters = {
   sdr: ImageBitmap

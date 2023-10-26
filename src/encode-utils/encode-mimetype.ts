@@ -4,13 +4,16 @@ import { EncodeMimetypeParameters } from '../types'
  *
  * @param params
  */
-export const convertImageBufferToMimetype = async ({ source, sourceMimeType, outMimeType, outQuality, flipY }: EncodeMimetypeParameters) => {
+export const convertImageBufferToMimetype = async (params: EncodeMimetypeParameters) => {
+  const { source, outMimeType, outQuality, flipY } = params
   // eslint-disable-next-line no-undef
   let imageBitmapSource: ImageBitmapSource
-  if (source instanceof Uint8Array || source instanceof Uint8ClampedArray) {
-    imageBitmapSource = new Blob([source], { type: sourceMimeType })
-  } else {
+  if ((source instanceof Uint8Array || source instanceof Uint8ClampedArray) && 'sourceMimeType' in params) {
+    imageBitmapSource = new Blob([source], { type: params.sourceMimeType })
+  } else if (source instanceof ImageData) {
     imageBitmapSource = source
+  } else {
+    throw new Error('Invalid source')
   }
   const img = await createImageBitmap(imageBitmapSource, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
   const width = img.width
