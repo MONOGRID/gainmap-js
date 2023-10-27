@@ -11,6 +11,9 @@ export type WorkerInterface = {
   }
 }
 
+/**
+ * Transferable
+ */
 export type Transferable = ArrayBufferLike | ImageBitmap
 
 export type WorkerInterfaceImplementation = {

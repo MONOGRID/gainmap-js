@@ -3,9 +3,9 @@ import { MainModule } from '../libultrahdr-wasm/build/libultrahdr'
 import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
 import { GainmapEncodingResult, GainMapMetadata } from './types'
 
+export * from '../libultrahdr-wasm/build/libultrahdr'
 let library: MainModule | undefined
 
-export type LibultraHDRModule = MainModule
 /**
  * Instances the WASM module and returns it, only one module will be created upon multiple calls
  *

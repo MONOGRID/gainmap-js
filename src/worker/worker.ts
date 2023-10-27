@@ -2,7 +2,7 @@
 import registerPromiseWorker from 'promise-worker-transferable/register'
 
 import { encodeBuffers } from '../encode-utils/encode-buffers'
-import { WithTranferListFunction, WorkerInterface, WorkerRequest } from './worker-types'
+import { type WithTranferListFunction, type WorkerInterface, type WorkerRequest } from './worker-types'
 
 const encodeGainmapBuffers = (message: WorkerInterface['encodeGainmapBuffers']['request'], withTransferList: WithTranferListFunction): WorkerInterface['encodeGainmapBuffers']['result'] => {
   const result = encodeBuffers(message.payload)

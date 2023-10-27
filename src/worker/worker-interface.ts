@@ -1,7 +1,9 @@
 // @ts-expect-error untyped lib
 import PromiseWorker from 'promise-worker-transferable'
 
-import { PromiseWorkerType, WorkerInterface, WorkerInterfaceImplementation } from '../worker/worker-types'
+import { type PromiseWorkerType, type WorkerInterface, type WorkerInterfaceImplementation } from './worker-types'
+
+export * from './worker-types'
 /**
  *
  * @param worker

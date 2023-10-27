@@ -138,10 +138,12 @@ export type EncodeParametersBase = GainmapEncodingParameters & {
   withWorker?: WorkerInterfaceImplementation
 }
 /**
+ * Options for encoing a RAW RGBA image into the specified mimeType
+ *
  * @category Encoding Parameters
  * @group Encoding Parameters
  */
-type EncodeMimeTypeOptions = {
+export type EncodeMimeTypeOptions = {
   /**
    * The mimeType of the output
    */
