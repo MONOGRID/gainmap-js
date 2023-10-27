@@ -1,5 +1,4 @@
-import { type encodeBuffers } from '../encode-utils/encode-buffers'
-import { type EncodeBuffersParameters } from '../types'
+import { CompressedImage, type CompressParameters, type EncodeBuffersParameters, type EncodeBuffersResult } from '../types'
 
 export type WorkerInterface = {
   encodeGainmapBuffers: {
@@ -7,7 +6,14 @@ export type WorkerInterface = {
       type: 'encode-gainmap-buffers',
       payload: EncodeBuffersParameters
     }
-    result: ReturnType<typeof encodeBuffers> & { sdr: Uint8ClampedArray, hdr: Uint8Array | Uint8ClampedArray | Float32Array | Uint16Array }
+    result: EncodeBuffersResult & { sdr: EncodeBuffersParameters['sdr'], hdr: EncodeBuffersParameters['hdr'] }
+  },
+  compress: {
+    request: {
+      type: 'compress',
+      payload: CompressParameters
+    }
+    result: Awaited<CompressedImage> & { source: Uint8ClampedArray }
   }
 }
 
