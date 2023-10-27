@@ -1,0 +1,23 @@
+name: Publish wiki
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    branches: [main]
+    workflows: ["Test And Release"]
+    types:
+      - completed
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v3
+          with:
+            submodules: recursive
+        - run: npm i && npx typedoc
+        - uses: Andrew-Chen-Wang/github-wiki-action@v4
