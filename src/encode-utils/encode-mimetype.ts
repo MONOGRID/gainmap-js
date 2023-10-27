@@ -1,11 +1,34 @@
 import { EncodeMimetypeParameters } from '../types'
 
 /**
+ * Used internally
+ *
+ * @internal
+ * @param canvas
+ * @param outMimeType
+ * @param outQuality
+ * @returns
+ */
+const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, outMimeType: EncodeMimetypeParameters['outMimeType'], outQuality: EncodeMimetypeParameters['outQuality']) => {
+  if (canvas instanceof OffscreenCanvas) {
+    return canvas.convertToBlob({ type: outMimeType, quality: outQuality || 0.9 })
+  }
+  return new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((res) => {
+      if (res) resolve(res)
+      else reject('Failed to convert canvas to blob')
+    }, outMimeType, outQuality || 0.9)
+  })
+}
+
+/**
  * Converts a RAW RGBA image buffer into the provided `mimeType` using the provided `quality`
  *
  * @category Encoding Functions
  * @group Encoding Functions
  * @param params
+ * @throws {Error} if the provided source image cannot be decoded
+ * @throws {Error} if the function fails to create a canvas context
  */
 export const convertImageBufferToMimetype = async (params: EncodeMimetypeParameters) => {
   const { source, outMimeType, outQuality, flipY } = params
@@ -16,14 +39,20 @@ export const convertImageBufferToMimetype = async (params: EncodeMimetypeParamet
   } else if (source instanceof ImageData) {
     imageBitmapSource = source
   } else {
-    throw new Error('Invalid source')
+    throw new Error('Invalid source image')
   }
   const img = await createImageBitmap(imageBitmapSource, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
   const width = img.width
   const height = img.height
-  const canvas = new OffscreenCanvas(width, height)
+
+  let canvas: OffscreenCanvas | HTMLCanvasElement
+  if (typeof OffscreenCanvas !== 'undefined') {
+    canvas = new OffscreenCanvas(width, height)
+  } else {
+    canvas = document.createElement('canvas')
+  }
   const ctx = canvas.getContext('2d')
-  if (!ctx) throw new Error('???')
+  if (!ctx) throw new Error('Failed to create canvas Context')
   // flip Y
   if (flipY === true) {
     ctx.translate(0, height)
@@ -32,7 +61,7 @@ export const convertImageBufferToMimetype = async (params: EncodeMimetypeParamet
 
   ctx.drawImage(img, 0, 0, width, height)
 
-  const blob = await canvas.convertToBlob({ type: outMimeType, quality: outQuality || 0.9 })
+  const blob = await canvasToBlob(canvas, outMimeType, outQuality || 0.9)
 
   const arrBuffer = new Uint8Array(await blob.arrayBuffer())
 
