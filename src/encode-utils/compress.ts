@@ -1,37 +1,39 @@
-import { EncodeMimetypeParameters } from '../types'
+import { CompressedImage, CompressParameters } from '../types'
 
 /**
  * Used internally
  *
  * @internal
  * @param canvas
- * @param outMimeType
- * @param outQuality
+ * @param mimeType
+ * @param quality
  * @returns
  */
-const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, outMimeType: EncodeMimetypeParameters['outMimeType'], outQuality: EncodeMimetypeParameters['outQuality']) => {
+const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, mimeType: CompressParameters['mimeType'], quality: CompressParameters['quality']) => {
   if (canvas instanceof OffscreenCanvas) {
-    return canvas.convertToBlob({ type: outMimeType, quality: outQuality || 0.9 })
+    return canvas.convertToBlob({ type: mimeType, quality: quality || 0.9 })
   }
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((res) => {
       if (res) resolve(res)
       else reject('Failed to convert canvas to blob')
-    }, outMimeType, outQuality || 0.9)
+    }, mimeType, quality || 0.9)
   })
 }
 
 /**
  * Converts a RAW RGBA image buffer into the provided `mimeType` using the provided `quality`
  *
- * @category Encoding Functions
- * @group Encoding Functions
+ * @category Compression
+ * @group Compression
  * @param params
+ * @throws {Error} if the browser does not support [createImageBitmap](https://caniuse.com/createimagebitmap)
  * @throws {Error} if the provided source image cannot be decoded
  * @throws {Error} if the function fails to create a canvas context
  */
-export const convertImageBufferToMimetype = async (params: EncodeMimetypeParameters) => {
-  const { source, outMimeType, outQuality, flipY } = params
+export const compress = async (params: CompressParameters): Promise<CompressedImage> => {
+  if (typeof createImageBitmap === 'undefined') throw new Error('createImageBitmap() not supported.')
+  const { source, mimeType, quality, flipY } = params
   // eslint-disable-next-line no-undef
   let imageBitmapSource: ImageBitmapSource
   if ((source instanceof Uint8Array || source instanceof Uint8ClampedArray) && 'sourceMimeType' in params) {
@@ -61,12 +63,13 @@ export const convertImageBufferToMimetype = async (params: EncodeMimetypeParamet
 
   ctx.drawImage(img, 0, 0, width, height)
 
-  const blob = await canvasToBlob(canvas, outMimeType, outQuality || 0.9)
+  const blob = await canvasToBlob(canvas, mimeType, quality || 0.9)
 
-  const arrBuffer = new Uint8Array(await blob.arrayBuffer())
+  const data = new Uint8Array(await blob.arrayBuffer())
 
   return {
-    data: arrBuffer,
+    data,
+    mimeType,
     width,
     height
   }

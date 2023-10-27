@@ -1,7 +1,7 @@
 import { MainModule } from '../libultrahdr-wasm/build/libultrahdr'
 // @ts-expect-error untyped
 import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
-import { GainmapEncodingResult, GainMapMetadata } from './types'
+import { CompressedEncodingResult, GainMapMetadata } from './types'
 
 export * from '../libultrahdr-wasm/build/libultrahdr'
 let library: MainModule | undefined
@@ -28,7 +28,7 @@ export const getLibrary = async () => {
  * @param encodingResult
  * @returns an Uint8Array representing a JPEG-R file
  */
-export const encodeJPEGMetadata = async (encodingResult: GainmapEncodingResult) => {
+export const encodeJPEGMetadata = async (encodingResult: CompressedEncodingResult) => {
   const lib = await getLibrary()
   return lib.appendGainMap(
     encodingResult.sdr.width, encodingResult.sdr.height,

@@ -66,8 +66,8 @@ export type GainMapMetadata = {
 
 /**
  * Parameters used by content Creators in order to create a GainMap
- * @category Encoding Parameters
- * @group Encoding Parameters
+ * @category Gainmap Specifications
+ * @group Gainmap Specifications
  */
 export type GainmapEncodingParameters = {
   /**
@@ -118,10 +118,11 @@ export type GainmapDecodingParameters = {
 
 /**
  * Paramaters used to Encode a GainMap
+ *
  * @category Encoding Parameters
  * @group Encoding Parameters
  */
-export type EncodeParametersBase = GainmapEncodingParameters & {
+export type EncodingParametersBase = GainmapEncodingParameters & {
   /**
    * Input image for encoding, must be an HDR image
    */
@@ -138,20 +139,45 @@ export type EncodeParametersBase = GainmapEncodingParameters & {
   withWorker?: WorkerInterfaceImplementation
 }
 /**
- * Options for encoing a RAW RGBA image into the specified mimeType
+ * This library can provide gainmap compressed in these mimeTypes
+ *
+ * @category Compression
+ * @group Compression
+ */
+export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
+/**
+ * Accepted HDR image buffers, definitions coming from the THREE.js Library types
+ *
+ * @category General
+ * @group General
+ */
+export type HDRRawImageBuffer = EXR['data'] | RGBE['data'] | LogLuv['data']
+/**
+ * Raw HDR image data
+ *
+ * @category General
+ * @group General
+ */
+export type HDRRawImage = {
+  data: HDRRawImageBuffer
+  width: number
+  height: number
+}
+/**
+ * Options for compressing a RAW RGBA image into the specified mimeType
  *
  * @category Encoding Parameters
  * @group Encoding Parameters
  */
-export type EncodeMimeTypeOptions = {
+export type CompressOptions = {
   /**
    * The mimeType of the output
    */
-  outMimeType: 'image/png' | 'image/jpeg' | 'image/webp'
+  mimeType: CompressionMimeType
   /**
    * Encoding quality [0-1]
    */
-  outQuality?: number,
+  quality?: number,
   /**
    * FlipY of the encoding process
    */
@@ -159,96 +185,23 @@ export type EncodeMimeTypeOptions = {
 }
 
 /**
- * Additional parameters to encode a GainMap compressed with a mimeType
- * @category Encoding Parameters
- * @group Encoding Parameters
+ * Data structure representing a compressed image with a mimeType
+ *
+ * @category Compression
+ * @group Compression
  */
-export type EncodeParametersWithMimetype = EncodeParametersBase & EncodeMimeTypeOptions
-/**
- * @category Encoding Parameters
- * @group Encoding Parameters
- */
-export type EncodeParameters = EncodeParametersBase | EncodeParametersWithMimetype
-/**
- * @category Encoding Results
- * @group Encoding Results
- */
-export type GainmapEncodingResult = {
-  /**
-   * Original HDR RAW RGBA Data passed back.
-   */
-  hdr: {
-    data: Uint8Array
-    width: number
-    height: number
-  }
-  /**
-   * Buffer containing an encoded image with a mimeType
-   */
-  sdr: {
-    data: Uint8Array
-    width: number
-    height: number
-  }
-  /**
-   * Buffer containing an encoded image with a mimeType
-   */
-  gainMap: {
-    data: Uint8Array
-    width: number
-    height: number
-  }
-} & GainMapMetadata
-/**
- * @category Encoding Results
- * @group Encoding Results
- */
-export type GainmapRawEncodingResult = {
-  /**
-   * RAW RGBA data
-   */
-  sdr: Uint8ClampedArray
-  /**
-   * RAW RGBA data
-   */
-  gainMap: Uint8ClampedArray
-  /**
-   * Original HDR RAW RGBA Data passed back
-   */
-  hdr: {
-    data: Uint8Array
-    width: number
-    height: number
-  }
-} & GainMapMetadata
-/**
- * Parameters used to encode a GainMap
- * @category Encoding Parameters
- * @group Encoding Parameters
- */
-export type EncodeBuffersParameters = GainmapEncodingParameters & {
-  /**
-   * RAW RGBA SDR Representation
-   */
-  sdr: Uint8ClampedArray
-  /**
-   * RAW RGBA Original HDR Image
-   */
-  hdr: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
-  /**
-   * Width RAW RGBA HDR Image
-   */
+export type CompressedImage = {
+  data: Uint8Array
+  mimeType: CompressionMimeType
   width: number
-  /**
-   * Height RAW RGBA HDR Image
-   */
   height: number
 }
+
 /**
- * @category Encoding Parameters
- * @group Encoding Parameters
+ * @category Compression
+ * @group Compression
  */
-export type EncodeMimetypeParameters = EncodeMimeTypeOptions & ({
+export type CompressParameters = CompressOptions & ({
   /**
    * RAW RGBA Image Data
    */
@@ -263,6 +216,96 @@ export type EncodeMimetypeParameters = EncodeMimeTypeOptions & ({
    */
   sourceMimeType: string
 })
+
+/**
+ * Additional parameters to encode a GainMap compressed with a mimeType
+ * @category Encoding Parameters
+ * @group Encoding Parameters
+ */
+export type EncodingParametersWithCompression = EncodingParametersBase & CompressOptions
+
+/**
+ * @category Encoding Results
+ * @group Encoding Results
+ */
+export type CompressedEncodingResult = {
+  /**
+   * Original HDR RAW RGBA Data passed back.
+   */
+  hdr: HDRRawImage
+  /**
+   * SDR RAW RGBA
+   */
+  rawSDR: Uint8ClampedArray
+  /**
+   * GainMap RAW RGBA
+   */
+  rawGainMap: Uint8ClampedArray
+  /**
+   * Data structure representing a compressed image with a mimeType
+   * @see {@link CompressedImage}
+   */
+  sdr: CompressedImage
+  /**
+   * Data structure representing a compressed image with a mimeType
+   * @see {@link CompressedImage}
+   */
+  gainMap: CompressedImage
+
+} & GainMapMetadata
+/**
+ * @category Encoding Results
+ * @group Encoding Results
+ */
+export type RawEncodingResult = {
+  /**
+   * RAW RGBA data
+   */
+  sdr: Uint8ClampedArray
+  /**
+   * RAW RGBA data
+   */
+  gainMap: Uint8ClampedArray
+  /**
+   * Original HDR RAW RGBA Data passed back
+   */
+  hdr: HDRRawImage
+} & GainMapMetadata
+/**
+ * Parameters used to encode a GainMap
+ *
+ * @category Encoding Parameters
+ * @group Encoding Parameters
+ */
+export type EncodeBuffersParameters = GainmapEncodingParameters & {
+  /**
+   * RAW RGBA SDR Representation
+   */
+  sdr: Uint8ClampedArray
+  /**
+   * RAW RGBA Original HDR Image
+   */
+  hdr: HDRRawImageBuffer
+  /**
+   * Width of the RAW RGBA HDR Image
+   */
+  width: number
+  /**
+   * Height of the RAW RGBA HDR Image
+   */
+  height: number
+}
+
+/**
+ * Output of the core encoding algorithm
+ *
+ * @category Encoding Results
+ * @group Encoding Results
+ */
+export type EncodeBuffersResult = GainMapMetadata & {
+  gainMap: Uint8ClampedArray
+}
+
 /**
  * @category Decoding Parameters
  * @group Decoding Parameters

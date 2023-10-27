@@ -80,7 +80,7 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { render
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gainmap
  */
-export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters): DecodeToRenderTargetResult => {
+export const decode = (params: DecodeToRenderTargetParameters): DecodeToRenderTargetResult => {
   const { sdr, gainMap, renderer } = params
 
   const scene = new Scene()
@@ -146,17 +146,17 @@ export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters): De
 /**
  * Decodes a Gainmap to a raw `Uint16Array` which can be used to popupate a `DataTexture`.
  *
- * Uses {@link decodeToRenderTarget} internally then calls `readRenderTargetPixels` in order to return an `Uint16Array` which can be used to either:
+ * Uses {@link decode} internally then calls `readRenderTargetPixels` in order to return an `Uint16Array` which can be used to either:
  * * populate a DataTexture
  * * store the RAW data somewhere
  *
  * @category Decoding Functions
  * @group Decoding Functions
- * @see {@link decodeToRenderTarget}
+ * @see {@link decode}
  * @param params
  * @returns
  */
-export const decode = (params: DecodeToDataArrayParameters) => {
+export const decodeToArray = (params: DecodeToDataArrayParameters) => {
   let _renderer = params.renderer
   let destroyRenderer = false
   if (!_renderer) {
@@ -164,10 +164,10 @@ export const decode = (params: DecodeToDataArrayParameters) => {
     destroyRenderer = true
   }
 
-  let decodeResult: ReturnType<typeof decodeToRenderTarget>
+  let decodeResult: ReturnType<typeof decode>
 
   try {
-    decodeResult = decodeToRenderTarget({ ...params, renderer: _renderer })
+    decodeResult = decode({ ...params, renderer: _renderer })
   } catch (e) {
     cleanup({ renderer: _renderer, destroyRenderer })
     throw e

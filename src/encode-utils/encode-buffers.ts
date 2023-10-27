@@ -1,6 +1,6 @@
 import { Color, DataUtils } from 'three'
 
-import { EncodeBuffersParameters, GainMapMetadata } from '../types'
+import { EncodeBuffersParameters, EncodeBuffersResult } from '../types'
 /**
  * Calculates a Gainmap stasting from the HDR and the SDR Representation.
  *
@@ -13,7 +13,7 @@ import { EncodeBuffersParameters, GainMapMetadata } from '../types'
  * @param params Encoding Params
  * @returns
  */
-export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minContentBoost, gamma }: EncodeBuffersParameters) => {
+export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minContentBoost, gamma }: EncodeBuffersParameters): EncodeBuffersResult => {
   const originalChannels = sdr.length / width / height
 
   const sdrColor = new Color()
@@ -94,8 +94,9 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
 
     sdrWithGainMapAlphaIndex += 4
   }
-  // console.log('[GainMap] Max Original val', maxVal)
-  const metadata: GainMapMetadata = {
+
+  return {
+    gainMap,
     gainMapMin: [mapMinLog2.r, mapMinLog2.g, mapMinLog2.b],
     gainMapMax: [mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b],
     gamma: _mapGamma,
@@ -103,10 +104,5 @@ export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minCon
     offsetSdr,
     hdrCapacityMin: Math.min(Math.max(0, mapMinLog2.r), Math.max(0, mapMinLog2.g), Math.max(0, mapMinLog2.b)),
     hdrCapacityMax: Math.max(mapMaxLog2.r, mapMaxLog2.g, mapMaxLog2.b)
-  }
-
-  return {
-    gainMap,
-    ...metadata
   }
 }
