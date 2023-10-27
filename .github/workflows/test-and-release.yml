@@ -56,7 +56,10 @@ jobs:
             name: build-artifact
             if-no-files-found: error
             path: |
-              libultrahdr-wasm/build/*.+(ts|js|map|wasm)
+              libultrahdr-wasm/build/*.ts
+              libultrahdr-wasm/build/*.js
+              libultrahdr-wasm/build/*.map
+              libultrahdr-wasm/build/*.wasm
               dist/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
