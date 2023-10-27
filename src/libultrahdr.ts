@@ -1,13 +1,15 @@
 import { MainModule } from '../libultrahdr-wasm/build/libultrahdr'
 // @ts-expect-error untyped
 import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
-import { CompressedEncodingResult, GainMapMetadata } from './types'
+import { CompressedImage, GainMapMetadata } from './types'
 
 export * from '../libultrahdr-wasm/build/libultrahdr'
 let library: MainModule | undefined
 
 /**
- * Instances the WASM module and returns it, only one module will be created upon multiple calls
+ * Instances the WASM module and returns it, only one module will be created upon multiple calls.
+ * @category General
+ * @group General
  *
  * @returns
  */
@@ -30,7 +32,7 @@ export const getLibrary = async () => {
  * @throws {Error} If `encodingResult.sdr.mimeType !== 'image/jpeg'`
  * @throws {Error} If `encodingResult.gainMap.mimeType !== 'image/jpeg'`
  */
-export const encodeJPEGMetadata = async (encodingResult: CompressedEncodingResult) => {
+export const encodeJPEGMetadata = async (encodingResult: GainMapMetadata & { sdr: CompressedImage, gainMap: CompressedImage }) => {
   const lib = await getLibrary()
 
   if (encodingResult.sdr.mimeType !== 'image/jpeg') throw new Error('This function expects an SDR image compressed in jpeg')

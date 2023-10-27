@@ -11,10 +11,8 @@ describe('wasm', () => {
     const { page, pageError } = await getTestbed()
 
     const result = await page.evaluate(`
-      encodeJPEGMetadata(
-        'memorial.exr',
-        'image/jpeg'
-    )`) as Awaited<number[]>
+      encodeJPEGMetadata('memorial.exr')
+    `) as Awaited<number[]>
 
     expect(pageError).not.toBeCalled()
     // expect(pageLog).not.toBeCalled()
