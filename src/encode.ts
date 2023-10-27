@@ -16,7 +16,26 @@ export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
 /**
  * Encodes a Gainmap starting from an HDR file.
  *
- * @param params
+ * Can optionally use a WebWorker to offload the encoding process to the worker
+ *
+ * @category Encoding Functions
+ * @group Encoding Functions
+ * @example
+ * import { encode } from 'gainmap-js'
+ * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
+ *
+ * const loader = new EXRLoader()
+ * const image = await loader.loadAsync('image.exr')
+ * // This will:
+ * // * create a WebGLRenderer
+ * // * Render the Gainmap
+ * // * not use a worker
+ * // * dispose the WebGLRenderer
+ * // * return an Uint8Array representing the gainmap data
+ *
+ * const gainmap = await encode({image})
+ *
+ * @param params Encoding Paramaters
  * @returns
  */
 export const encode = async <T extends EncodeParameters>(params: T): Promise<T extends EncodeParametersWithMimetype ? GainmapEncodingResult : GainmapRawEncodingResult> => {

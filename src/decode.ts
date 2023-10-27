@@ -19,7 +19,7 @@ import {
 } from 'three'
 
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
-import { DecodeToDataArrayParameters, DecodeToRenderTargetParameters } from './types'
+import { DecodeToDataArrayParameters, DecodeToRenderTargetParameters, DecodeToRenderTargetResult } from './types'
 
 export { GainMapDecoderMaterial }
 
@@ -49,10 +49,38 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { render
 /**
  * Decodes a gainmap using a WebGLRenderTarget
  *
+ * @category Decoding Functions
+ * @group Decoding Functions
+ * @example
+ * import { decode } from 'gainmap-js'
+ * import { ImageBitmapLoader, Mesh, PlaneGeometry, MeshBasicMaterial } from 'three'
+ *
+ * const loader = new ImageBitmapLoader()
+ * loader.setOptions( { imageOrientation: 'flipY' } )
+ *
+ * // load SDR Representation
+ * const sdr = await loader.loadAsync('sdr.jpg')
+ * // load Gainmap recovery image
+ * const gainMap = await loader.loadAsync('gainmap.jpg')
+ * // load metadata
+ * const metadata = await (await fetch('metadata.json')).json()
+ *
+ * const result = await decodeToRenderTarget({
+ *   sdr,
+ *   gainMap,
+ *   // this will restore the full HDR range
+ *   maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax)
+ *   ...metadata,
+ * })
+ *
+ * // result can be used to populate a Texture
+ * const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ map: result.renderTarget.texture }))
+ *
  * @param params
  * @returns
+ * @throws {Error} if the WebGLRenderer fails to render the gainmap
  */
-export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters) => {
+export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters): DecodeToRenderTargetResult => {
   const { sdr, gainMap, renderer } = params
 
   const scene = new Scene()
@@ -110,23 +138,21 @@ export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters) => 
   }
 
   return {
-    /**
-     * The Rendertarget which contains a `texture` which you can use to draw the GainMap
-     */
     renderTarget,
-    /**
-     * The Material used in the RenderTarget
-     */
     material,
-    /**
-     * Render the gainmap after changing its parameters
-     */
     render
   }
 }
 /**
- * Decodes a Gainmap to a raw `Uint16Array` which can be used to popupate a `DataTexture`
+ * Decodes a Gainmap to a raw `Uint16Array` which can be used to popupate a `DataTexture`.
  *
+ * Uses {@link decodeToRenderTarget} internally then calls `readRenderTargetPixels` in order to return an `Uint16Array` which can be used to either:
+ * * populate a DataTexture
+ * * store the RAW data somewhere
+ *
+ * @category Decoding Functions
+ * @group Decoding Functions
+ * @see {@link decodeToRenderTarget}
  * @param params
  * @returns
  */

@@ -32,7 +32,12 @@ void main() {
   gl_FragColor = vec4(hdrColor, 1.0);
 }
 `
-
+/**
+ * A Material which is able to decode the Gainmap into a full HDR Representation
+ *
+ * @category Materials
+ * @group Materials
+ */
 export class GainMapDecoderMaterial extends ShaderMaterial {
   private _maxDisplayBoost: GainmapDecodingParameters['maxDisplayBoost']
   private _hdrCapacityMin: GainMapMetadata['hdrCapacityMin']
@@ -68,6 +73,9 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
     this._hdrCapacityMax = hdrCapacityMax
   }
 
+  /**
+   * @see {@link GainmapDecodingParameters}
+   */
   get maxDisplayBoost () { return this._maxDisplayBoost }
   set maxDisplayBoost (value: number) {
     this._maxDisplayBoost = value

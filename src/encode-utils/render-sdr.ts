@@ -35,8 +35,11 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer }: { renderer: WebGLR
 /**
  * Renders an SDR Representation of an HDR Image
  *
+ * @category Encoding Functions
+ * @group Encoding Functions
  * @param hdrTexture The HDR image to be rendered
  * @param renderer (optional) WebGLRenderer to use diring the rendering, a disposable renderer will be create and destroyed if this is not provided.
+ * @throws {Error} if the WebGLRenderer fails to render the SDR image
  */
 export const renderSDR = (hdrTexture: DataTexture, renderer?: WebGLRenderer) => {
   let _renderer = renderer

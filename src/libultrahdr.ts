@@ -22,6 +22,9 @@ export const getLibrary = async () => {
  * Encapsulates a Gainmap into a single JPEG file (aka: JPEG-R) with the base map
  * as the sdr visualization and the gainMap encoded into a MPF (Multi-Picture Format) tag.
  *
+ * @category Encoding
+ * @group Encoding
+ *
  * @param encodingResult
  * @returns an Uint8Array representing a JPEG-R file
  */
@@ -67,8 +70,11 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
 /**
  * Decodes a JPEG file with an embedded Gainmap and XMP Metadata (aka JPEG-R)
  *
+ * @category Decoding
+ * @group Decoding
  * @param file A Jpeg file Uint8Array.
  * @returns The decoded data
+ * @throws {Error} if the provided file cannot be parsed or does not contain a valid Gainmap
  */
 export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const lib = await getLibrary()

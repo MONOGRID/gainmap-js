@@ -8,6 +8,8 @@ import { EncodeBuffersParameters, GainMapMetadata } from '../types'
  *
  * It can be run into a worker in order to avoid blocking the UI.
  *
+ * @category Encoding Functions
+ * @group Encoding Functions
  * @param params Encoding Params
  * @returns
  */
