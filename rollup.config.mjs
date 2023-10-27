@@ -52,7 +52,7 @@ export default defineConfig({
     license({
       banner: `
         ${name} v${version}
-        Copyright 2016<%= moment().format('YYYY') > 2018 ? '-' + moment().format('YYYY') : null %> ${author}
+        With ❤️, by ${author}
       `
     })
   ]
