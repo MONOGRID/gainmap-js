@@ -33,11 +33,12 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer }: { renderer: WebGLR
   renderTarget?.dispose()
 }
 /**
+ * Renders an SDR Representation of an HDR Image
  *
- * @param tex
- * @param toneMapping
+ * @param hdrTexture The HDR image to be rendered
+ * @param renderer (optional) WebGLRenderer to use diring the rendering, a disposable renderer will be create and destroyed if this is not provided.
  */
-export const renderSDR = (tex: DataTexture, renderer?: WebGLRenderer) => {
+export const renderSDR = (hdrTexture: DataTexture, renderer?: WebGLRenderer) => {
   let _renderer = renderer
   let destroyRenderer = false
   if (!_renderer) {
@@ -51,8 +52,8 @@ export const renderSDR = (tex: DataTexture, renderer?: WebGLRenderer) => {
   const plane = new Mesh(new PlaneGeometry(), new MeshBasicMaterial())
   plane.geometry.computeBoundingBox()
 
-  const width = tex.image.width
-  const height = tex.image.height
+  const width = hdrTexture.image.width
+  const height = hdrTexture.image.height
 
   // const originalToneMapping = _renderer.toneMapping
   // const originalColorSpace = _renderer.outputColorSpace
@@ -64,7 +65,7 @@ export const renderSDR = (tex: DataTexture, renderer?: WebGLRenderer) => {
   // _renderer.debug.onShaderError()
 
   plane.scale.y = 1
-  plane.material.map = tex
+  plane.material.map = hdrTexture
   plane.material.needsUpdate = true
   plane.material.map.needsUpdate = true
 

@@ -1,6 +1,6 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import { GainMapMetadata } from '../types'
+import { GainmapDecodingParameters, GainMapMetadata } from '../types'
 
 const vertexShader = `
 varying vec2 vUv;
@@ -34,14 +34,14 @@ void main() {
 `
 
 export class GainMapDecoderMaterial extends ShaderMaterial {
-  private _maxDisplayBoost: number
+  private _maxDisplayBoost: GainmapDecodingParameters['maxDisplayBoost']
   private _hdrCapacityMin: GainMapMetadata['hdrCapacityMin']
   private _hdrCapacityMax: GainMapMetadata['hdrCapacityMax']
   /**
    *
    * @param params
    */
-  constructor ({ gamma, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost, hdrCapacityMin, hdrCapacityMax, sdr, gainMap }: GainMapMetadata & { maxDisplayBoost: number, sdr: Texture, gainMap: Texture }) {
+  constructor ({ gamma, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost, hdrCapacityMin, hdrCapacityMax, sdr, gainMap }: GainMapMetadata & GainmapDecodingParameters & { sdr: Texture, gainMap: Texture }) {
     super({
       name: 'GainMapDecoderMaterial',
       vertexShader,

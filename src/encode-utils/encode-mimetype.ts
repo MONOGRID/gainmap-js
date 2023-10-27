@@ -1,7 +1,7 @@
 import { EncodeMimetypeParameters } from '../types'
 
 /**
- *
+ * Converts a RAW RGBA image buffer into the provided `mimeType` using the provided `quality`
  * @param params
  */
 export const convertImageBufferToMimetype = async (params: EncodeMimetypeParameters) => {

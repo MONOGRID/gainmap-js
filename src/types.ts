@@ -4,22 +4,36 @@ import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
 import { WorkerInterfaceImplementation } from './worker/worker-types'
-
+/**
+ * This is the Metadata stored in an encoded Gainmap which is used
+ * to decode it and return an HDR image
+ */
 export type GainMapMetadata = {
   /**
    * This is the gamma to apply to the stored map values.
+   *
+   * Typically you can use a gamma of 1.0.
+   *
+   * You can use a different value if your gain map has a very uneven distribution of log_recovery(x, y) values.
+   *
+   * For example, this might apply if a gain map has a lot of detail just above SDR range (represented as small log_recovery(x, y) values), and a very large map_max_log2 for the top end of the HDR rendition's desired brightness (represented by large log_recovery(x, y) values). In this case, you can use a map_gamma higher than 1.0 so that recovery(x, y) can precisely encode the detail in both the low end and high end of log_recovery(x, y).
    */
   gamma: [number, number, number]
   /**
    * This is log2 of the minimum display boost value for which the map is applied at all.
+   *
    * This value also affects how much to apply the gain map based on the display boost.
+   *
    * Must be 0.0 or greater.
    */
   hdrCapacityMin: number
   /**
    * Stores the value of hdr_capacity_max. This is log2 of the maximum display boost value for which the map is applied completely.
+   *
    * This value also affects how much to apply the gain map based on the display boost.
+   *
    * Must be greater than hdrCapacityMin.
+   *
    * Required.
    */
   hdrCapacityMax: number
@@ -43,31 +57,12 @@ export type GainMapMetadata = {
    * (divided by) that of the SDR image, at a given pixel.
    */
   gainMapMax: [number, number, number]
-
 }
+
 /**
- * Paramaters used to Encode a GainMap
+ * Parameters used by content Creators in order to create a GainMap
  */
-export type EncodeParametersBase = {
-  /**
-   * Input image for encoding, must be an HDR image
-   */
-  image: EXR | RGBE | LogLuv | DataTexture,
-  /**
-   * Optional WebGLRenderer, will be created and destroyed on demand
-   * if not provided.
-   */
-  renderer?: WebGLRenderer,
-  /**
-   * This value lets the content creator constrain how much brighter an image can get, when shown on an HDR display, relative to the SDR rendition.
-   *
-   * This value is a constant for a particular image. For example, if the value is four, then for any given pixel, the linear luminance of the displayed HDR rendition must be, at the most, 4x the linear luminance of the SDR rendition. In practice, this means that the brighter parts of the scene can be shown up to 4x brighter.
-   *
-   * In practice, this value is typically greater than 1.0.
-   *
-   * Always greater than or equal to Min content boost.
-   */
-  maxContentBoost?: number
+export type GainmapEncodingParameters = {
   /**
    * This value lets the content creator constrain how much darker an image can get, when shown on an HDR display, relative to the SDR rendition. This value is a constant for a particular image.
    *
@@ -79,6 +74,16 @@ export type EncodeParametersBase = {
    */
   minContentBoost?: number
   /**
+   * This value lets the content creator constrain how much brighter an image can get, when shown on an HDR display, relative to the SDR rendition.
+   *
+   * This value is a constant for a particular image. For example, if the value is four, then for any given pixel, the linear luminance of the displayed HDR rendition must be, at the most, 4x the linear luminance of the SDR rendition. In practice, this means that the brighter parts of the scene can be shown up to 4x brighter.
+   *
+   * In practice, this value is typically greater than 1.0.
+   *
+   * Always greater than or equal to Min content boost.
+   */
+  maxContentBoost?: number
+  /**
    * This is the gamma to apply to the stored map values.
    *
    * Typically you can use a gamma of 1.0.
@@ -88,15 +93,40 @@ export type EncodeParametersBase = {
    * For example, this might apply if a gain map has a lot of detail just above SDR range (represented as small log_recovery(x, y) values), and a very large map_max_log2 for the top end of the HDR rendition's desired brightness (represented by large log_recovery(x, y) values). In this case, you can use a map_gamma higher than 1.0 so that recovery(x, y) can precisely encode the detail in both the low end and high end of log_recovery(x, y).
    */
   gamma?: [number, number, number]
+}
+/**
+ * Parameters for decoding a Gainmap
+ */
+export type GainmapDecodingParameters = {
+  /**
+   * The maximum available boost supported by a display, at a given point in time.
+   *
+   * This value can change over time based on device settings and other factors,
+   * such as ambient light conditions, or how many bright pixels are on the screen.
+   */
+    maxDisplayBoost: number
+}
+
+/**
+ * Paramaters used to Encode a GainMap
+ */
+export type EncodeParametersBase = GainmapEncodingParameters & {
+  /**
+   * Input image for encoding, must be an HDR image
+   */
+  image: EXR | RGBE | LogLuv | DataTexture,
+  /**
+   * Optional WebGLRenderer, will be created and destroyed on demand
+   * if not provided.
+   */
+  renderer?: WebGLRenderer,
   /**
    * Encodes the Gainmap using a Web Worker
    */
   withWorker?: WorkerInterfaceImplementation
 }
-/**
- * Additional parameters to encode a GainMap compressed with a mimeType
- */
-export type EncodeParametersWithMimetype = EncodeParametersBase & {
+
+type EncodeMimeTypeOptions = {
   /**
    * The mimeType of the output
    */
@@ -104,12 +134,17 @@ export type EncodeParametersWithMimetype = EncodeParametersBase & {
   /**
    * Encoding quality [0-1]
    */
-  outQuality?: number
+  outQuality?: number,
   /**
    * FlipY of the encoding process
    */
   flipY?: boolean
 }
+
+/**
+ * Additional parameters to encode a GainMap compressed with a mimeType
+ */
+export type EncodeParametersWithMimetype = EncodeParametersBase & EncodeMimeTypeOptions
 /**
  *
  */
@@ -165,23 +200,28 @@ export type GainmapRawEncodingResult = {
   }
 } & GainMapMetadata
 /**
- *
+ * Parameters used to encode a GainMap
  */
-export type EncodeBuffersParameters = {
+export type EncodeBuffersParameters = GainmapEncodingParameters & {
+  /**
+   * RAW RGBA SDR Representation
+   */
   sdr: Uint8ClampedArray
+  /**
+   * RAW RGBA Original HDR Image
+   */
   hdr: Uint8Array | Uint8ClampedArray | Uint16Array | Float32Array
+  /**
+   * Width RAW RGBA HDR Image
+   */
   width: number
+  /**
+   * Height RAW RGBA HDR Image
+   */
   height: number
-  minContentBoost?: number
-  maxContentBoost?: number
-  gamma?: [number, number, number]
 }
 
-export type EncodeMimetypeParameters = {
-  outMimeType: 'image/png' | 'image/jpeg' | 'image/webp'
-  outQuality?: number,
-  flipY?: boolean
-} & ({
+export type EncodeMimetypeParameters = EncodeMimeTypeOptions & ({
   /**
    * RAW RGBA Image Data
    */
@@ -191,21 +231,31 @@ export type EncodeMimetypeParameters = {
    * Encoded Image Data with a mimeType
    */
   source: Uint8Array | Uint8ClampedArray
+  /**
+   * mimeType of the encoded input
+   */
   sourceMimeType: string
 })
 
 export type DecodeToDataArrayParameters = {
-  sdr: ImageBitmap
-  gainMap: ImageBitmap
-  renderer?: WebGLRenderer,
   /**
-   * The maximum available boost supported by a display, at a given point in time.
-   * This value can change over time based on device settings and other factors,
-   * such as ambient light conditions, or how many bright pixels are on the screen.
+   * An ImageBitmap containing the SDR Rendition
    */
-  maxDisplayBoost: number
-} & GainMapMetadata
+  sdr: ImageBitmap
+  /**
+   * An ImageBitmap containing the GainMap recovery image
+   */
+  gainMap: ImageBitmap
+  /**
+   * WebGLRenderer used to decode the GainMap
+   */
+  renderer?: WebGLRenderer
+
+} & GainmapDecodingParameters & GainMapMetadata
 
 export type DecodeToRenderTargetParameters = Omit<DecodeToDataArrayParameters, 'renderer'> & {
+  /**
+   * WebGLRenderer used to decode the GainMap
+   */
   renderer: WebGLRenderer
 }

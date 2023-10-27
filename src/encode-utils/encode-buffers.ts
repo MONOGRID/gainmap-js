@@ -2,8 +2,13 @@ import { Color, DataUtils } from 'three'
 
 import { EncodeBuffersParameters, GainMapMetadata } from '../types'
 /**
+ * Calculates a Gainmap stasting from the HDR and the SDR Representation.
  *
- * @param params
+ * This is the core of the encode process and will last many secods depending on the size of your HDR image.
+ *
+ * It can be run into a worker in order to avoid blocking the UI.
+ *
+ * @param params Encoding Params
  * @returns
  */
 export const encodeBuffers = ({ sdr, hdr, width, height, maxContentBoost, minContentBoost, gamma }: EncodeBuffersParameters) => {
