@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
 import { ACESFilmicToneMapping, NoToneMapping } from 'three'
 
-import { GainmapEncodingResult } from '../src'
+import { CompressedEncodingResult } from '../src'
 import { getTestbed } from './common'
 
 describe('encoder', () => {
@@ -35,12 +35,12 @@ describe('encoder', () => {
     const { page, pageError, pageLog } = await getTestbed()
 
     const result = await page.evaluate(`
-      encode(
+      encodeAndCompress(
         '${file}',
         'image/${format === 'jpg' ? 'jpeg' : format}',
         ${quality},
         ${tonemapping}
-    )`) as Awaited<GainmapEncodingResult>
+    )`) as Awaited<CompressedEncodingResult>
 
     expect(pageError).not.toBeCalled()
     expect(pageLog).not.toBeCalled()

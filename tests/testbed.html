@@ -19,7 +19,7 @@
     }
   </script>
   <script type="module">
-    import { encode } from 'gainmap-js';
+    import { encodeAndCompress } from 'gainmap-js';
     import { encodeJPEGMetadata, decodeJPEGMetadata } from 'gainmap-js/libultrahdr';
     import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
@@ -35,13 +35,13 @@
       })
     }
 
-    window.encode = async (url, outMimeType = 'image/jpeg', outQuality = 0.9, sdrToneMapping = ACESFilmicToneMapping) => {
+    window.encodeAndCompress = async (url, outMimeType = 'image/jpeg', outQuality = 0.9, sdrToneMapping = ACESFilmicToneMapping) => {
       let loader
       if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
+      const result = await encodeAndCompress({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
       // Uint8Arrays can't be transferred outside puppetteer
       result.gainMap.data = Array.from(result.gainMap.data)
       result.sdr.data = Array.from(result.sdr.data)
@@ -54,7 +54,7 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const result = await encode({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
+      const result = await encodeAndCompress({ image, outMimeType, outQuality, sdrToneMapping, flipY: loader instanceof EXRLoader })
 
       const jpeg = await encodeJPEGMetadata(result)
       // Uint8Arrays can't be transferred outside puppetteer
@@ -85,7 +85,7 @@
       if (file.name.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (file.name.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.parse(buf)
-      const result = await encode({ image, outMimeType: 'image/jpeg', flipY: loader instanceof EXRLoader })
+      const result = await encodeAndCompress({ image, outMimeType: 'image/jpeg', flipY: loader instanceof EXRLoader })
 
       encodeJPEGMetadata(result)
     }
