@@ -27,9 +27,15 @@ export const getLibrary = async () => {
  *
  * @param encodingResult
  * @returns an Uint8Array representing a JPEG-R file
+ * @throws {Error} If `encodingResult.sdr.mimeType !== 'image/jpeg'`
+ * @throws {Error} If `encodingResult.gainMap.mimeType !== 'image/jpeg'`
  */
 export const encodeJPEGMetadata = async (encodingResult: CompressedEncodingResult) => {
   const lib = await getLibrary()
+
+  if (encodingResult.sdr.mimeType !== 'image/jpeg') throw new Error('This function expects an SDR image compressed in jpeg')
+  if (encodingResult.gainMap.mimeType !== 'image/jpeg') throw new Error('This function expects a GainMap image compressed in jpeg')
+
   return lib.appendGainMap(
     encodingResult.sdr.width, encodingResult.sdr.height,
     encodingResult.sdr.data, encodingResult.sdr.data.length,
@@ -44,6 +50,13 @@ export const encodeJPEGMetadata = async (encodingResult: CompressedEncodingResul
   ) as Uint8Array
 }
 
+/**
+ *
+ * @param description
+ * @param name
+ * @param defaultValue
+ * @returns
+ */
 const getAttribute = (description: Element, name: string, defaultValue?: string) => {
   let returnValue: string | [string, string, string]
   const parsedValue = description.attributes.getNamedItem(name)?.nodeValue
