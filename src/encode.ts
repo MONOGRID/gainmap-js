@@ -10,15 +10,16 @@ import {
 import { encodeBuffers } from './encode-utils/encode-buffers'
 import { convertImageBufferToMimetype } from './encode-utils/encode-mimetype'
 import { renderSDR } from './encode-utils/render-sdr'
-import { EncodeParameters, EncodeParametersWithMimetype, GainmapEncodeResult, GainmapEncodeResultRaw } from './types'
+import { EncodeParameters, EncodeParametersWithMimetype, GainmapEncodingResult, GainmapRawEncodingResult } from './types'
 
 export { convertImageBufferToMimetype, encodeBuffers, renderSDR }
 /**
+ * Encodes a Gainmap starting from an HDR file.
  *
  * @param params
  * @returns
  */
-export const encode = async <T extends EncodeParameters>(params: T): Promise<T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw> => {
+export const encode = async <T extends EncodeParameters>(params: T): Promise<T extends EncodeParametersWithMimetype ? GainmapEncodingResult : GainmapRawEncodingResult> => {
   const { image, renderer, gamma, maxContentBoost, minContentBoost, withWorker } = params
 
   let tex: DataTexture
@@ -102,12 +103,12 @@ export const encode = async <T extends EncodeParameters>(params: T): Promise<T e
       sdr,
       hdr: { data: imageData, width: imageWidth, height: imageHeight },
       gainMap
-    } as GainmapEncodeResult as T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw
+    } as GainmapEncodingResult as T extends EncodeParametersWithMimetype ? GainmapEncodingResult : GainmapRawEncodingResult
   } else {
     return {
       ...encodingResult,
       sdr: rawSdr,
       hdr: { data: imageData, width: imageWidth, height: imageHeight }
-    } as GainmapEncodeResultRaw as T extends EncodeParametersWithMimetype ? GainmapEncodeResult : GainmapEncodeResultRaw
+    } as GainmapRawEncodingResult as T extends EncodeParametersWithMimetype ? GainmapEncodingResult : GainmapRawEncodingResult
   }
 }

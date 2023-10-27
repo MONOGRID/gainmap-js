@@ -47,6 +47,7 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { render
   renderTarget?.dispose()
 }
 /**
+ * Decodes a gainmap using a WebGLRenderTarget
  *
  * @param params
  * @returns
@@ -90,9 +91,6 @@ export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters) => 
   plane.geometry.computeBoundingBox()
   scene.add(plane)
 
-  /**
-   * Render the gainmap after changing its parameters
-   */
   const render = () => {
     renderer.setRenderTarget(renderTarget)
     try {
@@ -112,12 +110,22 @@ export const decodeToRenderTarget = (params: DecodeToRenderTargetParameters) => 
   }
 
   return {
+    /**
+     * The Rendertarget which contains a `texture` which you can use to draw the GainMap
+     */
     renderTarget,
+    /**
+     * The Material used in the RenderTarget
+     */
     material,
+    /**
+     * Render the gainmap after changing its parameters
+     */
     render
   }
 }
 /**
+ * Decodes a Gainmap to a raw `Uint16Array` which can be used to popupate a `DataTexture`
  *
  * @param params
  * @returns

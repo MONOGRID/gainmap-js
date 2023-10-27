@@ -1,12 +1,13 @@
 import { MainModule } from '../libultrahdr-wasm/build/libultrahdr'
 // @ts-expect-error untyped
 import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
-import { GainmapEncodeResult, GainMapMetadata } from './types'
+import { GainmapEncodingResult, GainMapMetadata } from './types'
 
 let library: MainModule | undefined
 
 export type LibultraHDRModule = MainModule
 /**
+ * Instances the WASM module and returns it, only one module will be created upon multiple calls
  *
  * @returns
  */
@@ -18,11 +19,13 @@ export const getLibrary = async () => {
 }
 
 /**
+ * Encapsulates a Gainmap into a single JPEG file (aka: JPEG-R) with the base map
+ * as the sdr visualization and the gainMap encoded into a MPF (Multi-Picture Format) tag.
  *
  * @param encodingResult
- * @returns
+ * @returns an Uint8Array representing a JPEG-R file
  */
-export const encodeJPEGMetadata = async (encodingResult: GainmapEncodeResult) => {
+export const encodeJPEGMetadata = async (encodingResult: GainmapEncodingResult) => {
   const lib = await getLibrary()
   return lib.appendGainMap(
     encodingResult.sdr.width, encodingResult.sdr.height,
@@ -62,9 +65,10 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
 }
 
 /**
+ * Decodes a JPEG file with an embedded Gainmap and XMP Metadata (aka JPEG-R)
  *
- * @param file
- * @returns
+ * @param file A Jpeg file Uint8Array.
+ * @returns The decoded data
  */
 export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const lib = await getLibrary()
@@ -101,6 +105,9 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
 
   return {
     ...result,
+    /**
+     * Parsed metadata
+     */
     parsedMetadata
   }
 }
