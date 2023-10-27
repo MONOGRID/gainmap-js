@@ -50,6 +50,14 @@ jobs:
         - run: npm test
         - run: npm run build
         - run: npx semantic-release --dry-run
+
+        - uses: actions/upload-artifact@v3
+          with:
+            name: build-artifact
+            if-no-files-found: error
+            path: |
+              libultrahdr-wasm/build/*.+(ts|js|map|wasm)
+              dist/
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
