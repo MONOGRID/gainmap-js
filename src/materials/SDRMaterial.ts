@@ -10,6 +10,11 @@ void main() {
 `
 
 const fragmentShader = /* glsl */`
+#ifndef saturate
+// <tonemapping_pars_fragment> may have defined saturate() already
+#define saturate( a ) clamp( a, 0.0, 1.0 )
+#endif
+
 uniform sampler2D map;
 uniform float brightness;
 uniform float contrast;
@@ -54,20 +59,14 @@ mat4 saturationMatrix( float saturation ) {
   );
 }
 
-vec3 adjustExposure(vec3 color, float value) {
-  return (1.0 + value) * color;
-}
-
 void main() {
-  vec4 color = saturate(exposure * texture2D(sdr, vUv));
+  vec4 color = saturate(exposure * texture2D(map, vUv));
 
-  fragColor = vec4(
+  gl_FragColor =
     brightnessMatrix( brightness ) *
     contrastMatrix( contrast ) *
     saturationMatrix( saturation ) *
-    color.rgb,
-    color.a
-  );
+    color;
 }
 `
 /**
@@ -81,11 +80,12 @@ export class SDRMaterial extends ShaderMaterial {
   private _contrast: number = 1
   private _saturation: number = 1
   private _exposure: number = 1
+  private _map: Texture
   /**
    *
    * @param params
    */
-  constructor ({ map }: {map: Texture}) {
+  constructor ({ map }: { map: Texture }) {
     super({
       name: 'SDRMaterial',
       vertexShader,
@@ -101,6 +101,11 @@ export class SDRMaterial extends ShaderMaterial {
       depthTest: false,
       depthWrite: false
     })
+
+    this._map = map
+
+    this.needsUpdate = true
+    this.uniformsNeedUpdate = true
   }
 
   get brightness () { return this._brightness }
@@ -125,5 +130,11 @@ export class SDRMaterial extends ShaderMaterial {
   set exposure (value: number) {
     this._exposure = value
     this.uniforms.exposure.value = value
+  }
+
+  get map () { return this._map }
+  set map (value: Texture) {
+    this._map = value
+    this.uniforms.map.value = value
   }
 }

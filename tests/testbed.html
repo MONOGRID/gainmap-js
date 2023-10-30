@@ -78,7 +78,7 @@
       let loader
       if (file.name.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (file.name.indexOf('.hdr') !== -1) loader = new RGBELoader()
-      const image = await loader.parse(buf)
+      const image = await loader.parse(buf.buffer)
       const result = await encodeAndCompress({ image, mimeType: 'image/jpeg', flipY: loader instanceof EXRLoader })
 
       encodeJPEGMetadata(result)

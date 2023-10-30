@@ -1,11 +1,11 @@
 'use strict'
 
-import { ClampToEdgeWrapping, NearestFilter, Texture, WebGLRenderTarget } from 'three'
+import { ClampToEdgeWrapping, HalfFloatType, NearestFilter, NoColorSpace, ShaderMaterial, Texture, WebGLRenderTarget } from 'three'
+
+import { QuadRenderer } from '../utils/QuadRenderer'
 const vertexShader = /* glsl */`
-varying vec2 vUv;
 
 void main() {
-  vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `
@@ -13,11 +13,8 @@ void main() {
 const fragmentShader = /* glsl */`
 precision mediump float;
 
-// #define CELL_SIZE $(cellSize)s
-
 uniform sampler2D u_texture;
 uniform vec2 u_srcResolution;
-uniform vec2 u_dstResolution;
 
 void main() {
   // compute the first pixel the source cell
@@ -40,117 +37,62 @@ void main() {
 }
 `
 
-export const find = (srcTex: Texture) => {
+export const findTextureMax = (srcTex: Texture) => {
   const cellSize = 2
 
-  const uniforms = {
-    u_srcResolution: { value: [srcTex.image.width, srcTex.image.height] },
-    u_dstResolution: { value: [srcTex.image.width, srcTex.image.height] },
-    u_texture: { value: srcTex }
-  }
-  // const mat = new RawShaderMaterial({
-  //   vertexShader,
-  //   fragmentShader,
-  //   uniforms: {
-  //     u_srcResolution: { value: [srcTex.image.width, srcTex.image.height] },
-  //     u_texture: { value: srcTex }
-  //   }
-  // })
+  const mat = new ShaderMaterial({
+    vertexShader,
+    fragmentShader,
+    uniforms: {
+      u_srcResolution: { value: [srcTex.image.width, srcTex.image.height] },
+      u_texture: { value: srcTex }
+    },
+    defines: {
+      CELL_SIZE: cellSize
+    }
+  })
 
-  const framebuffers: WebGLRenderTarget[] = []
   let w = srcTex.image.width
   let h = srcTex.image.height
+
+  const quadRenderer = new QuadRenderer(w, h, HalfFloatType, NoColorSpace, mat)
+
+  const framebuffers: WebGLRenderTarget[] = []
+
   while (w > 1 || h > 1) {
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
-
-    const fb = new WebGLRenderTarget(w, h, { minFilter: NearestFilter, magFilter: NearestFilter, wrapS: ClampToEdgeWrapping, wrapT: ClampToEdgeWrapping })
-    // creates a framebuffer and creates and attaches an RGBA/UNSIGNED texture
-    // const fb = twgl.createFramebufferInfo(gl, [
-    //   { min: gl.NEAREST, max: gl.NEAREST, wrap: gl.CLAMP_TO_EDGE }
-    // ], w, h)
+    const fb = new WebGLRenderTarget(w, h, {
+      type: HalfFloatType,
+      colorSpace: NoColorSpace,
+      minFilter: NearestFilter,
+      magFilter: NearestFilter,
+      wrapS: ClampToEdgeWrapping,
+      wrapT: ClampToEdgeWrapping,
+      generateMipmaps: false,
+      depthBuffer: false,
+      stencilBuffer: false
+    })
     framebuffers.push(fb)
   }
 
   w = srcTex.image.width
   h = srcTex.image.height
-  framebuffers.forEach((fbi, ndx) => {
+  framebuffers.forEach((fbi) => {
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
-    // uniforms.u_dstResolution = [w, h]
-    // twgl.bindFramebufferInfo(gl, fbi)
-    // twgl.setUniforms(programInfo, uniforms)
-    // twgl.drawBufferInfo(gl, unitQuadBufferInfo)
 
-    // uniforms.u_texture = fbi.attachments[0]
-    // uniforms.u_srcResolution = [w, h]
+    quadRenderer.renderTarget = fbi
+    quadRenderer.render()
+
+    const arr = quadRenderer.toArray()
+    console.log(framebuffers, arr)
+
+    mat.uniforms.u_texture.value = fbi.texture
+    mat.uniforms.u_srcResolution.value = [w, h]
+    mat.needsUpdate = true
   })
-}
 
-// make a texture as our source
-const ctx = document.createElement('canvas').getContext('2d')
-ctx.fillStyle = 'rgb(12, 34, 56)'
-ctx.fillRect(20, 30, 1, 1)
-ctx.fillStyle = 'rgb(254, 243, 32)'
-ctx.fillRect(270, 140, 1, 1)
-
-const canvas = document.createElement('canvas')
-const m4 = twgl.m4
-const gl = canvas.getContext('webgl')
-const fsSrc = document.getElementById('max-fs').text.replace('$(cellSize)s', cellSize)
-const programInfo = twgl.createProgramInfo(gl, ['vs', fsSrc])
-
-const unitQuadBufferInfo = twgl.primitives.createXYQuadBufferInfo(gl)
-const framebufferInfo = twgl.createFramebufferInfo(gl)
-
-const srcTex = twgl.createTexture(gl, {
-  src: ctx.canvas,
-  min: gl.NEAREST,
-  mag: gl.NEAREST,
-  wrap: gl.CLAMP_TO_EDGE
-})
-
-const framebuffers = []
-var w = ctx.canvas.width
-var h = ctx.canvas.height
-while (w > 1 || h > 1) {
-  w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
-  h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
-  // creates a framebuffer and creates and attaches an RGBA/UNSIGNED texture
-  const fb = twgl.createFramebufferInfo(gl, [
-    { min: gl.NEAREST, max: gl.NEAREST, wrap: gl.CLAMP_TO_EDGE }
-  ], w, h)
-  framebuffers.push(fb)
-}
-
-const uniforms = {
-  u_srcResolution: [ctx.canvas.width, ctx.canvas.height],
-  u_texture: srcTex
-}
-
-gl.useProgram(programInfo.program)
-twgl.setBuffersAndAttributes(gl, programInfo, unitQuadBufferInfo)
-
-var w = ctx.canvas.width
-var h = ctx.canvas.height
-framebuffers.forEach(function (fbi, ndx) {
-  w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
-  h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
-  uniforms.u_dstResolution = [w, h]
-  twgl.bindFramebufferInfo(gl, fbi)
-  twgl.setUniforms(programInfo, uniforms)
-  twgl.drawBufferInfo(gl, unitQuadBufferInfo)
-
-  uniforms.u_texture = fbi.attachments[0]
-  uniforms.u_srcResolution = [w, h]
-})
-
-const p = new Uint8Array(4)
-gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, p)
-log('max: ', p[0], p[1], p[2])
-
-function log () {
-  const elem = document.createElement('pre')
-  elem.appendChild(document.createTextNode(Array.prototype.join.call(arguments, ' ')))
-  document.body.appendChild(elem)
+  const out = quadRenderer.toArray()
+  return [out[0], out[1], out[2]]
 }

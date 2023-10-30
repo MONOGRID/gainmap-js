@@ -9,9 +9,9 @@ import {
 
 import { compress } from './encode-utils/compress'
 import { encodeBuffers } from './encode-utils/encode-buffers'
-import { renderSDR } from './encode-utils/render-sdr'
-import { SDRMaterial } from './materials/SDRMaterial'
-import { CompressedEncodingResult, CompressedImage, EncodingParametersBase, EncodingParametersWithCompression, HDRRawImageBuffer, RawEncodingResult } from './types'
+import { findTextureMax } from './encode-utils/hdr-range-finder'
+import { renderSDR, SDRMaterial } from './encode-utils/render-sdr'
+import { CompressedEncodingResult, CompressedImage, EncodeBuffersResult, EncodingParametersBase, EncodingParametersWithCompression, HDRRawImageBuffer, RawEncodingResult } from './types'
 
 export { compress, encodeBuffers, renderSDR, SDRMaterial }
 /**
@@ -74,10 +74,16 @@ export const encode = async (params: EncodingParametersBase): Promise<RawEncodin
       'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
     )
   }
+  const max = findTextureMax(dataTexture)
+  console.log(max)
 
-  let sdrRawData = renderSDR(dataTexture, renderer)
+  const sdrRenderer = renderSDR(dataTexture, renderer)
+  let sdrRawData = sdrRenderer.toArray()
+  sdrRenderer.material.dispose()
+  sdrRenderer.material.map?.dispose()
+  sdrRenderer.dispose()
 
-  let encodingResult: Awaited<ReturnType<typeof encodeBuffers>>
+  let encodingResult: EncodeBuffersResult
   if (withWorker) {
     const res = await withWorker.encodeGainmapBuffers({
       hdr: hdrRawData,

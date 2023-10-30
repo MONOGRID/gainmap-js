@@ -71,6 +71,9 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
     this._maxDisplayBoost = maxDisplayBoost
     this._hdrCapacityMin = hdrCapacityMin
     this._hdrCapacityMax = hdrCapacityMax
+
+    this.needsUpdate = true
+    this.uniformsNeedUpdate = true
   }
 
   /**

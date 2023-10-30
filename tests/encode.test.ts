@@ -4,29 +4,28 @@ import { describe, expect, it } from '@jest/globals'
 import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
-import { ACESFilmicToneMapping, NoToneMapping } from 'three'
 
 import { CompressedEncodingResult } from '../src'
 import { getTestbed } from './common'
 
 describe('encoder', () => {
   it.concurrent.each([
-    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', format: 'jpg', quality: 0.7 },
+    { file: 'memorial.exr', format: 'webp', quality: 0.7 },
+    { file: 'memorial.exr', format: 'png', quality: 0.7 },
 
-    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', format: 'jpg', quality: 0.7 },
+    { file: 'memorial.hdr', format: 'webp', quality: 0.7 },
+    { file: 'memorial.hdr', format: 'png', quality: 0.7 },
 
-    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: NoToneMapping },
+    { file: 'memorial.exr', format: 'jpg', quality: 0.7 },
+    { file: 'memorial.exr', format: 'webp', quality: 0.7 },
+    { file: 'memorial.exr', format: 'png', quality: 0.7 },
 
-    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: NoToneMapping },
-    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: NoToneMapping }
-  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
+    { file: 'memorial.hdr', format: 'jpg', quality: 0.7 },
+    { file: 'memorial.hdr', format: 'webp', quality: 0.7 },
+    { file: 'memorial.hdr', format: 'png', quality: 0.7 }
+  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality }) => {
     // we need to launch puppetteer with a
     // custom written "testbed.html" page
     // because our encoder works by
@@ -38,8 +37,7 @@ describe('encoder', () => {
       encodeAndCompress(
         '${file}',
         'image/${format === 'jpg' ? 'jpeg' : format}',
-        ${quality},
-        ${tonemapping}
+        ${quality}
     )`) as Awaited<CompressedEncodingResult>
 
     expect(pageError).not.toBeCalled()
@@ -71,9 +69,9 @@ describe('encoder', () => {
     if (!existsSync(path.join(__dirname, './results'))) {
       await mkdir(path.join(__dirname, './results/'))
     }
-    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-output.${format}`), Buffer.from(result.sdr.data))
-    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-gainmap.${format}`), Buffer.from(result.gainMap.data))
-    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-t${tonemapping}-${format}.json`), Buffer.from(
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-output.${format}`), Buffer.from(result.sdr.data))
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-gainmap.${format}`), Buffer.from(result.gainMap.data))
+    await writeFile(path.join(__dirname, `./results/${file}-q${quality}-${format}.json`), Buffer.from(
       JSON.stringify({
         offsetSdr: result.offsetSdr,
         offsetHdr: result.offsetHdr,

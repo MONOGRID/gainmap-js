@@ -1,9 +1,8 @@
-import { type DataTexture, type Texture, type WebGLRenderer, type WebGLRenderTarget } from 'three'
+import { type DataTexture, type WebGLRenderer } from 'three'
 import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
-import { type GainMapDecoderMaterial } from './decode'
 import { type WorkerInterfaceImplementation } from './worker/worker-types'
 /**
  * This is the Metadata stored in an encoded Gainmap which is used
@@ -253,6 +252,17 @@ export type CompressedEncodingResult = {
   gainMap: CompressedImage
 
 } & GainMapMetadata
+
+/**
+ * Output of the core encoding algorithm
+ *
+ * @category Encoding Results
+ * @group Encoding Results
+ */
+export type EncodeBuffersResult = GainMapMetadata & {
+  gainMap: Uint8ClampedArray
+}
+
 /**
  * @category Encoding Results
  * @group Encoding Results
@@ -263,14 +273,10 @@ export type RawEncodingResult = {
    */
   sdr: Uint8ClampedArray
   /**
-   * RAW RGBA data
-   */
-  gainMap: Uint8ClampedArray
-  /**
    * Original HDR RAW RGBA Data passed back
    */
   hdr: HDRRawImage
-} & GainMapMetadata
+} & EncodeBuffersResult
 /**
  * Parameters used to encode a GainMap
  *
@@ -297,20 +303,10 @@ export type EncodeBuffersParameters = GainmapEncodingParameters & {
 }
 
 /**
- * Output of the core encoding algorithm
- *
- * @category Encoding Results
- * @group Encoding Results
- */
-export type EncodeBuffersResult = GainMapMetadata & {
-  gainMap: Uint8ClampedArray
-}
-
-/**
  * @category Decoding Parameters
  * @group Decoding Parameters
  */
-export type DecodeToDataArrayParameters = {
+export type DecodeParameters = {
   /**
    * An ImageBitmap containing the SDR Rendition
    */
@@ -325,32 +321,3 @@ export type DecodeToDataArrayParameters = {
   renderer?: WebGLRenderer
 
 } & GainmapDecodingParameters & GainMapMetadata
-/**
- * @category Decoding Parameters
- * @group Decoding Parameters
- */
-export type DecodeToRenderTargetParameters = Omit<DecodeToDataArrayParameters, 'renderer'> & {
-  /**
-   * WebGLRenderer used to decode the GainMap
-   */
-  renderer: WebGLRenderer
-}
-
-/**
- * @category Decoding Results
- * @group Decoding Results
- */
-export type DecodeToRenderTargetResult = {
-  /**
-   * The Rendertarget which contains a `texture` which you can use to draw the GainMap
-   */
-  renderTarget: WebGLRenderTarget<Texture>
-  /**
-   * The Material used in the RenderTarget
-   */
-  material: GainMapDecoderMaterial
-  /**
-   * Render the gainmap after changing its parameters
-   */
-  render: () => void
-}

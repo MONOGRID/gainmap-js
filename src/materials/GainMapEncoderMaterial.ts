@@ -70,6 +70,9 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     this._offsetSdr = offsetSdr
     this._offsetHdr = offsetHdr
     this._gamma = gamma
+
+    this.needsUpdate = true
+    this.uniformsNeedUpdate = true
   }
 
   get gamma () { return this._gamma }
