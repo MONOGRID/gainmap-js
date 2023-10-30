@@ -1,11 +1,14 @@
 'use strict'
 
-import { ClampToEdgeWrapping, HalfFloatType, NearestFilter, NoColorSpace, ShaderMaterial, Texture, WebGLRenderTarget } from 'three'
+import { ClampToEdgeWrapping, HalfFloatType, NearestFilter, NoColorSpace, ShaderMaterial, Texture, Vector2, WebGLRenderTarget } from 'three'
 
 import { QuadRenderer } from '../utils/QuadRenderer'
 const vertexShader = /* glsl */`
 
+varying vec2 vUv;
+
 void main() {
+  vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }
 `
@@ -13,27 +16,32 @@ void main() {
 const fragmentShader = /* glsl */`
 precision mediump float;
 
-uniform sampler2D u_texture;
+uniform sampler2D map;
 uniform vec2 u_srcResolution;
 
+varying vec2 vUv;
+
 void main() {
+  gl_FragColor = texture2D(map, vUv);
+
+
   // compute the first pixel the source cell
-  vec2 srcPixel = floor(gl_FragCoord.xy) * float(CELL_SIZE);
+  // vec2 srcPixel = floor(gl_FragCoord.xy) * float(CELL_SIZE);
 
-  // one pixel in source
-  vec2 onePixel = vec2(1) / u_srcResolution;
+  // // one pixel in source
+  // vec2 onePixel = vec2(1) / u_srcResolution;
 
-  // uv for first pixel in cell. +0.5 for center of pixel
-  vec2 uv = (srcPixel + 0.5) * onePixel;
+  // // uv for first pixel in cell. +0.5 for center of pixel
+  // vec2 uv = (srcPixel + 0.5) * onePixel;
 
-  vec4 maxColor = vec4(0);
-  for (int y = 0; y < CELL_SIZE; ++y) {
-    for (int x = 0; x < CELL_SIZE; ++x) {
-      maxColor = max(maxColor, texture2D(u_texture, uv + vec2(x, y) * onePixel));
-    }
-  }
+  // vec4 maxColor = vec4(0);
+  // for (int y = 0; y < CELL_SIZE; ++y) {
+  //   for (int x = 0; x < CELL_SIZE; ++x) {
+  //     maxColor = max(maxColor, texture2D(map, uv + vec2(x, y) * onePixel));
+  //   }
+  // }
 
-  gl_FragColor = maxColor;
+  // gl_FragColor = maxColor;
 }
 `
 
@@ -44,8 +52,8 @@ export const findTextureMax = (srcTex: Texture) => {
     vertexShader,
     fragmentShader,
     uniforms: {
-      u_srcResolution: { value: [srcTex.image.width, srcTex.image.height] },
-      u_texture: { value: srcTex }
+      u_srcResolution: { value: new Vector2(srcTex.image.width, srcTex.image.height) },
+      map: { value: srcTex }
     },
     defines: {
       CELL_SIZE: cellSize
@@ -88,9 +96,11 @@ export const findTextureMax = (srcTex: Texture) => {
     const arr = quadRenderer.toArray()
     console.log(framebuffers, arr)
 
-    mat.uniforms.u_texture.value = fbi.texture
-    mat.uniforms.u_srcResolution.value = [w, h]
+    mat.uniforms.map.value = fbi.texture
+    mat.uniforms.u_srcResolution.value.x = w
+    mat.uniforms.u_srcResolution.value.y = h
     mat.needsUpdate = true
+    mat.uniformsNeedUpdate = true
   })
 
   const out = quadRenderer.toArray()
