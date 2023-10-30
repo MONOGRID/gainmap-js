@@ -10,9 +10,10 @@ import {
 import { compress } from './encode-utils/compress'
 import { encodeBuffers } from './encode-utils/encode-buffers'
 import { renderSDR } from './encode-utils/render-sdr'
+import { SDRMaterial } from './materials/SDRMaterial'
 import { CompressedEncodingResult, CompressedImage, EncodingParametersBase, EncodingParametersWithCompression, HDRRawImageBuffer, RawEncodingResult } from './types'
 
-export { compress, encodeBuffers, renderSDR }
+export { compress, encodeBuffers, renderSDR, SDRMaterial }
 /**
  * Encodes a Gainmap starting from an HDR file.
  *
