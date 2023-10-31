@@ -31,7 +31,7 @@ export const getDataTexture = (image: EXR | RGBE | LogLuv | DataTexture) => {
       RepeatWrapping,
       LinearFilter,
       LinearFilter,
-      16,
+      1,
       'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
     )
 

@@ -2,9 +2,7 @@ import {
   ClampToEdgeWrapping,
   DataTexture,
   DataUtils,
-  HalfFloatType,
   NearestFilter,
-  NoColorSpace,
   ShaderMaterial,
   Vector2,
   WebGLRenderer,
@@ -70,7 +68,7 @@ void main() {
  * @param renderer
  * @returns
  */
-export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode: 'min' | 'max' = 'min', renderer?: WebGLRenderer) => {
+export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
   const srcTex = getDataTexture(image)
   const cellSize = 2
 
@@ -92,7 +90,7 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
   let w = srcTex.image.width
   let h = srcTex.image.height
 
-  const quadRenderer = new QuadRenderer(w, h, HalfFloatType, NoColorSpace, mat, renderer)
+  const quadRenderer = new QuadRenderer(w, h, srcTex.type, srcTex.colorSpace, mat, renderer)
 
   const framebuffers: WebGLRenderTarget[] = []
 
@@ -100,8 +98,9 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
     const fb = new WebGLRenderTarget(w, h, {
-      type: HalfFloatType,
-      colorSpace: NoColorSpace,
+      type: srcTex.type,
+      format: srcTex.format,
+      colorSpace: srcTex.colorSpace,
       minFilter: NearestFilter,
       magFilter: NearestFilter,
       wrapS: ClampToEdgeWrapping,

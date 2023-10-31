@@ -20,17 +20,21 @@ afterAll(async () => {
 })
 
 export const getTestbed = async () => {
-  const pageError = jest.fn((e: Error) => {
-    console.error(e.name, ':', e.message, '\nSTACKTRACE:\n', e.stack)
+  const pageError = jest.fn((e: string) => {
+    console.error(e)
   })
 
-  const pageLog = jest.fn((e: ConsoleMessage) => {
-    console.log('PAGE MESSAGE:', e.text(), '\nSTACKTRACE:\n', e.stackTrace().map(e => `at ${e.url}:${e.lineNumber}:${e.columnNumber}`).join('\n'))
+  const pageLog = jest.fn((e: string) => {
+    console.log(e)
   })
 
   const page = await globalThis.browser.newPage()
-  page.on('console', pageLog)
-  page.on('pageerror', pageError)
+  page.on('console', (e: ConsoleMessage) => {
+    pageLog(`PAGE MESSAGE: ${e.text()}\nSTACKTRACE:\n ${e.stackTrace().map(e => `at ${e.url}${e.lineNumber ? ':' + e.lineNumber : ''}:${e.columnNumber ? ':' + e.columnNumber : ''}`).join('\n')}`)
+  })
+  page.on('pageerror', (e: Error) => {
+    pageError(`${e.name}: ${e.message}\nSTACKTRACE:\n ${e.stack}`)
+  })
 
   page.setRequestInterception(true)
   page.on('request', async (request) => {
