@@ -26,7 +26,7 @@ describe('wasm', () => {
   }, 100000)
 
   it('extracts metadata', async () => {
-    const { page, pageError } = await getTestbed()
+    const { page, pageError, pageLog } = await getTestbed()
 
     const result = await page.evaluate(`decodeJPEGMetadata(
       'memorial.jpg'
@@ -36,7 +36,8 @@ describe('wasm', () => {
     result.sdr = Uint8Array.from(result.sdr)
 
     expect(pageError).not.toBeCalled()
-    console.log(result)
+    expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
+    // console.log(result)
     // const file = await readFile(join(__dirname, './fixtures/memorial.jpg'))
 
     // const meta = await decodeJPEGMetadata(file)

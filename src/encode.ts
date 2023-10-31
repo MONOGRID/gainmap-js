@@ -1,18 +1,9 @@
-import {
-  DataTexture,
-  LinearFilter,
-  NoColorSpace,
-  RepeatWrapping,
-  RGBAFormat,
-  UVMapping
-} from 'three'
-
 import { compress } from './encode-utils/compress'
-import { encodeBuffers } from './encode-utils/encode-buffers'
-import { renderSDR } from './encode-utils/render-sdr'
-import { CompressedEncodingResult, CompressedImage, EncodingParametersBase, EncodingParametersWithCompression, HDRRawImageBuffer, RawEncodingResult } from './types'
+import { getGainMap } from './encode-utils/get-gainmap'
+import { getSDRRendition } from './encode-utils/get-sdr-rendition'
+import { CompressedImage, EncodingParametersBase, EncodingParametersWithCompression, GainMapMetadata } from './types'
+import { getDataTexture } from './utils/get-data-texture'
 
-export { compress, encodeBuffers, renderSDR }
 /**
  * Encodes a Gainmap starting from an HDR file.
  *
@@ -29,7 +20,6 @@ export { compress, encodeBuffers, renderSDR }
  * // This will:
  * // * create a WebGLRenderer
  * // * Render the Gainmap
- * // * not use a worker
  * // * dispose the WebGLRenderer
  *
  * const gainmap = await encode({image})
@@ -37,75 +27,36 @@ export { compress, encodeBuffers, renderSDR }
  * @param params Encoding Paramaters
  * @returns
  */
-export const encode = async (params: EncodingParametersBase): Promise<RawEncodingResult> => {
-  const { image, renderer, gamma, maxContentBoost, minContentBoost, withWorker } = params
+export const encode = (params: EncodingParametersBase) => {
+  const { image, renderer } = params
 
-  let dataTexture: DataTexture
-  let hdrRawData: HDRRawImageBuffer
-  let width: number
-  let height: number
+  const dataTexture = getDataTexture(image)
 
-  if (image instanceof DataTexture) {
-    dataTexture = image
-    if (dataTexture.image.data instanceof Uint16Array || dataTexture.image.data instanceof Float32Array) {
-      hdrRawData = dataTexture.image.data
-      width = dataTexture.image.width
-      height = dataTexture.image.height
-    } else {
-      throw new Error('Provided DataTexture is not HDR')
-    }
-  } else {
-    hdrRawData = image.data
-    width = image.width
-    height = image.height
-    dataTexture = new DataTexture(
-      image.data,
-      image.width,
-      image.height,
-      'format' in image ? image.format : RGBAFormat,
-      image.type,
-      UVMapping,
-      RepeatWrapping,
-      RepeatWrapping,
-      LinearFilter,
-      LinearFilter,
-      16,
-      'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
-    )
-  }
+  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping)
 
-  let sdrRawData = renderSDR(dataTexture, renderer)
+  const gainMapRenderer = getGainMap({
+    ...params,
+    image: dataTexture,
+    sdr,
+    renderer: sdr.renderer // reuse the same (maybe disposable?) renderer
+  })
 
-  let encodingResult: Awaited<ReturnType<typeof encodeBuffers>>
-  if (withWorker) {
-    const res = await withWorker.encodeGainmapBuffers({
-      hdr: hdrRawData,
-      sdr: sdrRawData,
-      width,
-      height,
-      gamma,
-      maxContentBoost,
-      minContentBoost
-    })
-    // reassign back transferables
-    hdrRawData = res.hdr
-    sdrRawData = res.sdr
-    encodingResult = res
-  } else {
-    encodingResult = await encodeBuffers({
-      hdr: hdrRawData,
-      sdr: sdrRawData,
-      width,
-      height,
-      gamma,
-      maxContentBoost,
-      minContentBoost
-    })
-  }
   return {
-    ...encodingResult,
-    sdr: sdrRawData,
-    hdr: { data: hdrRawData, width, height }
+    sdr,
+    gainMap: gainMapRenderer,
+    hdr: dataTexture,
+    getMetadata: () => {
+      const meta: GainMapMetadata = {
+        gainMapMax: gainMapRenderer.material.gainMapMax,
+        gainMapMin: gainMapRenderer.material.gainMapMin,
+        gamma: gainMapRenderer.material.gamma,
+        hdrCapacityMax: gainMapRenderer.material.hdrCapacityMax,
+        hdrCapacityMin: gainMapRenderer.material.hdrCapacityMin,
+        offsetHdr: gainMapRenderer.material.offsetHdr,
+        offsetSdr: gainMapRenderer.material.offsetSdr
+      }
+      return meta
+    }
   }
 }
 
@@ -121,8 +72,8 @@ export const encode = async (params: EncodingParametersBase): Promise<RawEncodin
  * @param params Encoding Paramaters
  * @throws {Error} if the browser does not support [createImageBitmap](https://caniuse.com/createimagebitmap)
  */
-export const encodeAndCompress = async (params: EncodingParametersWithCompression): Promise<CompressedEncodingResult> => {
-  const encodingResult = await encode(params)
+export const encodeAndCompress = async (params: EncodingParametersWithCompression) => {
+  const encodingResult = encode(params)
 
   const { mimeType, quality, flipY, withWorker } = params
 
@@ -131,8 +82,8 @@ export const encodeAndCompress = async (params: EncodingParametersWithCompressio
   let rawSDR: Uint8ClampedArray
   let rawGainMap: Uint8ClampedArray
 
-  const sdrImageData = new ImageData(encodingResult.sdr, encodingResult.hdr.width, encodingResult.hdr.height)
-  const gainMapImageData = new ImageData(encodingResult.gainMap, encodingResult.hdr.width, encodingResult.hdr.height)
+  const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
+  const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
 
   if (withWorker) {
     const workerResult = await Promise.all([
@@ -171,8 +122,12 @@ export const encodeAndCompress = async (params: EncodingParametersWithCompressio
     rawGainMap = gainMapImageData.data
   }
 
+  encodingResult.sdr.dispose()
+  encodingResult.gainMap.dispose()
+
   return {
     ...encodingResult,
+    ...encodingResult.getMetadata(),
     sdr: compressResult[0],
     gainMap: compressResult[1],
     rawSDR,

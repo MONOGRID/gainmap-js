@@ -1,56 +1,18 @@
 import {
-  ClampToEdgeWrapping,
   HalfFloatType,
-  LinearFilter,
-  LinearMipMapLinearFilter,
-  Mesh,
   NoColorSpace,
-  NoToneMapping,
-  OrthographicCamera,
-  PlaneGeometry,
-  RGBAFormat,
-  Scene,
-  SRGBColorSpace,
-  Texture,
-  UnsignedByteType,
-  UVMapping,
-  WebGLRenderer,
-  WebGLRenderTarget
+  SRGBColorSpace
 } from 'three'
 
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
-import { DecodeToDataArrayParameters, DecodeToRenderTargetParameters, DecodeToRenderTargetResult } from './types'
+import { DecodeParameters } from './types'
+import { QuadRenderer } from './utils/QuadRenderer'
 
-export { GainMapDecoderMaterial }
-
-const instantiateRenderer = () => {
-  const renderer = new WebGLRenderer()
-  renderer.debug.checkShaderErrors = false
-  renderer.setSize(128, 128)
-  renderer.toneMapping = NoToneMapping
-  renderer.outputColorSpace = NoColorSpace
-
-  return renderer
-}
-
-const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { renderer?: WebGLRenderer, renderTarget?: WebGLRenderTarget, destroyRenderer?: boolean, material?: GainMapDecoderMaterial }) => {
-  if (material) {
-    material.uniforms.sdr.value.dispose()
-    material.uniforms.gainMap.value.dispose()
-    material.dispose()
-  }
-
-  if (destroyRenderer) {
-    renderer?.dispose()
-    renderer?.forceContextLoss()
-  }
-  renderTarget?.dispose()
-}
 /**
  * Decodes a gainmap using a WebGLRenderTarget
  *
- * @category Decoding Functions
- * @group Decoding Functions
+ * @category Decoding
+ * @group Decoding
  * @example
  * import { decode } from 'gainmap-js'
  * import { ImageBitmapLoader, Mesh, PlaneGeometry, MeshBasicMaterial } from 'three'
@@ -80,102 +42,33 @@ const cleanup = ({ renderer, renderTarget, destroyRenderer, material }: { render
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gainmap
  */
-export const decode = (params: DecodeToRenderTargetParameters): DecodeToRenderTargetResult => {
+export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   const { sdr, gainMap, renderer } = params
 
-  const scene = new Scene()
+  if (sdr.colorSpace !== SRGBColorSpace) {
+    console.warn('SDR Colorspace needs to be *SRGBColorSpace*, setting it automatically')
+    sdr.colorSpace = SRGBColorSpace
+  }
+  sdr.needsUpdate = true
 
-  const camera = new OrthographicCamera()
-  camera.position.set(0, 0, 10)
-  camera.left = -0.5
-  camera.right = 0.5
-  camera.top = 0.5
-  camera.bottom = -0.5
-  camera.updateProjectionMatrix()
-
-  const renderTarget = new WebGLRenderTarget(sdr.width, sdr.height, {
-    type: HalfFloatType,
-    colorSpace: NoColorSpace,
-    format: RGBAFormat,
-    magFilter: LinearFilter,
-    minFilter: LinearMipMapLinearFilter,
-    depthBuffer: false,
-    stencilBuffer: false,
-    generateMipmaps: true
-  })
-
-  const sdrTexture = new Texture(sdr, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, SRGBColorSpace)
-  sdrTexture.needsUpdate = true
-  const gainMapTexture = new Texture(gainMap, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, NoColorSpace)
-  gainMapTexture.needsUpdate = true
+  if (gainMap.colorSpace !== NoColorSpace) {
+    console.warn('Gainmap Colorspace needs to be *NoColorSpace*')
+    gainMap.colorSpace = NoColorSpace
+  }
+  gainMap.needsUpdate = true
 
   const material = new GainMapDecoderMaterial({
     ...params,
-    sdr: sdrTexture,
-    gainMap: gainMapTexture
+    sdr,
+    gainMap
   })
 
-  const plane = new Mesh(new PlaneGeometry(), material)
-  plane.geometry.computeBoundingBox()
-  scene.add(plane)
-
-  const render = () => {
-    renderer.setRenderTarget(renderTarget)
-    try {
-      renderer.render(scene, camera)
-    } catch (e) {
-      renderer.setRenderTarget(null)
-      throw new Error('An error occurred while rendering the gainmap: ' + e)
-    }
-    renderer.setRenderTarget(null)
-  }
-
+  const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, NoColorSpace, material, renderer)
   try {
-    render()
+    quadRenderer.render()
   } catch (e) {
-    cleanup({ renderTarget, material })
+    quadRenderer.dispose()
     throw e
   }
-
-  return {
-    renderTarget,
-    material,
-    render
-  }
-}
-/**
- * Decodes a Gainmap to a raw `Uint16Array` which can be used to popupate a `DataTexture`.
- *
- * Uses {@link decode} internally then calls `readRenderTargetPixels` in order to return an `Uint16Array` which can be used to either:
- * * populate a DataTexture
- * * store the RAW data somewhere
- *
- * @category Decoding Functions
- * @group Decoding Functions
- * @see {@link decode}
- * @param params
- * @returns
- */
-export const decodeToArray = (params: DecodeToDataArrayParameters) => {
-  let _renderer = params.renderer
-  let destroyRenderer = false
-  if (!_renderer) {
-    _renderer = instantiateRenderer()
-    destroyRenderer = true
-  }
-
-  let decodeResult: ReturnType<typeof decode>
-
-  try {
-    decodeResult = decode({ ...params, renderer: _renderer })
-  } catch (e) {
-    cleanup({ renderer: _renderer, destroyRenderer })
-    throw e
-  }
-  const { renderTarget, material } = decodeResult
-
-  const out = new Uint16Array(renderTarget.width * renderTarget.height * 4)
-  _renderer.readRenderTargetPixels(renderTarget, 0, 0, renderTarget.width, renderTarget.height, out)
-  cleanup({ renderer: _renderer, renderTarget, destroyRenderer, material })
-  return out
+  return quadRenderer
 }

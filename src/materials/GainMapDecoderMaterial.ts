@@ -2,7 +2,7 @@ import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
 import { GainmapDecodingParameters, GainMapMetadata } from '../types'
 
-const vertexShader = `
+const vertexShader = /* glsl */`
 varying vec2 vUv;
 
 void main() {
@@ -11,7 +11,7 @@ void main() {
 }
 `
 
-const fragmentShader = `
+const fragmentShader = /* glsl */`
 uniform sampler2D sdr;
 uniform sampler2D gainMap;
 uniform vec3 gamma;
@@ -71,6 +71,9 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
     this._maxDisplayBoost = maxDisplayBoost
     this._hdrCapacityMin = hdrCapacityMin
     this._hdrCapacityMax = hdrCapacityMax
+
+    this.needsUpdate = true
+    this.uniformsNeedUpdate = true
   }
 
   /**

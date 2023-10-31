@@ -43,7 +43,7 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
   } else {
     throw new Error('Invalid source image')
   }
-  const img = await createImageBitmap(imageBitmapSource, { premultiplyAlpha: 'none', colorSpaceConversion: 'none' })
+  const img = await createImageBitmap(imageBitmapSource)
   const width = img.width
   const height = img.height
 
