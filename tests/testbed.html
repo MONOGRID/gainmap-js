@@ -19,7 +19,7 @@
     }
   </script>
   <script type="module">
-    import { encodeAndCompress } from 'gainmap-js';
+    import { encodeAndCompress, findTextureMinMax } from 'gainmap-js';
     import { encodeJPEGMetadata, decodeJPEGMetadata } from 'gainmap-js/libultrahdr';
     import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
@@ -41,7 +41,15 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const result = await encodeAndCompress({ image, mimeType, quality, flipY: loader instanceof EXRLoader })
+      const textureMinMax = findTextureMinMax(image)
+
+      const result = await encodeAndCompress({
+        image,
+        mimeType,
+        quality,
+        flipY: loader instanceof EXRLoader,
+        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+       })
       // Uint8Arrays can't be transferred outside puppetteer
       result.gainMap.data = Array.from(result.gainMap.data)
       result.sdr.data = Array.from(result.sdr.data)
@@ -54,7 +62,15 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const result = await encodeAndCompress({ image, mimeType: 'image/jpeg', quality, flipY: loader instanceof EXRLoader })
+      const textureMinMax = findTextureMinMax(image)
+
+      const result = await encodeAndCompress({
+        image,
+        mimeType: 'image/jpeg',
+        quality, flipY:
+        loader instanceof EXRLoader,
+        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+      })
 
       const jpeg = await encodeJPEGMetadata(result)
       // Uint8Arrays can't be transferred outside puppetteer
@@ -79,7 +95,13 @@
       if (file.name.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (file.name.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.parse(buf.buffer)
-      const result = await encodeAndCompress({ image, mimeType: 'image/jpeg', flipY: loader instanceof EXRLoader })
+      const textureMinMax = findTextureMinMax(image)
+      const result = await encodeAndCompress({
+        image,
+        mimeType: 'image/jpeg',
+        flipY: loader instanceof EXRLoader,
+        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+      })
 
       encodeJPEGMetadata(result)
     }

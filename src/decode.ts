@@ -1,26 +1,17 @@
 import {
-  ClampToEdgeWrapping,
   HalfFloatType,
-  LinearFilter,
-  NoColorSpace,
-  RGBAFormat,
-  SRGBColorSpace,
-  Texture,
-  UnsignedByteType,
-  UVMapping
+  NoColorSpace
 } from 'three'
 
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 import { DecodeParameters } from './types'
 import { QuadRenderer } from './utils/QuadRenderer'
 
-export { GainMapDecoderMaterial }
-
 /**
  * Decodes a gainmap using a WebGLRenderTarget
  *
- * @category Decoding Functions
- * @group Decoding Functions
+ * @category Decoding
+ * @group Decoding
  * @example
  * import { decode } from 'gainmap-js'
  * import { ImageBitmapLoader, Mesh, PlaneGeometry, MeshBasicMaterial } from 'three'
@@ -53,28 +44,18 @@ export { GainMapDecoderMaterial }
 export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   const { sdr, gainMap, renderer } = params
 
-  const sdrTexture = new Texture(sdr, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, SRGBColorSpace)
-  sdrTexture.needsUpdate = true
-  const gainMapTexture = new Texture(gainMap, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, NoColorSpace)
-  gainMapTexture.needsUpdate = true
+  // const sdrTexture = new Texture(sdr, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, SRGBColorSpace)
+  // sdrTexture.needsUpdate = true
+  // const gainMapTexture = new Texture(gainMap, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, NoColorSpace)
+  // gainMapTexture.needsUpdate = true
 
   const material = new GainMapDecoderMaterial({
     ...params,
-    sdr: sdrTexture,
-    gainMap: gainMapTexture
+    sdr,
+    gainMap
   })
 
-  const quadRenderer = new QuadRenderer(sdr.width, sdr.height, HalfFloatType, NoColorSpace, material, renderer)
-
-  try {
-    quadRenderer.render()
-  } catch (e) {
-    sdrTexture.dispose()
-    gainMapTexture.dispose()
-    material.dispose()
-    quadRenderer.renderTarget.dispose()
-    throw e
-  }
-
+  const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, NoColorSpace, material, renderer)
+  quadRenderer.render()
   return quadRenderer
 }

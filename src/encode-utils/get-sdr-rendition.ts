@@ -18,7 +18,7 @@ export { SDRMaterial }
  * @param renderer (optional) WebGLRenderer to use diring the rendering, a disposable renderer will be create and destroyed if this is not provided.
  * @throws {Error} if the WebGLRenderer fails to render the SDR image
  */
-export const renderSDR = (hdrTexture: DataTexture, renderer?: WebGLRenderer): InstanceType<typeof QuadRenderer<typeof UnsignedByteType, InstanceType<typeof SDRMaterial>>> => {
+export const getSDRRendition = (hdrTexture: DataTexture, renderer?: WebGLRenderer): InstanceType<typeof QuadRenderer<typeof UnsignedByteType, InstanceType<typeof SDRMaterial>>> => {
   hdrTexture.needsUpdate = true
   const quadRenderer = new QuadRenderer(hdrTexture.image.width, hdrTexture.image.height, UnsignedByteType, SRGBColorSpace, new SDRMaterial({ map: hdrTexture }), renderer)
 

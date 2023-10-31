@@ -1,5 +1,7 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
+import { GainmapEncodingParameters } from '../types'
+
 const vertexShader = /* glsl */`
 varying vec2 vUv;
 
@@ -10,13 +12,16 @@ void main() {
 `
 
 const fragmentShader = /* glsl */`
+#ifndef saturate
+#define saturate( a ) clamp( a, 0.0, 1.0 )
+#endif
 uniform sampler2D sdr;
 uniform sampler2D hdr;
 uniform vec3 gamma;
 uniform vec3 offsetSdr;
 uniform vec3 offsetHdr;
-uniform vec3 minLog2;
-uniform vec3 maxLog2;
+uniform float minLog2;
+uniform float maxLog2;
 
 varying vec2 vUv;
 
@@ -26,7 +31,7 @@ void main() {
 
   vec3 pixelGain = (hdrColor + offsetHdr) / (sdrColor + offsetSdr);
   vec3 logRecovery = (log2(pixelGain) - minLog2) / (maxLog2 - minLog2);
-  vec3 clampedRecovery = saturate(logRecoveryR);
+  vec3 clampedRecovery = saturate(logRecovery);
   gl_FragColor = vec4(pow(clampedRecovery, gamma), 1.0);
 }
 `
@@ -39,14 +44,24 @@ void main() {
 export class GainMapEncoderMaterial extends ShaderMaterial {
   private _minContentBoost: number
   private _maxContentBoost: number
-  private _offsetSdr: Vector3
-  private _offsetHdr: Vector3
-  private _gamma: Vector3
+  private _offsetSdr: [number, number, number]
+  private _offsetHdr: [number, number, number]
+  private _gamma: [number, number, number]
   /**
    *
    * @param params
    */
-  constructor ({ sdr, hdr, offsetSdr, offsetHdr, maxContentBoost, minContentBoost, gamma }: { maxContentBoost: number, minContentBoost: number, gamma: Vector3, offsetSdr: Vector3, offsetHdr: Vector3, sdr: Texture, hdr: Texture }) {
+  constructor ({ sdr, hdr, offsetSdr, offsetHdr, maxContentBoost, minContentBoost, gamma }: { sdr: Texture, hdr: Texture } & GainmapEncodingParameters) {
+    if (!maxContentBoost) throw new Error('maxContentBoost is required')
+    if (!sdr) throw new Error('sdr is required')
+    if (!hdr) throw new Error('hdr is required')
+
+    const _gamma = gamma || [1, 1, 1]
+    const _offsetSdr = offsetSdr || [1 / 64, 1 / 64, 1 / 64]
+    const _offsetHdr = offsetHdr || [1 / 64, 1 / 64, 1 / 64]
+    const _minContentBoost = minContentBoost || 1
+    const _maxContentBoost = Math.max(maxContentBoost, 1.0001)
+
     super({
       name: 'GainMapEncoderMaterial',
       vertexShader,
@@ -54,43 +69,43 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
       uniforms: {
         sdr: { value: sdr },
         hdr: { value: hdr },
-        gamma: { value: gamma },
-        offsetSdr: { value: offsetSdr },
-        offsetHdr: { value: offsetHdr },
-        minLog2: { value: Math.log2(minContentBoost) },
-        maxLog2: { value: Math.log2(maxContentBoost) }
+        gamma: { value: new Vector3().fromArray(_gamma) },
+        offsetSdr: { value: new Vector3().fromArray(_offsetSdr) },
+        offsetHdr: { value: new Vector3().fromArray(_offsetHdr) },
+        minLog2: { value: Math.log2(_minContentBoost) },
+        maxLog2: { value: Math.log2(_maxContentBoost) }
       },
       blending: NoBlending,
       depthTest: false,
       depthWrite: false
     })
 
-    this._minContentBoost = minContentBoost
-    this._maxContentBoost = maxContentBoost
-    this._offsetSdr = offsetSdr
-    this._offsetHdr = offsetHdr
-    this._gamma = gamma
+    this._minContentBoost = _minContentBoost
+    this._maxContentBoost = _maxContentBoost
+    this._offsetSdr = _offsetSdr
+    this._offsetHdr = _offsetHdr
+    this._gamma = _gamma
 
     this.needsUpdate = true
     this.uniformsNeedUpdate = true
   }
 
   get gamma () { return this._gamma }
-  set gamma (value: Vector3) {
+  set gamma (value: [number, number, number]) {
     this._gamma = value
-    this.uniforms.gamma.value = value
+    this.uniforms.gamma.value = new Vector3().fromArray(value)
   }
 
   get offsetHdr () { return this._offsetHdr }
-  set offsetHdr (value: Vector3) {
+  set offsetHdr (value: [number, number, number]) {
     this._offsetHdr = value
-    this.uniforms.offsetHdr.value = value
+    this.uniforms.offsetHdr.value = new Vector3().fromArray(value)
   }
 
   get offsetSdr () { return this._offsetSdr }
-  set offsetSdr (value: Vector3) {
+  set offsetSdr (value: [number, number, number]) {
     this._offsetSdr = value
-    this.uniforms.offsetSdr.value = value
+    this.uniforms.offsetSdr.value = new Vector3().fromArray(value)
   }
 
   get minContentBoost () { return this._minContentBoost }
@@ -104,4 +119,9 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     this._maxContentBoost = value
     this.uniforms.maxLog2.value = Math.log2(value)
   }
+
+  get gainMapMin (): [number, number, number] { return [Math.log2(this._minContentBoost), Math.log2(this._minContentBoost), Math.log2(this._minContentBoost)] }
+  get gainMapMax (): [number, number, number] { return [Math.log2(this._maxContentBoost), Math.log2(this._maxContentBoost), Math.log2(this._maxContentBoost)] }
+  get hdrCapacityMin (): number { return Math.min(Math.max(0, this.gainMapMin[0]), Math.max(0, this.gainMapMin[1]), Math.max(0, this.gainMapMin[2])) }
+  get hdrCapacityMax (): number { return Math.min(Math.max(0, this.gainMapMax[0]), Math.max(0, this.gainMapMax[1]), Math.max(0, this.gainMapMax[2])) }
 }

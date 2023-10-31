@@ -5,7 +5,7 @@ import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
 
-import { CompressedEncodingResult } from '../src'
+import { encodeAndCompress } from '../src/encode'
 import { getTestbed } from './common'
 
 describe('encoder', () => {
@@ -38,7 +38,7 @@ describe('encoder', () => {
         '${file}',
         'image/${format === 'jpg' ? 'jpeg' : format}',
         ${quality}
-    )`) as Awaited<CompressedEncodingResult>
+    )`) as Awaited<ReturnType<typeof encodeAndCompress>>
 
     expect(pageError).not.toBeCalled()
     expect(pageLog).not.toBeCalled()

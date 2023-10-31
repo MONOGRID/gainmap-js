@@ -1,4 +1,4 @@
-import { type DataTexture, type WebGLRenderer } from 'three'
+import { type DataTexture, Texture, type WebGLRenderer } from 'three'
 import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
@@ -70,6 +70,14 @@ export type GainMapMetadata = {
  */
 export type GainmapEncodingParameters = {
   /**
+   *
+   */
+  offsetHdr?: [number, number, number]
+  /**
+   *
+   */
+  offsetSdr?: [number, number, number]
+  /**
    * This value lets the content creator constrain how much darker an image can get, when shown on an HDR display, relative to the SDR rendition. This value is a constant for a particular image.
    * @defaultValue 1
    * @remarks
@@ -86,7 +94,7 @@ export type GainmapEncodingParameters = {
    * * In practice, this value is typically greater than 1.0.
    * * Always greater than or equal to Min content boost.
    */
-  maxContentBoost?: number
+  maxContentBoost: number
   /**
    * This is the gamma to apply to the stored map values.
    *
@@ -132,10 +140,6 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
    * will be created and destroyed on demand if not provided.
    */
   renderer?: WebGLRenderer,
-  /**
-   * Encodes the Gainmap using a Web Worker
-   */
-  withWorker?: WorkerInterfaceImplementation
 }
 /**
  * This library can provide gainmap compressed in these mimeTypes
@@ -165,8 +169,8 @@ export type HDRRawImage = {
 /**
  * Options for compressing a RAW RGBA image into the specified mimeType
  *
- * @category Encoding Parameters
- * @group Encoding Parameters
+ * @category Compression
+ * @group Compression
  */
 export type CompressOptions = {
   /**
@@ -221,100 +225,26 @@ export type CompressParameters = CompressOptions & ({
  * @category Encoding Parameters
  * @group Encoding Parameters
  */
-export type EncodingParametersWithCompression = EncodingParametersBase & CompressOptions
-
-/**
- * @category Encoding Results
- * @group Encoding Results
- */
-export type CompressedEncodingResult = {
+export type EncodingParametersWithCompression = EncodingParametersBase & CompressOptions & {
   /**
-   * Original HDR RAW RGBA Data passed back.
+   * Encodes the Gainmap using a Web Worker
    */
-  hdr: HDRRawImage
-  /**
-   * SDR RAW RGBA
-   */
-  rawSDR: Uint8ClampedArray
-  /**
-   * GainMap RAW RGBA
-   */
-  rawGainMap: Uint8ClampedArray
-  /**
-   * Data structure representing a compressed image with a mimeType
-   * @see {@link CompressedImage}
-   */
-  sdr: CompressedImage
-  /**
-   * Data structure representing a compressed image with a mimeType
-   * @see {@link CompressedImage}
-   */
-  gainMap: CompressedImage
-
-} & GainMapMetadata
-
-/**
- * Output of the core encoding algorithm
- *
- * @category Encoding Results
- * @group Encoding Results
- */
-export type EncodeBuffersResult = GainMapMetadata & {
-  gainMap: Uint8ClampedArray
+  withWorker?: WorkerInterfaceImplementation
 }
 
 /**
- * @category Encoding Results
- * @group Encoding Results
- */
-export type RawEncodingResult = {
-  /**
-   * RAW RGBA data
-   */
-  sdr: Uint8ClampedArray
-  /**
-   * Original HDR RAW RGBA Data passed back
-   */
-  hdr: HDRRawImage
-} & EncodeBuffersResult
-/**
- * Parameters used to encode a GainMap
- *
- * @category Encoding Parameters
- * @group Encoding Parameters
- */
-export type EncodeBuffersParameters = GainmapEncodingParameters & {
-  /**
-   * RAW RGBA SDR Representation
-   */
-  sdr: Uint8ClampedArray
-  /**
-   * RAW RGBA Original HDR Image
-   */
-  hdr: HDRRawImageBuffer
-  /**
-   * Width of the RAW RGBA HDR Image
-   */
-  width: number
-  /**
-   * Height of the RAW RGBA HDR Image
-   */
-  height: number
-}
-
-/**
- * @category Decoding Parameters
- * @group Decoding Parameters
+ * @category Decoding
+ * @group Decoding
  */
 export type DecodeParameters = {
   /**
    * An ImageBitmap containing the SDR Rendition
    */
-  sdr: ImageBitmap
+  sdr: Texture
   /**
    * An ImageBitmap containing the GainMap recovery image
    */
-  gainMap: ImageBitmap
+  gainMap: Texture
   /**
    * WebGLRenderer used to decode the GainMap
    */

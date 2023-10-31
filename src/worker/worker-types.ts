@@ -1,13 +1,13 @@
-import { CompressedImage, type CompressParameters, type EncodeBuffersParameters, type EncodeBuffersResult } from '../types'
+import { CompressedImage, type CompressParameters } from '../types'
 
 export type WorkerInterface = {
-  encodeGainmapBuffers: {
-    request: {
-      type: 'encode-gainmap-buffers',
-      payload: EncodeBuffersParameters
-    }
-    result: EncodeBuffersResult & { sdr: EncodeBuffersParameters['sdr'], hdr: EncodeBuffersParameters['hdr'] }
-  },
+  // encodeGainmapBuffers: {
+  //   request: {
+  //     type: 'encode-gainmap-buffers',
+  //     payload: EncodeBuffersParameters
+  //   }
+  //   result: EncodeBuffersResult & { sdr: EncodeBuffersParameters['sdr'], hdr: EncodeBuffersParameters['hdr'] }
+  // },
   compress: {
     request: {
       type: 'compress',

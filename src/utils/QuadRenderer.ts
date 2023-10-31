@@ -20,8 +20,11 @@ import {
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
-
-type TypeToBuffer<TType extends TextureDataType> =
+/**
+ * @category General
+ * @group General
+ */
+export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   TType extends typeof UnsignedByteType ? Uint8ClampedArray :
   TType extends typeof HalfFloatType ? Uint16Array :
   TType extends typeof UnsignedIntType ? Uint32Array :
@@ -32,7 +35,10 @@ type TypeToBuffer<TType extends TextureDataType> =
   never
 
 /**
- * Uitlity structure used for rendering a texture using a material
+ * Utility structure used for rendering a texture using a material
+ *
+ * @category General
+ * @group General
  */
 export class QuadRenderer<TType extends TextureDataType, TMaterial extends Material> {
   private _renderer: WebGLRenderer
@@ -112,12 +118,12 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
       this._renderer.render(this._scene, this._camera)
     } catch (e) {
       this._renderer.setRenderTarget(null)
-      throw new Error('An error occurred while rendering: ' + e)
+      throw e
     }
     this._renderer.setRenderTarget(null)
   }
 
-  public toArray (): TypeToBuffer<TType> {
+  public toArray (): TextureDataTypeToBufferType<TType> {
     let out: ArrayBufferLike
     switch (this._type) {
       case UnsignedByteType:
@@ -145,7 +151,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
         throw new Error('Unsupported data type')
     }
     this._renderer.readRenderTargetPixels(this._renderTarget, 0, 0, this._width, this._height, out)
-    return out as TypeToBuffer<TType>
+    return out as TextureDataTypeToBufferType<TType>
   }
 
   public dispose () {

@@ -11,7 +11,6 @@ void main() {
 
 const fragmentShader = /* glsl */`
 #ifndef saturate
-// <tonemapping_pars_fragment> may have defined saturate() already
 #define saturate( a ) clamp( a, 0.0, 1.0 )
 #endif
 
