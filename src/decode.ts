@@ -1,6 +1,7 @@
 import {
   HalfFloatType,
-  NoColorSpace
+  NoColorSpace,
+  SRGBColorSpace
 } from 'three'
 
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
@@ -44,10 +45,17 @@ import { QuadRenderer } from './utils/QuadRenderer'
 export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   const { sdr, gainMap, renderer } = params
 
-  // const sdrTexture = new Texture(sdr, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, SRGBColorSpace)
-  // sdrTexture.needsUpdate = true
-  // const gainMapTexture = new Texture(gainMap, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, RGBAFormat, UnsignedByteType, 1, NoColorSpace)
-  // gainMapTexture.needsUpdate = true
+  if (sdr.colorSpace !== SRGBColorSpace) {
+    console.warn('SDR Colorspace needs to be *SRGBColorSpace*, setting it automatically')
+    sdr.colorSpace = SRGBColorSpace
+  }
+  sdr.needsUpdate = true
+
+  if (gainMap.colorSpace !== NoColorSpace) {
+    console.warn('Gainmap Colorspace needs to be *NoColorSpace*')
+    gainMap.colorSpace = NoColorSpace
+  }
+  gainMap.needsUpdate = true
 
   const material = new GainMapDecoderMaterial({
     ...params,
