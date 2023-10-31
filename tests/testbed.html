@@ -41,14 +41,14 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const textureMinMax = findTextureMinMax(image)
+      // const textureMinMax = findTextureMinMax(image)
 
       const result = await encodeAndCompress({
         image,
         mimeType,
         quality,
         flipY: loader instanceof EXRLoader,
-        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+        maxContentBoost: 8
        })
       // Uint8Arrays can't be transferred outside puppetteer
       result.gainMap.data = Array.from(result.gainMap.data)
@@ -62,14 +62,15 @@
       if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
       const image = await loader.loadAsync(`https://local/${url}`)
       image.flipY = false
-      const textureMinMax = findTextureMinMax(image)
+
+      // const textureMinMax = findTextureMinMax(image)
 
       const result = await encodeAndCompress({
         image,
         mimeType: 'image/jpeg',
-        quality, flipY:
-        loader instanceof EXRLoader,
-        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+        quality,
+        flipY: loader instanceof EXRLoader,
+        maxContentBoost: 8
       })
 
       const jpeg = await encodeJPEGMetadata(result)
@@ -100,7 +101,7 @@
         image,
         mimeType: 'image/jpeg',
         flipY: loader instanceof EXRLoader,
-        maxContentBoost: Math.max.apply(this, textureMinMax) || 4
+        maxContentBoost: Math.max.apply(this, textureMinMax)
       })
 
       encodeJPEGMetadata(result)

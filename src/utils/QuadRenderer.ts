@@ -35,7 +35,7 @@ export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   never
 
 /**
- * Utility structure used for rendering a texture using a material
+ * Utility structure used for rendering a texture with a material
  *
  * @category General
  * @group General
@@ -96,6 +96,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   }
 
   /**
+   * Instantiates a temporary renderer
    *
    * @returns
    */
@@ -108,6 +109,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   }
 
   /**
+   * Renders the input texture using the specified material
    *
    * @param from
    * @param from
@@ -123,6 +125,11 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._renderer.setRenderTarget(null)
   }
 
+  /**
+   * Obtains a Buffer containing the rendered texture.
+   *
+   * @returns
+   */
   public toArray (): TextureDataTypeToBufferType<TType> {
     let out: ArrayBufferLike
     switch (this._type) {
@@ -154,6 +161,9 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     return out as TextureDataTypeToBufferType<TType>
   }
 
+  /**
+   * If using a disposable renderer, it will dispose it.
+   */
   public dispose () {
     this._renderer.setRenderTarget(null)
     if (this._rendererIsDisposable) {
@@ -162,19 +172,32 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     }
   }
 
+  /**
+   * Width of the texture
+   */
   public get width () { return this._width }
   public set width (value: number) {
     this._width = value
     this._renderTarget.setSize(this._width, this._height)
   }
 
+  /**
+   * Height of the texture
+   */
   public get height () { return this._height }
   public set height (value: number) {
     this._height = value
     this._renderTarget.setSize(this._width, this._height)
   }
 
+  /**
+   * The renderer used
+   */
   public get renderer () { return this._renderer }
+
+  /**
+   * The `WebGLRenderTarget` used.
+   */
   public get renderTarget () { return this._renderTarget }
   public set renderTarget (value: WebGLRenderTarget) {
     this._renderTarget = value
@@ -183,6 +206,9 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     // this._type = value.texture.type
   }
 
+  /**
+   * The `Material` used.
+   */
   public get material () { return this._material }
   // public set material (value: TMaterial) { this._material = value }
 

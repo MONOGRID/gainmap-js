@@ -3,6 +3,7 @@ import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 /**
+ * Utility function to obtain a `DataTexture` from various input formats
  *
  * @param image
  * @returns

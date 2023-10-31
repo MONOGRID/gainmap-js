@@ -32,7 +32,7 @@ export const encode = (params: EncodingParametersBase) => {
 
   const dataTexture = getDataTexture(image)
 
-  const sdr = getSDRRendition(dataTexture, renderer)
+  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping)
 
   const gainMapRenderer = getGainMap({
     ...params,
@@ -82,11 +82,8 @@ export const encodeAndCompress = async (params: EncodingParametersWithCompressio
   let rawSDR: Uint8ClampedArray
   let rawGainMap: Uint8ClampedArray
 
-  const sdrArr = encodingResult.sdr.toArray()
-  const gainMapArr = encodingResult.gainMap.toArray()
-
-  const sdrImageData = new ImageData(sdrArr, encodingResult.sdr.width, encodingResult.sdr.height)
-  const gainMapImageData = new ImageData(gainMapArr, encodingResult.gainMap.width, encodingResult.gainMap.height)
+  const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
+  const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
 
   if (withWorker) {
     const workerResult = await Promise.all([

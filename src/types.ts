@@ -1,4 +1,4 @@
-import { type DataTexture, Texture, type WebGLRenderer } from 'three'
+import { type DataTexture, Texture, ToneMapping, type WebGLRenderer } from 'three'
 import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
@@ -106,6 +106,7 @@ export type GainmapEncodingParameters = {
    */
   gamma?: [number, number, number]
 }
+
 /**
  * Parameters for decoding a Gainmap
  *
@@ -120,7 +121,7 @@ export type GainmapDecodingParameters = {
    * This value can change over time based on device settings and other factors,
    * such as ambient light conditions, or how many bright pixels are on the screen.
    */
-    maxDisplayBoost: number
+  maxDisplayBoost: number
 }
 
 /**
@@ -140,7 +141,13 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
    * will be created and destroyed on demand if not provided.
    */
   renderer?: WebGLRenderer,
+  /**
+   * Optional tonemapping to apply to the SDR Rendition
+   * @defaultValue `ACESFilmicToneMapping`
+   */
+  toneMapping?: ToneMapping
 }
+
 /**
  * This library can provide gainmap compressed in these mimeTypes
  *
@@ -148,6 +155,7 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
  * @group Compression
  */
 export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
+
 /**
  * Accepted HDR image buffers, definitions coming from the THREE.js Library types
  *
@@ -155,6 +163,7 @@ export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
  * @group General
  */
 export type HDRRawImageBuffer = EXR['data'] | RGBE['data'] | LogLuv['data']
+
 /**
  * Raw HDR image data
  *
@@ -166,6 +175,7 @@ export type HDRRawImage = {
   width: number
   height: number
 }
+
 /**
  * Options for compressing a RAW RGBA image into the specified mimeType
  *
@@ -238,11 +248,11 @@ export type EncodingParametersWithCompression = EncodingParametersBase & Compres
  */
 export type DecodeParameters = {
   /**
-   * An ImageBitmap containing the SDR Rendition
+   * An Texture containing the SDR Rendition
    */
   sdr: Texture
   /**
-   * An ImageBitmap containing the GainMap recovery image
+   * An Texture containing the GainMap recovery image
    */
   gainMap: Texture
   /**
