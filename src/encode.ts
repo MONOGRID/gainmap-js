@@ -38,12 +38,12 @@ export const encode = (params: EncodingParametersBase) => {
     ...params,
     image: dataTexture,
     sdr,
-    renderer
+    renderer: sdr.renderer // reuse the same (maybe disposable?) renderer
   })
 
   return {
-    gainMap: gainMapRenderer,
     sdr,
+    gainMap: gainMapRenderer,
     hdr: dataTexture,
     getMetadata: () => {
       const meta: GainMapMetadata = {
@@ -121,6 +121,9 @@ export const encodeAndCompress = async (params: EncodingParametersWithCompressio
     rawSDR = sdrImageData.data
     rawGainMap = gainMapImageData.data
   }
+
+  encodingResult.sdr.dispose()
+  encodingResult.gainMap.dispose()
 
   return {
     ...encodingResult,

@@ -108,12 +108,18 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     this.uniforms.offsetSdr.value = new Vector3().fromArray(value)
   }
 
+  /**
+   * Non logarithmic space
+   */
   get minContentBoost () { return this._minContentBoost }
   set minContentBoost (value: number) {
     this._minContentBoost = value
     this.uniforms.minLog2.value = Math.log2(value)
   }
 
+  /**
+   * Non logarithmic space
+   */
   get maxContentBoost () { return this._maxContentBoost }
   set maxContentBoost (value: number) {
     this._maxContentBoost = value

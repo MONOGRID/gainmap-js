@@ -64,6 +64,11 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
   })
 
   const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, NoColorSpace, material, renderer)
-  quadRenderer.render()
+  try {
+    quadRenderer.render()
+  } catch (e) {
+    quadRenderer.dispose()
+    throw e
+  }
   return quadRenderer
 }

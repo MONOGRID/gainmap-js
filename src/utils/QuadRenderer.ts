@@ -103,6 +103,8 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   public static instantiateRenderer () {
     const renderer = new WebGLRenderer()
     renderer.setSize(128, 128)
+    // renderer.outputColorSpace = SRGBColorSpace
+    // renderer.toneMapping = LinearToneMapping
     // renderer.debug.checkShaderErrors = false
     // this._rendererIsDisposable = true
     return renderer

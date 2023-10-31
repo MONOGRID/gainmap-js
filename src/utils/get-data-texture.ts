@@ -5,6 +5,9 @@ import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 /**
  * Utility function to obtain a `DataTexture` from various input formats
  *
+ * @category General
+ * @group General
+ *
  * @param image
  * @returns
  */
@@ -31,6 +34,12 @@ export const getDataTexture = (image: EXR | RGBE | LogLuv | DataTexture) => {
       16,
       'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
     )
+
+    // TODO: This tries to detect a raw RGBE and applies flipY
+    // see if there's a better way to detect it?
+    if ('header' in image && 'gamma' in image) {
+      dataTexture.flipY = true
+    }
     dataTexture.needsUpdate = true
   }
 

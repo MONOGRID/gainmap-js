@@ -26,6 +26,11 @@ export const getGainMap = (params: { sdr: InstanceType<typeof QuadRenderer> } & 
   })
 
   const quadRenderer = new QuadRenderer(dataTexture.image.width, dataTexture.image.height, UnsignedByteType, NoColorSpace, material, renderer)
-  quadRenderer.render()
+  try {
+    quadRenderer.render()
+  } catch (e) {
+    quadRenderer.dispose()
+    throw e
+  }
   return quadRenderer
 }
