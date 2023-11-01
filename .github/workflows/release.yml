@@ -1,4 +1,4 @@
-name: 'Publish wiki'
+name: 'Release'
 
 on:
   workflow_run:
@@ -8,7 +8,7 @@ on:
       - completed
 
 concurrency:
-  group: publish-wiki
+  group: release
   cancel-in-progress: true
 
 permissions:
@@ -16,9 +16,12 @@ permissions:
   actions: read
 
 jobs:
-  publish-wiki:
+  release:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
         - uses: actions/checkout@v3 # checkout the repo
           with:
@@ -36,6 +39,5 @@ jobs:
             node-version: 18
 
         - run: npm ci # install packages
-        - run: npx typedoc # produce wiki
+        - run: npx semantic-release --dry-run # release
 
-        - uses: Andrew-Chen-Wang/github-wiki-action@v4 # publish wiki

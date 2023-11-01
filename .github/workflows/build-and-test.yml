@@ -1,25 +1,29 @@
-name: Test And Release
+name: 'Build And Test'
+
 on: [push, pull_request]
+
 jobs:
-    Test-And-Release:
+    Build-And-Test:
       runs-on: ubuntu-latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
-        - uses: actions/checkout@v3
+        - uses: actions/checkout@v3         # checkout the repo
           with:
             submodules: recursive
-        - uses: mymindstorm/setup-emsdk@v11
+        - uses: mymindstorm/setup-emsdk@v11 # setup emscripten
 
-        - uses: actions/setup-python@v4
+        - uses: actions/setup-python@v4     # setup python
           with:
             python-version: '3.10'
 
-        - uses: BSFishy/pip-action@v1
+        - uses: BSFishy/pip-action@v1       # install python packages
           with:
             packages: |
               meson
               ninja
 
-        - name: Overwrite file
+        - name: Write em.txt               # write em.txt
           uses: "DamianReeves/write-file-action@master"
           with:
             path: libultrahdr-wasm/em.txt
@@ -37,21 +41,21 @@ jobs:
               cpu = 'wasm32'
               endian = 'little'
 
-        - run: |
+        - run: | # build WASM
             cd libultrahdr-wasm
             meson setup build --cross-file=em.txt
             meson compile -C build
 
-        - uses: actions/setup-node@v3
+        - uses: actions/setup-node@v3       # setup node
           with:
             node-version: 18
 
-        - run: npm ci
-        - run: npm test
-        - run: npm run build
-        - run: npx semantic-release --dry-run
+        - run: npm ci                       # install packages
+        - run: npm run build                # build
+        - run: npm test                     # run tests
 
-        - uses: actions/upload-artifact@v3
+        - uses: actions/upload-artifact@v3  # upload build artifacts
+          if: success() || failure()
           with:
             name: build-artifact
             if-no-files-found: error
@@ -61,6 +65,4 @@ jobs:
               libultrahdr-wasm/build/*.map
               libultrahdr-wasm/build/*.wasm
               dist/
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+              junit.xml
