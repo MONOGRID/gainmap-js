@@ -21,19 +21,19 @@ jobs:
           name: build-artifact
           run_id: ${{ github.event.workflow_run.id }}
 
-      - name: Annotate Src Code Linting Results
+      - name: 'Src Code Linting Results'
         if: success() || failure()
-        uses: ataylorme/eslint-annotate-action@v2
+        uses: ldiego73/eslint-report-action@v1.1
         with:
-          report-json: "reports/eslint-src.json"
-          check-name: 'Eslint Src'
+          report: "reports/eslint-src.json"
+          title: 'Eslint Src'
 
-      - name: Annotate Examples Code Linting Results
+      - name: 'Examples Code Linting Results'
         if: success() || failure()
-        uses: ataylorme/eslint-annotate-action@v2
+        uses: ldiego73/eslint-report-action@v1.1
         with:
-          report-json: "reports/eslint-examples.json"
-          check-name: 'Eslint Examples'
+          report: "reports/eslint-examples.json"
+          title: 'Eslint Examples'
 
       - name: 'Produce test report'
         if: success() || failure()
