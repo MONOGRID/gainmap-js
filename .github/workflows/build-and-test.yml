@@ -68,10 +68,12 @@ jobs:
           run: npm run ci:check
 
         - name: 'Ensure TypeCheck Src log is error free'
+          if: always()
           id: typecheck_src_noerror
           run: '.github/check-error-in-logs.sh reports/typecheck.log'
 
         - name: 'Ensure TypeCheck Src log is error free'
+          if: always()
           id: typecheck_examples_noerror
           run: '.github/check-error-in-logs.sh reports/typecheck-exaples.log'
 
