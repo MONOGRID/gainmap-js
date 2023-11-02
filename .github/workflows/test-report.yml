@@ -15,9 +15,26 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - uses: dorny/test-reporter@v1
+      - name: 'Download Artifacts'
+        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        with:
+          name: build-artifact
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: Annotate Src Code Linting Results
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          report-json: "reports/eslint-src.json"
+
+      - name: Annotate Examples Code Linting Results
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          report-json: "reports/eslint-examples.json"
+
+      - name: 'Produce test report'
+        uses: dorny/test-reporter@v1
         with:
           artifact: build-artifact          # artifact name
           name: JEST Tests                  # Name of the check run which will be created
-          path: 'junit.xml'                 # Path to test results (inside artifact .zip)
+          path: 'reports/junit.xml'         # Path to test results (inside artifact .zip)
           reporter: jest-junit              # Format of test results

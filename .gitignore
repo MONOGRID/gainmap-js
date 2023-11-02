@@ -19,3 +19,6 @@ dist/
 doc/
 wiki/
 junit.xml
+reports/*.json
+reports/*.xml
+reports/*.txt

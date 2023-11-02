@@ -8,22 +8,27 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
-        - uses: actions/checkout@v3         # checkout the repo
+        - name: 'Checkout'
+          uses: actions/checkout@v3
           with:
             submodules: recursive
-        - uses: mymindstorm/setup-emsdk@v11 # setup emscripten
 
-        - uses: actions/setup-python@v4     # setup python
+        - name: 'Setup Emscripten'
+          uses: mymindstorm/setup-emsdk@v11
+
+        - name: 'Setup Python'
+          uses: actions/setup-python@v4
           with:
             python-version: '3.10'
 
-        - uses: BSFishy/pip-action@v1       # install python packages
+        - name: 'Install Meson & Ninja'
+          uses: BSFishy/pip-action@v1
           with:
             packages: |
               meson
               ninja
 
-        - name: Write em.txt               # write em.txt
+        - name: Write em.txt
           uses: "DamianReeves/write-file-action@master"
           with:
             path: libultrahdr-wasm/em.txt
@@ -41,21 +46,33 @@ jobs:
               cpu = 'wasm32'
               endian = 'little'
 
-        - run: | # build WASM
+        - name: 'Build libultrahdr WASM'
+          run: |
             cd libultrahdr-wasm
             meson setup build --cross-file=em.txt
             meson compile -C build
 
-        - uses: actions/setup-node@v3       # setup node
+        - name: 'Setup Nodejs'
+          uses: actions/setup-node@v3
           with:
             node-version: 18
 
-        - run: npm ci                       # install packages
-        - run: npm run lint                 # lint source
-        - run: npm run lint-examples        # lint examples
-        - run: npm test                     # build & run tests
+        - name: 'Install npm packages'
+          run: npm ci
 
-        - uses: actions/upload-artifact@v3  # upload build artifacts
+        - name: 'Build'
+          run: npm run build
+
+        - name: 'Produce Reports'
+          run: npm run ci:check
+          continue-on-error: true
+
+        - name: 'Run tests'
+          run: npm run ci:test
+          continue-on-error: true
+
+        - name: 'Upload Build artifacts'
+          uses: actions/upload-artifact@v3
           if: success() || failure()
           with:
             name: build-artifact
@@ -66,4 +83,4 @@ jobs:
               libultrahdr-wasm/build/*.map
               libultrahdr-wasm/build/*.wasm
               dist/
-              junit.xml
+              reports/
