@@ -50,8 +50,8 @@ export const encode = (params: EncodingParametersBase) => {
         gainMapMax: gainMapRenderer.material.gainMapMax,
         gainMapMin: gainMapRenderer.material.gainMapMin,
         gamma: gainMapRenderer.material.gamma,
-        hdrCapacityMax: 0,
-        hdrCapacityMin: 11, // this should produce a jest error
+        hdrCapacityMax: gainMapRenderer.material.hdrCapacityMax,
+        hdrCapacityMin: gainMapRenderer.material.hdrCapacityMin,
         offsetHdr: gainMapRenderer.material.offsetHdr,
         offsetSdr: gainMapRenderer.material.offsetSdr
       }
