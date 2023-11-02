@@ -58,9 +58,9 @@
 
     "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
     "ci:check": "concurrently npm:ci:check:*",
-    "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.txt",
+    "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
-    "ci:check:typecheck-examples": "tsc --pretty false --noEmit -p examples > reports/typecheck-examples.txt",
+    "ci:check:typecheck-examples": "tsc --pretty false --noEmit -p examples > reports/typecheck-examples.log",
     "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.ts\""
   },
   "repository": {

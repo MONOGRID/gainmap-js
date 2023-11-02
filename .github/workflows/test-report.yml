@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Produce test report'
-        if: success() || failure()
+        if: always()
         uses: dorny/test-reporter@v1
         with:
           artifact: build-artifact          # artifact name
