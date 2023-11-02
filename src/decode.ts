@@ -61,7 +61,7 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
 
   gainMap.needsUpdate = true
   // this should produce a tsc error
-  const material:string = new GainMapDecoderMaterial({
+  const material = new GainMapDecoderMaterial({
     ...params,
     sdr,
     gainMap

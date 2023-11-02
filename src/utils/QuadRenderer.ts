@@ -48,7 +48,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   private _camera: OrthographicCamera
   private _quad: Mesh<PlaneGeometry>
   private _renderTarget: WebGLRenderTarget
-  private _width: string
+  private _width: number
   private _height: number
   private _type: TType
   /**
