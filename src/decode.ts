@@ -9,30 +9,29 @@ import { DecodeParameters } from './types'
 import { QuadRenderer } from './utils/QuadRenderer'
 
 /**
- * Decodes a gainmap using a WebGLRenderTarget
+ * Decodes a gain map using a WebGLRenderTarget
  *
  * @category Decoding
  * @group Decoding
  * @example
  * import { decode } from 'gainmap-js'
- * import { ImageBitmapLoader, Mesh, PlaneGeometry, MeshBasicMaterial } from 'three'
+ * import { Mesh, MeshBasicMaterial, PlaneGeometry, TextureLoader } from 'three'
  *
- * const loader = new ImageBitmapLoader()
- * loader.setOptions( { imageOrientation: 'flipY' } )
+ * const loader = new TextureLoader()
  *
  * // load SDR Representation
  * const sdr = await loader.loadAsync('sdr.jpg')
- * // load Gainmap recovery image
+ * // load Gain map recovery image
  * const gainMap = await loader.loadAsync('gainmap.jpg')
  * // load metadata
  * const metadata = await (await fetch('metadata.json')).json()
  *
- * const result = await decodeToRenderTarget({
+ * const result = await decode({
  *   sdr,
  *   gainMap,
  *   // this will restore the full HDR range
- *   maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax)
- *   ...metadata,
+ *   maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax),
+ *   ...metadata
  * })
  *
  * // result can be used to populate a Texture
@@ -40,7 +39,7 @@ import { QuadRenderer } from './utils/QuadRenderer'
  *
  * @param params
  * @returns
- * @throws {Error} if the WebGLRenderer fails to render the gainmap
+ * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
 export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   const { sdr, gainMap, renderer } = params

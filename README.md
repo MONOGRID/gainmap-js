@@ -1,11 +1,16 @@
 # gainmap-js
-A Javascript (TypeScript) Encoder/Decoder Implementation  of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gainmap
+A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Technology for storing HDR Images using an SDR Image + a "Gain map"
 
-> :warning: This library **is primarly intended** for encoding and decoding gainmap images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
+> :warning: This library **is primarly intended** for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
 >
-> It can be used for general encode/decode of gainmaps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gainmaps.
+> It can be used for general encode/decode of gain maps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gainmaps.
 
-## What is a Gainmap?
+## Installing
+```bash
+$ npm install gainmap-js threejs
+```
+
+## What is a Gain map?
 
 [See here](https://gregbenzphotography.com/hdr-images/jpg-hdr-gain-maps-in-adobe-camera-raw/) for a detailed explanation, here are some relevant parts:
 
@@ -18,6 +23,112 @@ A Javascript (TypeScript) Encoder/Decoder Implementation  of Adobe Gainmap Techn
 > * A **base (default) image**. This can be an SDR or an HDR image (JPG gain maps are always encoded with SDR as the base). If the browser or viewing software does not understand gain maps, it will just the treat file as if it were just the base image.
 > * The **gain map**. This is a secondary “image” embedded in the file. It is not a real image, but rather contains data to convert each pixel from the base image into the other (SDR or HDR) version of the image.
 >* Gain map **metadata**. This tells the browser how the gain map is encoded as well as critical information to optimize rendering on any display.
+
+## API
+
+Refer to the [WIKI](./wiki/) for detailed documentation about the API.
+
+## Examples
+
+### Decoding
+
+The main use case of this library is to decode a JPEG file that contains gain map data
+and use it instead of a traditional `.exr` or `.hdr` image.
+
+```ts
+import { decode } from 'gainmap-js'
+import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
+// fetch a JPEG image containing a gainmap as ArrayBuffer
+const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+
+// extract data from the JPEG
+const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
+
+// restore the HDR texture
+const result = await decode({
+  sdr,
+  gainMap,
+  // this will restore the full HDR range
+  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
+  ...parsedMetadata
+})
+
+// result can be used to populate a Texture
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+  )
+```
+
+### Encoding
+
+Encoding a Gain map starting from an EXR file.
+
+This is generally not useful in a `three.js` site but this library exposes methods
+that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
+
+```ts
+import { compress, encode } from 'gainmap-js'
+import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+
+// load an HDR file
+const loader = new EXRLoader()
+const image = await loader.loadAsync('image.exr')
+
+// Encode the gainmap
+const encodingResult = encode({
+  image,
+  maxContentBoost: 4
+})
+
+// obtain the RAW RGBA SDR buffer and create an ImageData
+const sdrImageData = new ImageData(
+  encodingResult.sdr.toArray(),
+  encodingResult.sdr.width, encodingResult.sdr.height
+  )
+// obtain the RAW RGBA Gain map buffer and create an ImageData
+const gainMapImageData = new ImageData(
+  encodingResult.gainMap.toArray(),
+  encodingResult.gainMap.width, encodingResult.gainMap.height
+  )
+
+// parallel compress the RAW buffers into the specified mimeType
+const mimeType = 'image/jpeg'
+const quality = 0.9
+
+const [sdr, gainMap] = await Promise.all([
+  compress({
+    source: sdrImageData,
+    mimeType,
+    quality,
+    flipY: true // output needs to be flipped
+  }),
+  compress({
+    source: gainMapImageData,
+    mimeType,
+    quality,
+    flipY: true // output needs to be flipped
+  })
+])
+
+// obtain the metadata which will be embedded into
+// and XMP tag inside the final JPEG file
+const metadata = encodingResult.getMetadata()
+
+// embed the compressed images + metadata into a single
+// JPEG file
+const jpeg = await encodeJPEGMetadata({
+  ...encodingResult,
+  ...metadata,
+  sdr,
+  gainMap
+})
+
+// `jpeg` will be an `Uint8Array` which can be saved somewhere
+```
+
 
 ## References
 

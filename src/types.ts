@@ -70,11 +70,13 @@ export type GainMapMetadata = {
  */
 export type GainmapEncodingParameters = {
   /**
-   *
+   * This is the offset to apply to the HDR pixel values during gain map generation and application.
+   * @defaultValue [1/64, 1/64, 1/64]
    */
   offsetHdr?: [number, number, number]
   /**
-   *
+   * This is the offset to apply to the SDR pixel values during gain map generation and application
+   * @defaultValue [1/64, 1/64, 1/64]
    */
   offsetSdr?: [number, number, number]
   /**
