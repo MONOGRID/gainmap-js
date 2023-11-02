@@ -10,6 +10,5 @@ module.exports = {
   ],
   transform: {
     '^.+\\.[tj]s[xm]?$': ['ts-jest', { tsconfig: 'tests/tsconfig.json' }]
-  },
-  reporters: ['default', 'jest-junit']
+  }
 }

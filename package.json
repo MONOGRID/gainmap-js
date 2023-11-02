@@ -46,10 +46,22 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+
     "test": "jest",
     "pretest": "npm run build",
-    "lint": "tsc --noEmit && eslint src/**/*.ts",
-    "lint-examples": "tsc --noEmit -p examples && eslint examples/**/*.ts"
+
+    "check": "concurrently -c auto npm:check:*",
+    "check:typecheck-src": "tsc --noEmit",
+    "check:eslint-src": "eslint src/**/*.ts",
+    "check:typecheck-examples": "tsc --noEmit -p examples",
+    "check:eslint-examples": "eslint examples/**/*.ts",
+
+    "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
+    "ci:check": "concurrently npm:ci:check:*",
+    "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.txt",
+    "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json src/**/*.ts",
+    "ci:check:typecheck-examples": "tsc --pretty false --noEmit -p examples > reports/typecheck-examples.txt",
+    "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json examples/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -83,6 +95,7 @@
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.7.5",
     "babel-jest": "^29.7.0",
+    "concurrently": "^8.2.2",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.51.0",

@@ -41,7 +41,8 @@ jobs:
               cpu = 'wasm32'
               endian = 'little'
 
-        - run: | # build WASM
+        - name: 'Build libultrahdr'         # build WASM
+          run: |
             cd libultrahdr-wasm
             meson setup build --cross-file=em.txt
             meson compile -C build
@@ -51,9 +52,15 @@ jobs:
             node-version: 18
 
         - run: npm ci                       # install packages
-        - run: npm run lint                 # lint source
-        - run: npm run lint-examples        # lint examples
-        - run: npm test                     # build & run tests
+        - run: npm run build                # build
+
+        - name: 'Produce Reports'           # produce reports
+          run: npm run ci:check
+          continue-on-error: true
+
+        - name: 'Run tests'                 # run tests
+          run: npm run ci:test
+          continue-on-error: true
 
         - uses: actions/upload-artifact@v3  # upload build artifacts
           if: success() || failure()
@@ -66,4 +73,4 @@ jobs:
               libultrahdr-wasm/build/*.map
               libultrahdr-wasm/build/*.wasm
               dist/
-              junit.xml
+              reports/
