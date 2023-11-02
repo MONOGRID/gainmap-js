@@ -15,26 +15,6 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Download Artifacts'
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          name: build-artifact
-          run_id: ${{ github.event.workflow_run.id }}
-
-      - name: 'Src Code Linting Results'
-        if: success() || failure()
-        uses: ldiego73/eslint-report-action@v1.1
-        with:
-          report: "reports/eslint-src.json"
-          title: 'Eslint Src'
-
-      - name: 'Examples Code Linting Results'
-        if: success() || failure()
-        uses: ldiego73/eslint-report-action@v1.1
-        with:
-          report: "reports/eslint-examples.json"
-          title: 'Eslint Examples'
-
       - name: 'Produce test report'
         if: success() || failure()
         uses: dorny/test-reporter@v1
