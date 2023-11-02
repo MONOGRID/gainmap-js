@@ -55,10 +55,6 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
     gainMap.colorSpace = NoColorSpace
   }
 
-
-// this should produce an eslint error
-
-
   gainMap.needsUpdate = true
   // this should produce a tsc error
   const material = new GainMapDecoderMaterial({
