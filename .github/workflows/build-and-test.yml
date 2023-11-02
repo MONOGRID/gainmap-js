@@ -75,7 +75,7 @@ jobs:
         - name: 'Ensure TypeCheck Src log is error free'
           if: always()
           id: typecheck_examples_noerror
-          run: '.github/check-error-in-logs.sh reports/typecheck-exaples.log'
+          run: '.github/check-error-in-logs.sh reports/typecheck-examples.log'
 
         - name: 'TypeCheck Src'
           if: always()
