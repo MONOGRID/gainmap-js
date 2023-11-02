@@ -54,9 +54,14 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
     console.warn('Gainmap Colorspace needs to be *NoColorSpace*')
     gainMap.colorSpace = NoColorSpace
   }
-  gainMap.needsUpdate = true
 
-  const material = new GainMapDecoderMaterial({
+
+// this should produce an eslint error
+
+
+  gainMap.needsUpdate = true
+  // this should produce a tsc error
+  const material:string = new GainMapDecoderMaterial({
     ...params,
     sdr,
     gainMap

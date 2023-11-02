@@ -3,7 +3,7 @@ import { compress, encode } from 'gainmap-js'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 // load an HDR file
-const loader = new EXRLoader()
+const loader:string = new EXRLoader() // this should produce a TS error
 const image = await loader.loadAsync('image.exr')
 
 // Encode the gainmap

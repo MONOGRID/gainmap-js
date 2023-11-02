@@ -13,6 +13,10 @@ const encodingResult = encode({
   maxContentBoost: 4
 })
 
+
+// this many lines should produce an eslint error
+
+
 // obtain the RAW RGBA SDR buffer and create an ImageData
 const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
