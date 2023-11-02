@@ -65,11 +65,11 @@ jobs:
 
         - name: 'Produce Reports'
           run: npm run ci:check
-          continue-on-error: true
+          if: success() || failure()
 
         - name: 'Run tests'
           run: npm run ci:test
-          continue-on-error: true
+          if: success() || failure()
 
         - name: 'Upload Build artifacts'
           uses: actions/upload-artifact@v3
