@@ -46,7 +46,10 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "jest"
+    "test": "jest",
+    "pretest": "npm run build",
+    "lint": "tsc --noEmit && eslint src/**/*.ts",
+    "lint-examples": "tsc --noEmit -p examples && eslint examples/**/*.ts"
   },
   "repository": {
     "type": "git",

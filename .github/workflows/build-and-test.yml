@@ -51,8 +51,9 @@ jobs:
             node-version: 18
 
         - run: npm ci                       # install packages
-        - run: npm run build                # build
-        - run: npm test                     # run tests
+        - run: npm run lint                 # lint source
+        - run: npm run lint-examples        # lint examples
+        - run: npm test                     # build & run tests
 
         - uses: actions/upload-artifact@v3  # upload build artifacts
           if: success() || failure()

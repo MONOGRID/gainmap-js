@@ -10,13 +10,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
 
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "target": "ES2017",
+    "lib": ["ES2017", "DOM"],
     "noEmit": true
   },
-  "paths": {
-    "gainmap-js/wasm": "libultrahdr-wasm/build/libultrahdr-esm.js",
-    "gainmap-js/wasm/types": "libultrahdr-wasm/build/libultrahdr.d.ts"
-  },
-  "exclude": ["dist", "libultrahdr-wasm", "tests"]
+  "exclude": ["dist", "libultrahdr-wasm", "tests", "examples"]
 }

@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "gainmap-js": ["../dist"],
+      "gainmap-js/libultrahdr": ["../dist/libultrahdr"],
+      "gainmap-js/worker": ["../dist/worker"],
+      "gainmap-js/worker-interface": ["../dist/worker-interface"]
+    },
+  },
+  "exclude": []
+}
