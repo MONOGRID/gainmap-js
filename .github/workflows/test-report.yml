@@ -22,16 +22,20 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }}
 
       - name: Annotate Src Code Linting Results
+        if: success() || failure()
         uses: ataylorme/eslint-annotate-action@v2
         with:
           report-json: "reports/eslint-src.json"
 
       - name: Annotate Examples Code Linting Results
+        if: success() || failure()
         uses: ataylorme/eslint-annotate-action@v2
         with:
           report-json: "reports/eslint-examples.json"
 
+
       - name: 'Produce test report'
+        if: success() || failure()
         uses: dorny/test-reporter@v1
         with:
           artifact: build-artifact          # artifact name
