@@ -1,5 +1,5 @@
 
-name: 'Typecheck'
+name: 'Typecheck results'
 
 on:
   workflow_run:
@@ -14,11 +14,16 @@ permissions:
 
 jobs:
   Typecheck:
-    name: 'Typecheck'
+    name: 'Typecheck results'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3 # checkout the repo
+        with:
+          submodules: recursive
+
       - name: 'Download build artifacts'
         uses: dawidd6/action-download-artifact@v2
         with:

@@ -1,4 +1,4 @@
-name: 'Build And Test'
+name: 'Build and Test'
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
     Build-And-Test:
+      name: 'Build and Test'
       runs-on: ubuntu-latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

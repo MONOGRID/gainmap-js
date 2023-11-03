@@ -1,4 +1,4 @@
-name: 'Test Report'
+name: 'JEST Tests Results'
 
 on:
   workflow_run:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   report:
-    name: 'Repost JEST Tests Results'
+    name: 'JEST Tests Results'
     runs-on: ubuntu-latest
     steps:
       - name: 'Produce test report'

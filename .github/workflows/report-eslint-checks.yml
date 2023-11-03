@@ -1,5 +1,5 @@
 
-name: 'Eslint'
+name: 'Eslint checks results'
 
 on:
   workflow_run:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   Eslint:
-    name: 'Eslint'
+    name: 'Eslint checks results'
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
