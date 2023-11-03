@@ -72,15 +72,15 @@ jobs:
           if: always()
           run: npm run ci:check
 
-        - name: 'Ensure TypeCheck Src log is error free'
+        - name: 'Logscan TypeCheck Src'
           if: always()
-          id: typecheck_src_noerror
-          run: '.github/check-error-in-logs.sh reports/typecheck.log'
+          id: logscan_src
+          run: '.github/logscan.sh reports/typecheck.log'
 
-        - name: 'Ensure TypeCheck Src log is error free'
+        - name: 'Logscan TypeCheck Examples'
           if: always()
-          id: typecheck_examples_noerror
-          run: '.github/check-error-in-logs.sh reports/typecheck-examples.log'
+          id: logscan_examples
+          run: '.github/logscan.sh reports/typecheck-examples.log'
 
         - name: 'TypeCheck Src'
           if: always()
@@ -88,9 +88,9 @@ jobs:
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
             name: Typecheck Src
-            conclusion: ${{steps.typecheck_src_noerror.conclusion}}
+            conclusion: ${{steps.logscan_src.conclusion}}
             output: |
-              {"summary":"${{ steps.typecheck_src_noerror.outputs.summary }}"}
+              {"summary":"${{ steps.logscan_src.outputs.summary }}"}
 
         - name: 'TypeCheck Examples'
           if: always()
@@ -98,9 +98,9 @@ jobs:
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
             name: Typecheck Examples
-            conclusion: ${{steps.typecheck_examples_noerror.conclusion}}
+            conclusion: ${{steps.logscan_examples.conclusion}}
             output: |
-              {"summary":"${{ steps.typecheck_examples_noerror.outputs.summary }}"}
+              {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
 
         - name: 'Report Src Code Linting Results'
           if: always()
