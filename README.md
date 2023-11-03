@@ -142,6 +142,22 @@ const jpeg = await encodeJPEGMetadata({
 // `jpeg` will be an `Uint8Array` which can be saved somewhere
 ```
 
+## Libultrahdr in Vite
+
+If you import `@monogrid/gainmap-js/libultrahdr`
+You will need to exclude it from Vite optimizations.
+
+```js
+// vite.config.js
+
+module.exports = defineConfig({
+  ...
+  optimizeDeps: {
+    exclude: ['@monogrid/gainmap-js/libultrahdr']
+  },
+  ...
+})
+```
 
 ## References
 
