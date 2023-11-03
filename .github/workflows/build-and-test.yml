@@ -132,7 +132,7 @@ jobs:
           uses: ldiego73/eslint-report-action@v1.1
           with:
             report: "reports/eslint-tests.json"
-            title: 'Eslint Examples'
+            title: 'Eslint Tests'
 
         - name: 'Run tests'
           if: always()
