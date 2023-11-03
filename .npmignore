@@ -4,6 +4,7 @@
 tests
 tsconfig.json
 src
+reports
 libultrahdr-wasm/**/*
 !libultrahdr-wasm/build/*.ts
 !libultrahdr-wasm/build/*.js
