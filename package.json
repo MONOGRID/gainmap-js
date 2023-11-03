@@ -55,13 +55,17 @@
     "check:eslint-src": "eslint \"src/**/*.ts\"",
     "check:typecheck-examples": "tsc --noEmit -p examples",
     "check:eslint-examples": "eslint \"examples/**/*.ts\"",
+    "check:typecheck-tests": "tsc --noEmit --skipLibCheck -p tests",
+    "check:eslint-tests": "eslint \"tests/**/*.ts\"",
 
     "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
     "ci:check": "concurrently npm:ci:check:*",
     "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
     "ci:check:typecheck-examples": "tsc --pretty false --noEmit -p examples > reports/typecheck-examples.log",
-    "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.ts\""
+    "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.ts\"",
+    "ci:check:typecheck-tests": "tsc --pretty false --noEmit --skipLibCheck -p tests > reports/typecheck-tests.log",
+    "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
   },
   "repository": {
     "type": "git",
