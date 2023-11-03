@@ -10,26 +10,15 @@ import pkgJSON from './package.json' assert { type: 'json' }
 
 const { author, name, version } = pkgJSON
 
+/** @type {import('rollup').OutputOptions} */
 const settings = {
   globals: {
     three: 'three'
   }
 }
 
-export default defineConfig({
-  input: ['./src/index.ts', './src/libultrahdr.ts', './src/worker.ts', './src/worker-interface.ts'],
-  output: [
-    {
-      dir: 'dist',
-      ...settings,
-      name,
-      format: 'es'
-      // preserveModules: true,
-      // preserveModulesRoot: 'src'
-    }
-  ],
+const configBase = defineConfig({
   external: ['three'],
-
   plugins: [
     json(),
     copy({
@@ -57,3 +46,61 @@ export default defineConfig({
     })
   ]
 })
+
+export default [
+  defineConfig({
+    input: {
+      index: './src/index.ts',
+      libultrahdr: './src/libultrahdr.ts',
+      worker: './src/worker.ts',
+      'worker-interface': './src/worker-interface.ts'
+    },
+    output: {
+      dir: 'dist',
+      name,
+      format: 'es',
+      ...settings
+    },
+    ...configBase
+  }),
+  defineConfig({
+    input: './src/index.ts',
+    output: {
+      format: 'umd',
+      name,
+      file: 'dist/index.umd.js',
+      ...settings
+    },
+    ...configBase
+  }),
+  defineConfig({
+    input: './src/libultrahdr.ts',
+    output: {
+      format: 'umd',
+      name: 'libultrahdr',
+      file: 'dist/libultrahdr.umd.js',
+      ...settings
+    },
+    ...configBase
+  }),
+  defineConfig({
+    input: './src/worker.ts',
+    output: {
+      format: 'umd',
+      name: 'worker',
+      file: 'dist/worker.umd.js',
+      ...settings
+    },
+    ...configBase
+  }),
+  defineConfig({
+    input: './src/worker-interface.ts',
+    output: {
+      format: 'umd',
+      name: 'worker-interface',
+      file: 'dist/worker-interface.umd.js',
+      ...settings
+    },
+    ...configBase
+  })
+]

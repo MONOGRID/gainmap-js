@@ -3,6 +3,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "resolvePackageJsonExports": true,
     "paths": {
       "gainmap-js": ["../dist"],
       "gainmap-js/libultrahdr": ["../dist/libultrahdr"],

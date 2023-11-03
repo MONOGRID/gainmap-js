@@ -2,6 +2,7 @@
   "name": "gainmap-js",
   "version": "1.0.0",
   "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gainmap",
+  "main": "dist/index.umd.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -14,9 +15,6 @@
     "./libultrahdr": {
       "import": "./dist/libultrahdr.js",
       "types": "./dist/libultrahdr.d.ts"
-    },
-    "./wasm": {
-      "import": "./libultrahdr-wasm/build/libultrahdr-esm.js"
     },
     "./worker": {
       "import": "./dist/worker.js",
