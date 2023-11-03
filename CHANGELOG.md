@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/MONOGRID/gainmap-js/compare/v1.0.1...v1.0.2) (2023-11-03)
+
+
+### Bug Fixes
+
+* **release:** add publishConfig to package.json ([cffff0b](https://github.com/MONOGRID/gainmap-js/commit/cffff0b31050ab54040922748b82d97e6aa820a3))
+
 ## [1.0.1](https://github.com/MONOGRID/gainmap-js/compare/v1.0.0...v1.0.1) (2023-11-03)
 
 
