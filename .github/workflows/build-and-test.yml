@@ -1,10 +1,6 @@
 name: 'Build and Test'
 
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+on: [push]
 
 jobs:
     Build-And-Test:
@@ -77,11 +73,6 @@ jobs:
           id: logscan_src
           run: '.github/logscan.sh reports/typecheck.log'
 
-        - name: 'Logscan TypeCheck Examples'
-          if: always()
-          id: logscan_examples
-          run: '.github/logscan.sh reports/typecheck-examples.log'
-
         - name: 'TypeCheck Src'
           if: always()
           uses: LouisBrunner/checks-action@v1.6.1
@@ -92,6 +83,11 @@ jobs:
             output: |
               {"summary":"${{ steps.logscan_src.outputs.summary }}"}
 
+        - name: 'Logscan TypeCheck Examples'
+          if: always()
+          id: logscan_examples
+          run: '.github/logscan.sh reports/typecheck-examples.log'
+
         - name: 'TypeCheck Examples'
           if: always()
           uses: LouisBrunner/checks-action@v1.6.1
@@ -101,6 +97,21 @@ jobs:
             conclusion: ${{steps.logscan_examples.conclusion}}
             output: |
               {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
+
+        - name: 'Logscan TypeCheck Tests'
+          if: always()
+          id: logscan_tests
+          run: '.github/logscan.sh reports/typecheck-tests.log'
+
+        - name: 'TypeCheck Tests'
+          if: always()
+          uses: LouisBrunner/checks-action@v1.6.1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            name: Typecheck Tests
+            conclusion: ${{steps.logscan_tests.conclusion}}
+            output: |
+              {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
 
         - name: 'Report Src Code Linting Results'
           if: always()
@@ -114,6 +125,13 @@ jobs:
           uses: ldiego73/eslint-report-action@v1.1
           with:
             report: "reports/eslint-examples.json"
+            title: 'Eslint Examples'
+
+        - name: 'Report Tests Code Linting Results'
+          if: always()
+          uses: ldiego73/eslint-report-action@v1.1
+          with:
+            report: "reports/eslint-tests.json"
             title: 'Eslint Examples'
 
         - name: 'Run tests'
