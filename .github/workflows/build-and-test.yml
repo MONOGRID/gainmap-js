@@ -1,10 +1,6 @@
 name: 'Build and Test'
 
-on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+on: [push]
 
 jobs:
     Build-And-Test:
@@ -72,29 +68,54 @@ jobs:
           if: always()
           run: npm run ci:check
 
-        - name: 'Run tests'
-          if: always()
-          run: npm run ci:test
-
-        - name: 'Upload Build artifacts'
-          if: always()
-          uses: actions/upload-artifact@v3
-          with:
-            name: build-artifact
-            if-no-files-found: error
-            path: |
-              libultrahdr-wasm/build/*.ts
-              libultrahdr-wasm/build/*.js
-              libultrahdr-wasm/build/*.map
-              libultrahdr-wasm/build/*.wasm
-              dist/
-              reports/
-
-        #
         #
         # CHECKS
         #
-        #
+
+        - name: 'Logscan TypeCheck Src'
+          if: always()
+          id: logscan_src
+          run: '.github/logscan.sh reports/typecheck.log'
+
+        - name: 'TypeCheck Src'
+          if: always()
+          uses: LouisBrunner/checks-action@v1.6.1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            name: Typecheck Src
+            conclusion: ${{steps.logscan_src.conclusion}}
+            output: |
+              {"summary":"${{ steps.logscan_src.outputs.summary }}"}
+
+        - name: 'Logscan TypeCheck Examples'
+          if: always()
+          id: logscan_examples
+          run: '.github/logscan.sh reports/typecheck-examples.log'
+
+        - name: 'TypeCheck Examples'
+          if: always()
+          uses: LouisBrunner/checks-action@v1.6.1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            name: Typecheck Examples
+            conclusion: ${{steps.logscan_examples.conclusion}}
+            output: |
+              {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
+
+        - name: 'Logscan TypeCheck Tests'
+          if: always()
+          id: logscan_tests
+          run: '.github/logscan.sh reports/typecheck-tests.log'
+
+        - name: 'TypeCheck Tests'
+          if: always()
+          uses: LouisBrunner/checks-action@v1.6.1
+          with:
+            token: ${{ secrets.GITHUB_TOKEN }}
+            name: Typecheck Tests
+            conclusion: ${{steps.logscan_tests.conclusion}}
+            output: |
+              {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
 
         - name: 'Report Src Code Linting Results'
           if: always()
@@ -117,48 +138,24 @@ jobs:
             report: "reports/eslint-tests.json"
             title: 'Eslint Tests'
 
+        #
+        # END CHECKS
+        #
 
-        - name: 'Analyze Typecheck Src log'
+        - name: 'Run tests'
           if: always()
-          id: logscan_src
-          run: '.github/logscan.sh reports/typecheck.log'
+          run: npm run ci:test
 
-        - name: 'TypeCheck Src'
+        - name: 'Upload Build artifacts'
           if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
+          uses: actions/upload-artifact@v3
           with:
-            name: 'Typecheck Src'
-            token: ${{ secrets.GITHUB_TOKEN }}
-            conclusion: ${{steps.logscan_src.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_src.outputs.summary }}"}
-
-        - name: 'Analyze Typecheck Examples log'
-          if: always()
-          id: logscan_examples
-          run: '.github/logscan.sh reports/typecheck-examples.log'
-
-        - name: 'TypeCheck Examples'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            name: 'Typecheck Examples'
-            token: ${{ secrets.GITHUB_TOKEN }}
-            conclusion: ${{steps.logscan_examples.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
-
-        - name: 'Analyze Typecheck Tests log'
-          if: always()
-          id: logscan_tests
-          run: '.github/logscan.sh reports/typecheck-tests.log'
-
-        - name: 'TypeCheck Tests'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            name: 'Typecheck Tests'
-            token: ${{ secrets.GITHUB_TOKEN }}
-            conclusion: ${{steps.logscan_tests.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
+            name: build-artifact
+            if-no-files-found: error
+            path: |
+              libultrahdr-wasm/build/*.ts
+              libultrahdr-wasm/build/*.js
+              libultrahdr-wasm/build/*.map
+              libultrahdr-wasm/build/*.wasm
+              dist/
+              reports/
