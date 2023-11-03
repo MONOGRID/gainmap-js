@@ -3,7 +3,7 @@ import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
-import { type WorkerInterfaceImplementation } from './worker/worker-types'
+import { type WorkerInterfaceImplementation } from './worker-types'
 /**
  * This is the Metadata stored in an encoded Gainmap which is used
  * to decode it and return an HDR image

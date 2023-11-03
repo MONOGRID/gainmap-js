@@ -112,9 +112,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
 
   /**
    * Renders the input texture using the specified material
-   *
-   * @param from
-   * @param from
    */
   public render = () => {
     this._renderer.setRenderTarget(this._renderTarget)

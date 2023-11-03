@@ -2,7 +2,17 @@
 
 import { decode } from 'gainmap-js'
 import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
+import {
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGLRenderer
+} from 'three'
+
+const renderer = new WebGLRenderer()
+
 // fetch a JPEG image containing a gainmap as ArrayBuffer
 const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
 
@@ -13,10 +23,18 @@ const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array
 const result = await decode({
   sdr,
   gainMap,
+  // this allows to use `result.renderTarget.texture` directly
+  renderer,
   // this will restore the full HDR range
   maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
   ...parsedMetadata
 })
 
-// result can be used to populate a Texture
-const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ map: result.renderTarget.texture }))
+const scene = new Scene()
+// `result` can be used to populate a Texture
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+)
+scene.add(mesh)
+renderer.render(scene, new PerspectiveCamera())

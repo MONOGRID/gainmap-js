@@ -26,7 +26,7 @@ $ npm install gainmap-js threejs
 
 ## API
 
-Refer to the [WIKI](./wiki/) for detailed documentation about the API.
+Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed documentation about the API.
 
 ## Examples
 
@@ -38,7 +38,17 @@ and use it instead of a traditional `.exr` or `.hdr` image.
 ```ts
 import { decode } from 'gainmap-js'
 import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
+import {
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGLRenderer
+} from 'three'
+
+const renderer = new WebGLRenderer()
+
 // fetch a JPEG image containing a gainmap as ArrayBuffer
 const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
 
@@ -49,16 +59,21 @@ const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array
 const result = await decode({
   sdr,
   gainMap,
+  // this allows to use `result.renderTarget.texture` directly
+  renderer,
   // this will restore the full HDR range
   maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
   ...parsedMetadata
 })
 
-// result can be used to populate a Texture
+const scene = new Scene()
+// `result` can be used to populate a Texture
 const mesh = new Mesh(
   new PlaneGeometry(),
   new MeshBasicMaterial({ map: result.renderTarget.texture })
-  )
+)
+scene.add(mesh)
+renderer.render(scene, new PerspectiveCamera())
 ```
 
 ### Encoding
@@ -69,7 +84,7 @@ This is generally not useful in a `three.js` site but this library exposes metho
 that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
 
 ```ts
-import { compress, encode } from 'gainmap-js'
+import { compress, encode, findTextureMinMax } from 'gainmap-js'
 import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
@@ -77,22 +92,20 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 const loader = new EXRLoader()
 const image = await loader.loadAsync('image.exr')
 
+// find RAW RGB Max value of a texture
+const textureMax = await findTextureMinMax(image)
+
 // Encode the gainmap
 const encodingResult = encode({
   image,
-  maxContentBoost: 4
+  // this will encode the full HDR range
+  maxContentBoost: Math.max.apply(this, textureMax)
 })
 
 // obtain the RAW RGBA SDR buffer and create an ImageData
-const sdrImageData = new ImageData(
-  encodingResult.sdr.toArray(),
-  encodingResult.sdr.width, encodingResult.sdr.height
-  )
+const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
-const gainMapImageData = new ImageData(
-  encodingResult.gainMap.toArray(),
-  encodingResult.gainMap.width, encodingResult.gainMap.height
-  )
+const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
 
 // parallel compress the RAW buffers into the specified mimeType
 const mimeType = 'image/jpeg'

@@ -7,22 +7,49 @@ import { getDataTexture } from './utils/get-data-texture'
 /**
  * Encodes a Gainmap starting from an HDR file.
  *
- * Can optionally use a WebWorker to offload the encoding process to the worker
+ * @remarks
+ * if you do not pass a `renderer` parameter
+ * you must manually dispose the result
+ * ```js
+ * const encodingResult = await encode({ ... })
+ * // do something with the buffers
+ * const sdr = encodingResult.sdr.getArray()
+ * const gainMap = encodingResult.gainMap.getArray()
+ * // after that
+ * encodingResult.sdr.dispose()
+ * encodingResult.gainMap.dispose()
+ * ```
  *
  * @category Encoding Functions
  * @group Encoding Functions
- * @example
- * import { encode } from 'gainmap-js'
- * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
  *
+ * @example
+ * import { encode, findTextureMinMax } from 'gainmap-js'
+ * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+ *
+ * // load an HDR file
  * const loader = new EXRLoader()
  * const image = await loader.loadAsync('image.exr')
- * // This will:
- * // * create a WebGLRenderer
- * // * Render the Gainmap
- * // * dispose the WebGLRenderer
  *
- * const gainmap = await encode({image})
+ * // find RAW RGB Max value of a texture
+ * const textureMax = await findTextureMinMax(image)
+ *
+ * // Encode the gainmap
+ * const encodingResult = encode({
+ *   image,
+ *   // this will encode the full HDR range
+ *   maxContentBoost: Math.max.apply(this, textureMax)
+ * })
+ * // can be re-encoded after changing parameters
+ * encodingResult.sdr.material.exposure = 0.9
+ * encodingResult.sdr.render()
+ * // or
+ * encodingResult.gainMap.material.gamma = [1.1, 1.1, 1.1]
+ * encodingResult.gainMap.render()
+ *
+ * // must be manually disposed
+ * encodingResult.sdr.dispose()
+ * encodingResult.gainMap.dispose()
  *
  * @param params Encoding Paramaters
  * @returns
@@ -65,9 +92,42 @@ export const encode = (params: EncodingParametersBase) => {
  *
  * Uses {@link encode} internally, then pipes the results to {@link compress}.
  *
+ * @remarks
+ * if a `renderer` parameter is not provided
+ * This function will automatically dispose its "disposable"
+ * renderer, no need to disapose it manually later
+ *
  * @category Encoding Functions
  * @group Encoding Functions
  * @example
+ * import { encodeAndCompress, findTextureMinMax } from 'gainmap-js'
+ * import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+ * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+ *
+ * // load an HDR file
+ * const loader = new EXRLoader()
+ * const image = await loader.loadAsync('image.exr')
+ *
+ * // find RAW RGB Max value of a texture
+ * const textureMax = await findTextureMinMax(image)
+ *
+ * // Encode the gainmap
+ * const encodingResult = await encodeAndCompress({
+ *   image,
+ *   maxContentBoost: Math.max.apply(this, textureMax),
+ *   mimeType: 'image/jpeg'
+ * })
+ *
+ * // embed the compressed images + metadata into a single
+ * // JPEG file
+ * const jpeg = await encodeJPEGMetadata({
+ *   ...encodingResult,
+ *   sdr: encodingResult.sdr,
+ *   gainMap: encodingResult.gainMap
+ * })
+ *
+ * // `jpeg` will be an `Uint8Array` which can be saved somewhere
+ *
  *
  * @param params Encoding Paramaters
  * @throws {Error} if the browser does not support [createImageBitmap](https://caniuse.com/createimagebitmap)
