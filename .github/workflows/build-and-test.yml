@@ -68,6 +68,10 @@ jobs:
           if: always()
           run: npm run ci:check
 
+        #
+        # CHECKS
+        #
+
         - name: 'Logscan TypeCheck Src'
           if: always()
           id: logscan_src
@@ -133,6 +137,10 @@ jobs:
           with:
             report: "reports/eslint-tests.json"
             title: 'Eslint Tests'
+
+        #
+        # END CHECKS
+        #
 
         - name: 'Run tests'
           if: always()
