@@ -4,13 +4,6 @@ if grep -q error $1; then
   out=$(cat $1)
   echo "$out"
 
-  # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-  # {
-  #   echo 'summary<<EOF'
-  #   echo "$out"
-  #   echo EOF
-  # } >> "$GITHUB_OUTPUT"
-
   # first `sed` replaces newlines with \n
   # seconds `sed` replaces quotes with escaped quotes \"
 
