@@ -1,7 +1,7 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { decode } from 'gainmap-js'
-import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { decode } from '@monogrid/gainmap-js'
+import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import {
   Mesh,
   MeshBasicMaterial,

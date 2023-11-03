@@ -1,8 +1,8 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 // this assumes a vite-like bundler understands the `?worker` import
-import GainMapWorker from 'gainmap-js/worker?worker'
-import { getPromiseWorker, getWorkerInterface } from 'gainmap-js/worker-interface'
+import GainMapWorker from '@monogrid/gainmap-js/worker?worker'
+import { getPromiseWorker, getWorkerInterface } from '@monogrid/gainmap-js/worker-interface'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 import { encodeAndCompress } from '../dist/encode'

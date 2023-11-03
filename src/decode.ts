@@ -14,7 +14,7 @@ import { QuadRenderer } from './utils/QuadRenderer'
  * @category Decoding
  * @group Decoding
  * @example
- * import { decode } from 'gainmap-js'
+ * import { decode } from '@monogrid/gainmap-js'
  * import { Mesh, MeshBasicMaterial, PlaneGeometry, TextureLoader } from 'three'
  *
  * const loader = new TextureLoader()

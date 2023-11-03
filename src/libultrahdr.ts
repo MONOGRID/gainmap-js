@@ -28,8 +28,8 @@ export const getLibrary = async () => {
  * @group Encoding
  *
  * @example
- * import { compress, encode, findTextureMinMax } from 'gainmap-js'
- * import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+ * import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+ * import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
  * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  *
  * // load an HDR file
@@ -147,8 +147,8 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  * @group Decoding
  *
  * @example
- * import { decode } from 'gainmap-js'
- * import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+ * import { decode } from '@monogrid/gainmap-js'
+ * import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
  * import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
  * // fetch a JPEG image containing a gainmap as ArrayBuffer
  * const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()

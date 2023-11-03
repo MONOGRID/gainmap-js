@@ -24,7 +24,7 @@ import { getDataTexture } from './utils/get-data-texture'
  * @group Encoding Functions
  *
  * @example
- * import { encode, findTextureMinMax } from 'gainmap-js'
+ * import { encode, findTextureMinMax } from '@monogrid/gainmap-js'
  * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  *
  * // load an HDR file
@@ -100,8 +100,8 @@ export const encode = (params: EncodingParametersBase) => {
  * @category Encoding Functions
  * @group Encoding Functions
  * @example
- * import { encodeAndCompress, findTextureMinMax } from 'gainmap-js'
- * import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+ * import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js'
+ * import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
  * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  *
  * // load an HDR file

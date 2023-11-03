@@ -1,5 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { compress, encode, findTextureMinMax } from 'gainmap-js'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 // load an HDR file

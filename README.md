@@ -7,7 +7,7 @@ A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Tec
 
 ## Installing
 ```bash
-$ npm install gainmap-js threejs
+$ npm install @monogrid/gainmap-js threejs
 ```
 
 ## What is a Gain map?
@@ -36,8 +36,8 @@ The main use case of this library is to decode a JPEG file that contains gain ma
 and use it instead of a traditional `.exr` or `.hdr` image.
 
 ```ts
-import { decode } from 'gainmap-js'
-import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { decode } from '@monogrid/gainmap-js'
+import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import {
   Mesh,
   MeshBasicMaterial,
@@ -84,8 +84,8 @@ This is generally not useful in a `three.js` site but this library exposes metho
 that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
 
 ```ts
-import { compress, encode, findTextureMinMax } from 'gainmap-js'
-import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 // load an HDR file

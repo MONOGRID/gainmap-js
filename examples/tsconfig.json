@@ -5,10 +5,10 @@
     "moduleResolution": "Bundler",
     "resolvePackageJsonExports": true,
     "paths": {
-      "gainmap-js": ["../dist"],
-      "gainmap-js/libultrahdr": ["../dist/libultrahdr"],
-      "gainmap-js/worker": ["../dist/worker"],
-      "gainmap-js/worker-interface": ["../dist/worker-interface"]
+      "@monogrid/gainmap-js": ["../dist"],
+      "@monogrid/gainmap-js/libultrahdr": ["../dist/libultrahdr"],
+      "@monogrid/gainmap-js/worker": ["../dist/worker"],
+      "@monogrid/gainmap-js/worker-interface": ["../dist/worker-interface"]
     },
   },
   "exclude": []

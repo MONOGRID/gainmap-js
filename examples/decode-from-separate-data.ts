@@ -1,5 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { decode } from 'gainmap-js'
+import { decode } from '@monogrid/gainmap-js'
 import {
   Mesh,
   MeshBasicMaterial,

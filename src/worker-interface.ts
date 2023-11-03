@@ -18,8 +18,8 @@ export const getPromiseWorker = (worker: Worker) => {
  *
  * @example
  * // this assumes a vite-like bundler understands the `?worker` import
- * import GainMapWorker from 'gainmap-js/worker?worker'
- * import { getPromiseWorker, getWorkerInterface } from 'gainmap-js/worker-interface'
+ * import GainMapWorker from '@monogrid/gainmap-js/worker?worker'
+ * import { getPromiseWorker, getWorkerInterface } from '@monogrid/gainmap-js/worker-interface'
  *
  * // turn our Worker into a PromiseWorker
  * const promiseWorker = getPromiseWorker(new GainMapWorker())
