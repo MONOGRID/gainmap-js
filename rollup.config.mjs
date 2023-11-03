@@ -17,7 +17,7 @@ const settings = {
 }
 
 export default defineConfig({
-  input: ['./src/index.ts', './src/libultrahdr.ts', './src/worker/worker.ts', './src/worker/worker-interface.ts'],
+  input: ['./src/index.ts', './src/libultrahdr.ts', './src/worker.ts', './src/worker-interface.ts'],
   output: [
     {
       dir: 'dist',
