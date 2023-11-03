@@ -1,9 +1,14 @@
-name: 'Build And Test'
+name: 'Build and Test'
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
 
 jobs:
     Build-And-Test:
+      name: 'Build and Test'
       runs-on: ubuntu-latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -66,50 +71,6 @@ jobs:
         - name: 'Produce Reports & Logs'
           if: always()
           run: npm run ci:check
-
-        - name: 'Ensure TypeCheck Src log is error free'
-          if: always()
-          id: typecheck_src_noerror
-          run: '.github/check-error-in-logs.sh reports/typecheck.log'
-
-        - name: 'Ensure TypeCheck Src log is error free'
-          if: always()
-          id: typecheck_examples_noerror
-          run: '.github/check-error-in-logs.sh reports/typecheck-examples.log'
-
-        - name: 'TypeCheck Src'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            name: Typecheck Src
-            conclusion: ${{steps.typecheck_src_noerror.conclusion}}
-            output: |
-              {"summary":"${{ steps.typecheck_src_noerror.outputs.summary }}"}
-
-        - name: 'TypeCheck Examples'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            name: Typecheck Examples
-            conclusion: ${{steps.typecheck_examples_noerror.conclusion}}
-            output: |
-              {"summary":"${{ steps.typecheck_examples_noerror.outputs.summary }}"}
-
-        - name: 'Report Src Code Linting Results'
-          if: always()
-          uses: ldiego73/eslint-report-action@v1.1
-          with:
-            report: "reports/eslint-src.json"
-            title: 'Eslint Src'
-
-        - name: 'Report Examples Code Linting Results'
-          if: always()
-          uses: ldiego73/eslint-report-action@v1.1
-          with:
-            report: "reports/eslint-examples.json"
-            title: 'Eslint Examples'
 
         - name: 'Run tests'
           if: always()

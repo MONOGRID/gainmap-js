@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   publish-wiki:
+    name: 'Publich Wiki'
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
@@ -33,11 +34,16 @@ jobs:
             workflow_conclusion: success
 
 
-        - uses: actions/setup-node@v3 # setup node
+        - name: 'Setup Nodejs'
+          uses: actions/setup-node@v3
           with:
             node-version: 18
 
-        - run: npm ci # install packages
-        - run: npx typedoc # produce wiki
+        - name: 'Install Packages'
+          run: npm ci
 
-        - uses: Andrew-Chen-Wang/github-wiki-action@v4 # publish wiki
+        - name: 'Produce Wiki'
+          run: npx typedoc
+
+        - name: 'Publish Wiki'
+          uses: Andrew-Chen-Wang/github-wiki-action@v4
