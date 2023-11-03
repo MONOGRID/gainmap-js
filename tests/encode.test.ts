@@ -26,7 +26,7 @@ describe('encoder', () => {
     { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: LinearToneMapping },
     { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: LinearToneMapping },
     { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: LinearToneMapping }
-  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
+  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }: string) => { // this should trigger a typecheck error
     // we need to launch puppetteer with a
     // custom written "testbed.html" page
     // because our encoder works by

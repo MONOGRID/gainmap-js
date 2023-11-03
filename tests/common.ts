@@ -16,7 +16,7 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await globalThis.browser.close()
+  await globalThis.browser.close(); // this should trigger an eslint error
 })
 
 export const getTestbed = async () => {
