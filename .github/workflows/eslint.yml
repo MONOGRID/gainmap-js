@@ -1,0 +1,41 @@
+
+name: 'Eslint'
+
+on:
+  workflow_run:
+    workflows: ["Build And Test"]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  Eslint:
+    name: 'Eslint'
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 'Download build artifacts'
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: build-artifact
+          run_id: ${{ github.event.workflow_run.id }}
+          workflow_conclusion: success
+
+      - name: 'Report Src Code Linting Results'
+        if: always()
+        uses: ldiego73/eslint-report-action@v1.1
+        with:
+          report: "reports/eslint-src.json"
+          title: 'Eslint Src'
+
+      - name: 'Report Examples Code Linting Results'
+        if: always()
+        uses: ldiego73/eslint-report-action@v1.1
+        with:
+          report: "reports/eslint-examples.json"
+          title: 'Eslint Examples'

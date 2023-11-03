@@ -2,7 +2,7 @@ name: 'Test Report'
 
 on:
   workflow_run:
-    workflows: ['Build And Test']           # runs after CI workflow
+    workflows: ['Build And Test']
     types:
       - completed
 
@@ -13,6 +13,7 @@ permissions:
 
 jobs:
   report:
+    name: 'Repost JEST Tests Results'
     runs-on: ubuntu-latest
     steps:
       - name: 'Produce test report'

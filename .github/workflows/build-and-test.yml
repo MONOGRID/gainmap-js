@@ -1,6 +1,10 @@
 name: 'Build And Test'
 
-on: [push, pull_request]
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
 
 jobs:
     Build-And-Test:
@@ -63,31 +67,17 @@ jobs:
         - name: 'Build'
           run: npm run build
 
-        - name: 'Run Checks & PRoduce Reports'
+        - name: 'Produce Reports & Logs'
+          if: always()
           run: npm run ci:check
-          if: success() || failure()
-
-        - name: 'Report Src Code Linting Results'
-          if: success() || failure()
-          uses: ldiego73/eslint-report-action@v1.1
-          with:
-            report: "reports/eslint-src.json"
-            title: 'Eslint Src'
-
-        - name: 'Report Examples Code Linting Results'
-          if: success() || failure()
-          uses: ldiego73/eslint-report-action@v1.1
-          with:
-            report: "reports/eslint-examples.json"
-            title: 'Eslint Examples'
 
         - name: 'Run tests'
+          if: always()
           run: npm run ci:test
-          if: success() || failure()
 
         - name: 'Upload Build artifacts'
+          if: always()
           uses: actions/upload-artifact@v3
-          if: success() || failure()
           with:
             name: build-artifact
             if-no-files-found: error
