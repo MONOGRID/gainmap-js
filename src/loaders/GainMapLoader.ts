@@ -17,17 +17,24 @@ import {
 
 import { decodeJPEGMetadata } from '../libultrahdr'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
+import { GainMapMetadata } from '../types'
 import { QuadRenderer } from '../utils/QuadRenderer'
-
+/**
+ *
+ */
 export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>> {
-  private renderer?: WebGLRenderer
-
-  constructor (renderer?: WebGLRenderer, manager?: LoadingManager) {
+  private renderer: WebGLRenderer
+  /**
+   *
+   * @param renderer
+   * @param manager
+   */
+  constructor (renderer: WebGLRenderer, manager?: LoadingManager) {
     super(manager)
     this.renderer = renderer
   }
 
-  public override load (url: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+  private prepareQuadRenderer () {
     // temporary values
     const material = new GainMapDecoderMaterial({
       gainMapMax: [1, 1, 1],
@@ -42,89 +49,153 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
       sdr: new Texture()
     })
 
-    const quadRenderer = new QuadRenderer(16, 16, HalfFloatType, NoColorSpace, material, this.renderer)
+    return new QuadRenderer(16, 16, HalfFloatType, NoColorSpace, material, this.renderer)
+  }
+
+  private async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, gainMapBuffer: ArrayBuffer | string, sdrBuffer: ArrayBuffer | string, metadata: GainMapMetadata) {
+    const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
+    // TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
+    // we use the original image buffer instead
+    const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
+
+    const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([
+      createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
+      createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
+    ])
+
+    const gainMap = new Texture(gainMapImageBitmap,
+      UVMapping,
+      ClampToEdgeWrapping,
+      ClampToEdgeWrapping,
+      LinearFilter,
+      LinearMipMapLinearFilter,
+      RGBAFormat,
+      UnsignedByteType,
+      1,
+      NoColorSpace
+    )
+
+    gainMap.needsUpdate = true
+
+    const sdr = new Texture(sdrImageBitmap,
+      UVMapping,
+      ClampToEdgeWrapping,
+      ClampToEdgeWrapping,
+      LinearFilter,
+      LinearMipMapLinearFilter,
+      RGBAFormat,
+      UnsignedByteType,
+      1,
+      SRGBColorSpace
+    )
+
+    sdr.needsUpdate = true
+
+    quadRenderer.width = sdrImageBitmap.width
+    quadRenderer.height = sdrImageBitmap.height
+    quadRenderer.material.gainMap = gainMap
+    quadRenderer.material.sdr = sdr
+    quadRenderer.material.gainMapMin = metadata.gainMapMin
+    quadRenderer.material.gainMapMax = metadata.gainMapMax
+    quadRenderer.material.offsetHdr = metadata.offsetHdr
+    quadRenderer.material.offsetSdr = metadata.offsetSdr
+    quadRenderer.material.gamma = metadata.gamma
+    quadRenderer.material.maxDisplayBoost = metadata.hdrCapacityMax
+    quadRenderer.material.needsUpdate = true
+
+    quadRenderer.render()
+  }
+
+  /**
+   *
+   * @param url
+   * @param onLoad
+   * @param onProgress
+   * @param onError
+   * @returns
+   */
+  public override load (url: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+    const quadRenderer = this.prepareQuadRenderer()
 
     const loader = new FileLoader(this.manager)
     loader.setResponseType('arraybuffer')
     loader.setRequestHeader(this.requestHeader)
     loader.setPath(this.path)
     loader.setWithCredentials(this.withCredentials)
-    loader.load(url, async (buffer) => {
-      if (typeof buffer === 'string') throw new Error('Invalid buffer')
+    loader.load(url, async (jpeg) => {
+      if (typeof jpeg === 'string') throw new Error('Invalid buffer')
 
-      const { gainMap: gainMapJPEG, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(buffer))
+      const { gainMap: gainMapJPEG, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(jpeg))
 
-      const gainMapBlob = new Blob([gainMapJPEG], { type: 'image/jpeg' })
-      // TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
-      // we use the original image buffer instead
-      const sdrBlob = new Blob([buffer], { type: 'image/jpeg' })
-
-      const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([
-        createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
-        createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
-      ])
-
-      const gainMap = new Texture(gainMapImageBitmap,
-        UVMapping,
-        ClampToEdgeWrapping,
-        ClampToEdgeWrapping,
-        LinearFilter,
-        LinearMipMapLinearFilter,
-        RGBAFormat,
-        UnsignedByteType,
-        1,
-        NoColorSpace
-      )
-
-      gainMap.needsUpdate = true
-
-      const sdr = new Texture(sdrImageBitmap,
-        UVMapping,
-        ClampToEdgeWrapping,
-        ClampToEdgeWrapping,
-        LinearFilter,
-        LinearMipMapLinearFilter,
-        RGBAFormat,
-        UnsignedByteType,
-        1,
-        SRGBColorSpace
-      )
-
-      sdr.needsUpdate = true
-
-      quadRenderer.width = sdrImageBitmap.width
-      quadRenderer.height = sdrImageBitmap.height
-      quadRenderer.material.gainMap = gainMap
-      quadRenderer.material.sdr = sdr
-      quadRenderer.material.gainMapMin = parsedMetadata.gainMapMin
-      quadRenderer.material.gainMapMax = parsedMetadata.gainMapMax
-      quadRenderer.material.offsetHdr = parsedMetadata.offsetHdr
-      quadRenderer.material.offsetSdr = parsedMetadata.offsetSdr
-      quadRenderer.material.gamma = parsedMetadata.gamma
-      quadRenderer.material.maxDisplayBoost = parsedMetadata.hdrCapacityMax
-      quadRenderer.material.needsUpdate = true
-
-      quadRenderer.render()
-
-      // const gainmapBackground = new DataTexture(
-      //   quadRenderer.toArray(),
-      //   quadRenderer.width,
-      //   quadRenderer.height,
-      //   RGBAFormat,
-      //   HalfFloatType,
-      //   EquirectangularReflectionMapping,
-      //   ClampToEdgeWrapping,
-      //   ClampToEdgeWrapping,
-      //   LinearFilter,
-      //   LinearFilter,
-      //   1,
-      //   NoColorSpace
-      // )
+      await this.render(quadRenderer, gainMapJPEG, jpeg, parsedMetadata)
 
       if (onLoad) onLoad(quadRenderer)
 
       quadRenderer.dispose()
     }, onProgress, onError)
+
+    return quadRenderer
+  }
+
+  /**
+   *
+   * @param sdrUrl
+   * @param gainMapUrl
+   * @param metadataUrl
+   * @param onLoad
+   * @param onProgress
+   * @param onError
+   * @returns
+   */
+  public loadSeparateData (sdrUrl: string, gainMapUrl: string, metadataUrl: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+    const quadRenderer = this.prepareQuadRenderer()
+
+    let sdr: ArrayBuffer | undefined
+    let gainMap: ArrayBuffer | undefined
+    let metadata: GainMapMetadata | undefined
+
+    const loadCheck = async () => {
+      if (sdr && gainMap && metadata) {
+        await this.render(quadRenderer, gainMap, sdr, metadata)
+
+        if (onLoad) onLoad(quadRenderer)
+
+        quadRenderer.dispose()
+      }
+    }
+
+    const sdrLoader = new FileLoader(this.manager)
+    sdrLoader.setResponseType('arraybuffer')
+    sdrLoader.setRequestHeader(this.requestHeader)
+    sdrLoader.setPath(this.path)
+    sdrLoader.setWithCredentials(this.withCredentials)
+    sdrLoader.load(sdrUrl, async (buffer) => {
+      if (typeof buffer === 'string') throw new Error('Invalid sdr buffer')
+      sdr = buffer
+      loadCheck()
+    })
+
+    const gainMapLoader = new FileLoader(this.manager)
+    gainMapLoader.setResponseType('arraybuffer')
+    gainMapLoader.setRequestHeader(this.requestHeader)
+    gainMapLoader.setPath(this.path)
+    gainMapLoader.setWithCredentials(this.withCredentials)
+    gainMapLoader.load(gainMapUrl, async (buffer) => {
+      if (typeof buffer === 'string') throw new Error('Invalid gainmap buffer')
+      gainMap = buffer
+      loadCheck()
+    })
+
+    const metadataLoader = new FileLoader(this.manager)
+    // metadataLoader.setResponseType('json')
+    metadataLoader.setRequestHeader(this.requestHeader)
+    metadataLoader.setPath(this.path)
+    metadataLoader.setWithCredentials(this.withCredentials)
+    metadataLoader.load(metadataUrl, async (json) => {
+      if (typeof json !== 'string') throw new Error('Invalid metadata string')
+      metadata = JSON.parse(json)
+      loadCheck()
+    })
 
     return quadRenderer
   }
