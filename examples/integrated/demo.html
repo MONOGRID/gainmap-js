@@ -25,12 +25,15 @@
 		<script type="importmap">
 			{
 				"imports": {
-          "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/",
-          "@monogrid/gainmap-js": "https://unpkg.com/browse/@monogrid/gainmap-js@1.0.2/dist/index.js"
+					"three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+					"three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/",
+					"@monogrid/gainmap-js": "../../dist/index.js",
+					"@monogrid/gainmap-js/libultrahdr": "../../dist/libultrahdr.js"
 				}
 			}
 		</script>
+		<!-- "@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@1.0.2/dist/index.js",
+		"@monogrid/gainmap-js/libultrahdr": "https://unpkg.com/@monogrid/gainmap-js@1.0.2/dist/libultrahdr.js" -->
 
 		<script type="module">
 
@@ -40,12 +43,12 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
-			import { RGBMLoader } from 'three/addons/loaders/RGBMLoader.js';
-			import { DebugEnvironment } from 'three/addons/environments/DebugEnvironment.js';
+			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+
+			import { GainMapLoader } from '@monogrid/gainmap-js';
 
 			const params = {
-				envMap: 'HDR',
+				envMap: 'Gain map',
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
@@ -55,8 +58,8 @@
 			let container, stats;
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
-			let generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
-			let ldrCubeMap, hdrCubeMap, rgbmCubeMap;
+			let hdrCubeRenderTarget, hdrCubeMap;
+			let gainmapRenderTarget, gainmapRenderer, gainmapBackground;
 
 			init();
 			animate();
@@ -103,48 +106,47 @@
 
 				};
 
-				const hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-				hdrCubeMap = new HDRCubeTextureLoader()
-					.setPath( './textures/cube/pisaHDR/' )
-					.load( hdrUrls, function () {
+				hdrCubeMap = new RGBELoader()
+					.load('textures/pisa-1k.hdr', function (response) {
 
-						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( response );
 
+						hdrCubeMap.mapping = THREE.EquirectangularReflectionMapping;
+						hdrCubeMap.minFilter = THREE.LinearFilter;
 						hdrCubeMap.magFilter = THREE.LinearFilter;
 						hdrCubeMap.needsUpdate = true;
+					})
 
-					} );
+				gainmapRenderer = new GainMapLoader(renderer)
+					.load('textures/pisa-4k.jpg', function (response) {
 
-				const ldrUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				ldrCubeMap = new THREE.CubeTextureLoader()
-					.setPath( './textures/cube/pisa/' )
-					.load( ldrUrls, function () {
+						const gainMap = gainmapRenderer.renderTarget.texture
 
-						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
+						gainmapRenderTarget = pmremGenerator.fromEquirectangular( gainMap );
 
-					} );
+						// this would be ideal but it doesn't work:
+						// EquirectangularReflectionMapping is not applied
 
+						// gainmapBackground = gainmapRenderer.renderTarget.texture;
 
-				const rgbmUrls = [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ];
-				rgbmCubeMap = new RGBMLoader().setMaxRange( 16 )
-					.setPath( './textures/cube/pisaRGBM16/' )
-					.loadCubemap( rgbmUrls, function () {
+						// we do this instead
+						gainmapBackground = gainmapRenderer.toDataTexture();
 
-						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+						gainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
+						gainmapBackground.minFilter = THREE.LinearFilter;
+						gainmapBackground.magFilter = THREE.LinearFilter;
+						gainmapBackground.generateMipmaps = false;
 
-					} );
+						gainmapBackground.needsUpdate = true
+					})
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileCubemapShader();
-
-				const envScene = new DebugEnvironment();
-				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene );
+				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				//renderer.toneMapping = ReinhardToneMapping;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -157,7 +159,7 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'envMap', [ 'Generated', 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'envMap', [ 'Gain map', 'HDR' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -197,21 +199,13 @@
 
 				switch ( params.envMap ) {
 
-					case 'Generated':
-						renderTarget = generatedCubeRenderTarget;
-						cubeMap = generatedCubeRenderTarget.texture;
-						break;
-					case 'LDR':
-						renderTarget = ldrCubeRenderTarget;
-						cubeMap = ldrCubeMap;
+					case 'Gain map':
+						renderTarget = gainmapRenderTarget;
+						cubeMap = gainmapBackground || gainmapRenderer.renderTarget.texture;
 						break;
 					case 'HDR':
 						renderTarget = hdrCubeRenderTarget;
 						cubeMap = hdrCubeMap;
-						break;
-					case 'RGBM16':
-						renderTarget = rgbmCubeRenderTarget;
-						cubeMap = rgbmCubeMap;
 						break;
 
 				}
