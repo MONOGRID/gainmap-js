@@ -59,7 +59,8 @@
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
 			let hdrCubeRenderTarget, hdrCubeMap;
-			let gainmapRenderTarget, gainmapRenderer, gainmapBackground;
+			let gainMap, gainmapRenderTarget, gainmapBackground;
+			let separateGainMap, separateGainmapRenderTarget, separateGainmapBackground;
 
 			init();
 			animate();
@@ -117,20 +118,18 @@
 						hdrCubeMap.needsUpdate = true;
 					})
 
-				gainmapRenderer = new GainMapLoader(renderer)
+				gainMap = new GainMapLoader(renderer)
 					.load('textures/pisa-4k.jpg', function (response) {
-
-						const gainMap = gainmapRenderer.renderTarget.texture
-
-						gainmapRenderTarget = pmremGenerator.fromEquirectangular( gainMap );
+						gainmapRenderTarget = pmremGenerator.fromEquirectangular( gainMap.renderTarget.texture );
 
 						// this would be ideal but it doesn't work:
 						// EquirectangularReflectionMapping is not applied
+						// to this render target
 
 						// gainmapBackground = gainmapRenderer.renderTarget.texture;
 
 						// we do this instead
-						gainmapBackground = gainmapRenderer.toDataTexture();
+						gainmapBackground = gainMap.toDataTexture();
 
 						gainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
 						gainmapBackground.minFilter = THREE.LinearFilter;
@@ -138,6 +137,28 @@
 						gainmapBackground.generateMipmaps = false;
 
 						gainmapBackground.needsUpdate = true
+					})
+
+				separateGainMap = new GainMapLoader(renderer)
+					.loadSeparateData('textures/pisa-4k.webp','textures/pisa-4k-gainmap.webp','textures/pisa-4k.json', function (response) {
+
+						separateGainmapRenderTarget = pmremGenerator.fromEquirectangular( separateGainMap.renderTarget.texture );
+
+						// this would be ideal but it doesn't work:
+						// EquirectangularReflectionMapping is not applied
+						// to this render target
+
+						// separateGainmapBackground = separateGainMap.renderTarget.texture;
+
+						// we do this instead
+						separateGainmapBackground = separateGainMap.toDataTexture();
+
+						separateGainmapBackground.mapping = THREE.EquirectangularReflectionMapping;
+						separateGainmapBackground.minFilter = THREE.LinearFilter;
+						separateGainmapBackground.magFilter = THREE.LinearFilter;
+						separateGainmapBackground.generateMipmaps = false;
+
+						separateGainmapBackground.needsUpdate = true
 					})
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
@@ -159,7 +180,7 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'envMap', [ 'Gain map', 'HDR' ] );
+				gui.add( params, 'envMap', [ 'Gain map', 'Webp Gain map', 'HDR' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -201,7 +222,11 @@
 
 					case 'Gain map':
 						renderTarget = gainmapRenderTarget;
-						cubeMap = gainmapBackground || gainmapRenderer.renderTarget.texture;
+						cubeMap = gainmapBackground || gainMap.renderTarget.texture;
+						break;
+					case 'Webp Gain map':
+						renderTarget = separateGainmapRenderTarget;
+						cubeMap = separateGainmapBackground || separateGainMap.renderTarget.texture;
 						break;
 					case 'HDR':
 						renderTarget = hdrCubeRenderTarget;
