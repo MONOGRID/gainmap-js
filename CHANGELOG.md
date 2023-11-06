@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/MONOGRID/gainmap-js/compare/v1.0.2...v1.1.0) (2023-11-06)
+
+
+### Features
+
+* **decode:** adds threejs loaders ([b32f02a](https://github.com/MONOGRID/gainmap-js/commit/b32f02a09d20fbd9d17b35c65cf4dba8aafc9ed5))
+
 ## [1.0.2](https://github.com/MONOGRID/gainmap-js/compare/v1.0.1...v1.0.2) (2023-11-03)
 
 
