@@ -1,6 +1,10 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import { GainmapEncodingParameters } from '../types'
+import {
+  GainmapEncodingParameters,
+  // eslint-disable-next-line unused-imports/no-unused-imports
+  GainMapMetadata
+} from '../types'
 
 const vertexShader = /* glsl */`
 varying vec2 vUv;
@@ -90,18 +94,27 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     this.uniformsNeedUpdate = true
   }
 
+  /**
+   * @see {@link GainmapEncodingParameters.gamma}
+   */
   get gamma () { return this._gamma }
   set gamma (value: [number, number, number]) {
     this._gamma = value
     this.uniforms.gamma.value = new Vector3().fromArray(value)
   }
 
+  /**
+   * @see {@link GainmapEncodingParameters.offsetHdr}
+   */
   get offsetHdr () { return this._offsetHdr }
   set offsetHdr (value: [number, number, number]) {
     this._offsetHdr = value
     this.uniforms.offsetHdr.value = new Vector3().fromArray(value)
   }
 
+  /**
+   * @see {@link GainmapEncodingParameters.offsetSdr}
+   */
   get offsetSdr () { return this._offsetSdr }
   set offsetSdr (value: [number, number, number]) {
     this._offsetSdr = value
@@ -109,7 +122,8 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
   }
 
   /**
-   * Non logarithmic space
+   * @see {@link GainmapEncodingParameters.minContentBoost}
+   * @remarks Non logarithmic space
    */
   get minContentBoost () { return this._minContentBoost }
   set minContentBoost (value: number) {
@@ -118,7 +132,8 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
   }
 
   /**
-   * Non logarithmic space
+   * @see {@link GainmapEncodingParameters.maxContentBoost}
+   * @remarks Non logarithmic space
    */
   get maxContentBoost () { return this._maxContentBoost }
   set maxContentBoost (value: number) {
@@ -126,8 +141,25 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     this.uniforms.maxLog2.value = Math.log2(value)
   }
 
+  /**
+   * @see {@link GainMapMetadata.gainMapMin}
+   * @remarks Logarithmic space
+   */
   get gainMapMin (): [number, number, number] { return [Math.log2(this._minContentBoost), Math.log2(this._minContentBoost), Math.log2(this._minContentBoost)] }
+  /**
+   * @see {@link GainMapMetadata.gainMapMax}
+   * @remarks Logarithmic space
+   */
   get gainMapMax (): [number, number, number] { return [Math.log2(this._maxContentBoost), Math.log2(this._maxContentBoost), Math.log2(this._maxContentBoost)] }
+
+  /**
+   * @see {@link GainMapMetadata.hdrCapacityMin}
+   * @remarks Logarithmic space
+   */
   get hdrCapacityMin (): number { return Math.min(Math.max(0, this.gainMapMin[0]), Math.max(0, this.gainMapMin[1]), Math.max(0, this.gainMapMin[2])) }
+  /**
+   * @see {@link GainMapMetadata.hdrCapacityMax}
+   * @remarks Logarithmic space
+   */
   get hdrCapacityMax (): number { return Math.min(Math.max(0, this.gainMapMax[0]), Math.max(0, this.gainMapMax[1]), Math.max(0, this.gainMapMax[2])) }
 }

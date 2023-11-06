@@ -1,6 +1,11 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import { GainmapDecodingParameters, GainMapMetadata } from '../types'
+import {
+  GainmapDecodingParameters,
+  // eslint-disable-next-line unused-imports/no-unused-imports
+  GainmapEncodingParameters,
+  GainMapMetadata
+} from '../types'
 
 const vertexShader = /* glsl */`
 varying vec2 vUv;
@@ -55,10 +60,10 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
         sdr: { value: sdr },
         gainMap: { value: gainMap },
         gamma: { value: new Vector3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]) },
-        offsetHdr: { value: new Vector3(offsetHdr[0], offsetHdr[1], offsetHdr[2]) },
-        offsetSdr: { value: new Vector3(offsetSdr[0], offsetSdr[1], offsetSdr[2]) },
-        gainMapMin: { value: new Vector3(gainMapMin[0], gainMapMin[1], gainMapMin[2]) },
-        gainMapMax: { value: new Vector3(gainMapMax[0], gainMapMax[1], gainMapMax[2]) },
+        offsetHdr: { value: new Vector3().fromArray(offsetHdr) },
+        offsetSdr: { value: new Vector3().fromArray(offsetSdr) },
+        gainMapMin: { value: new Vector3().fromArray(gainMapMin) },
+        gainMapMax: { value: new Vector3().fromArray(gainMapMax) },
         weightFactor: {
           value: (Math.log2(maxDisplayBoost) - hdrCapacityMin) / (hdrCapacityMax - hdrCapacityMin)
         }
@@ -76,12 +81,78 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
     this.uniformsNeedUpdate = true
   }
 
+  get sdr () { return this.uniforms.sdr.value as Texture }
+  set sdr (value: Texture) { this.uniforms.sdr.value = value }
+
+  get gainMap () { return this.uniforms.gainMap.value as Texture }
+  set gainMap (value: Texture) { this.uniforms.gainMap.value = value }
   /**
-   * @see {@link GainmapDecodingParameters}
+   * @see {@link GainMapMetadata.offsetHdr}
+   */
+  get offsetHdr () { return (this.uniforms.offsetHdr.value as Vector3).toArray() }
+  set offsetHdr (value: [number, number, number]) { (this.uniforms.offsetHdr.value as Vector3).fromArray(value) }
+  /**
+   * @see {@link GainMapMetadata.offsetSdr}
+   */
+  get offsetSdr () { return (this.uniforms.offsetSdr.value as Vector3).toArray() }
+  set offsetSdr (value: [number, number, number]) { (this.uniforms.offsetSdr.value as Vector3).fromArray(value) }
+  /**
+   * @see {@link GainMapMetadata.gainMapMin}
+   */
+  get gainMapMin () { return (this.uniforms.gainMapMin.value as Vector3).toArray() }
+  set gainMapMin (value: [number, number, number]) { (this.uniforms.gainMapMin.value as Vector3).fromArray(value) }
+  /**
+   * @see {@link GainMapMetadata.gainMapMax}
+   */
+  get gainMapMax () { return (this.uniforms.gainMapMax.value as Vector3).toArray() }
+  set gainMapMax (value: [number, number, number]) { (this.uniforms.gainMapMax.value as Vector3).fromArray(value) }
+
+  /**
+   * @see {@link GainmapEncodingParameters.gamma}
+   */
+  get gamma () {
+    const g = (this.uniforms.gamma.value as Vector3)
+    return [1 / g.x, 1 / g.y, 1 / g.z] as [number, number, number]
+  }
+
+  set gamma (value: [number, number, number]) {
+    const g = (this.uniforms.gamma.value as Vector3)
+    g.x = 1.0 / value[0]
+    g.y = 1.0 / value[1]
+    g.z = 1.0 / value[2]
+  }
+
+  /**
+   * @see {@link GainMapMetadata.hdrCapacityMin}
+   * @remarks Logarithmic space
+   */
+  get hdrCapacityMin () { return this._hdrCapacityMin }
+  set hdrCapacityMin (value: number) {
+    this._hdrCapacityMin = value
+    this.calculateWeight()
+  }
+
+  /**
+   * @see {@link GainMapMetadata.hdrCapacityMin}
+   * @remarks Logarithmic space
+   */
+  get hdrCapacityMax () { return this._hdrCapacityMax }
+  set hdrCapacityMax (value: number) {
+    this._hdrCapacityMax = value
+    this.calculateWeight()
+  }
+
+  /**
+   * @see {@link GainmapDecodingParameters.maxDisplayBoost}
+   * @remarks Non Logarithmic space
    */
   get maxDisplayBoost () { return this._maxDisplayBoost }
   set maxDisplayBoost (value: number) {
     this._maxDisplayBoost = value
+    this.calculateWeight()
+  }
+
+  private calculateWeight () {
     this.uniforms.weightFactor.value = (Math.log2(this._maxDisplayBoost) - this._hdrCapacityMin) / (this._hdrCapacityMax - this._hdrCapacityMin)
   }
 }

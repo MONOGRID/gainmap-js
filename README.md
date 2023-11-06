@@ -35,10 +35,24 @@ Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed do
 The main use case of this library is to decode a JPEG file that contains gain map data
 and use it instead of a traditional `.exr` or `.hdr` image.
 
+
+### Using a single JPEG with embedded Gain map Metadata
+
+This approach lets you load a single file with an embedded Gain Map.
+
+The advantage is to have a single file to load.
+
+The disadvantages are:
+ * No WEBP compression
+ * Uses the `@monogrid/gainmap-js/libultrahdr` package which is heavier and requires loading a `wasm` in order to extract the gainmap from the JPEG.
+ * The JPEG cannot be manipulated in Photoshop, GIMP, or any other software that does not support the gain map technology (no photo editing software supports it at the time of writing 06-11-2023).
+ * Photo sharing websites and/or services (i.e. sharing with Slack) will likely strip the Gain map metadata and the HDR information will be lost, leaving you with only the SDR Representation.
+
 ```ts
-import { decode } from '@monogrid/gainmap-js'
-import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr'
 import {
+  EquirectangularReflectionMapping,
+  LinearFilter,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -49,31 +63,77 @@ import {
 
 const renderer = new WebGLRenderer()
 
-// fetch a JPEG image containing a gainmap as ArrayBuffer
-const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+const loader = new JPEGRLoader(renderer)
 
-// extract data from the JPEG
-const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
-
-// restore the HDR texture
-const result = await decode({
-  sdr,
-  gainMap,
-  // this allows to use `result.renderTarget.texture` directly
-  renderer,
-  // this will restore the full HDR range
-  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
-  ...parsedMetadata
-})
+const result = loader.load('gainmap.jpeg')
+// `result` can be used to populate a Texture
 
 const scene = new Scene()
-// `result` can be used to populate a Texture
 const mesh = new Mesh(
   new PlaneGeometry(),
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
 renderer.render(scene, new PerspectiveCamera())
+
+// `result.renderTarget.texture` must be
+// converted to `DataTexture` in order
+// to use it as Equirectanmgular scene background
+// if needed
+
+scene.background = result.toDataTexture()
+scene.background.mapping = EquirectangularReflectionMapping
+scene.background.minFilter = LinearFilter
+
+```
+
+### Using separate files
+
+Using separate files will get rid of the limitations of using a single JPEG file but it will force to use three separate files
+
+1. An SDR Representation file
+2. A Gainmap file
+3. A JSON containing the gainmap metadata used for decoding
+
+This solution will use the lighter `@monogrid/gainmap-js` package which will not load a `wasm` file and contains less code.
+
+```ts
+import { GainMapLoader } from '@monogrid/gainmap-js'
+import {
+  EquirectangularReflectionMapping,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGLRenderer
+} from 'three'
+
+const renderer = new WebGLRenderer()
+
+const loader = new GainMapLoader(renderer)
+
+const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+// `result` can be used to populate a Texture
+
+const scene = new Scene()
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+)
+scene.add(mesh)
+renderer.render(scene, new PerspectiveCamera())
+
+// `result.renderTarget.texture` must be
+// converted to `DataTexture` in order
+// to use it as Equirectanmgular scene background
+// if needed
+
+scene.background = result.toDataTexture()
+scene.background.mapping = EquirectangularReflectionMapping
+scene.background.minFilter = LinearFilter
+
 ```
 
 ### Encoding
@@ -103,9 +163,17 @@ const encodingResult = encode({
 })
 
 // obtain the RAW RGBA SDR buffer and create an ImageData
-const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
+const sdrImageData = new ImageData(
+  encodingResult.sdr.toArray(),
+  encodingResult.sdr.width,
+  encodingResult.sdr.height
+)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
-const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
+const gainMapImageData = new ImageData(
+  encodingResult.gainMap.toArray(),
+  encodingResult.gainMap.width,
+  encodingResult.gainMap.height
+)
 
 // parallel compress the RAW buffers into the specified mimeType
 const mimeType = 'image/jpeg'
