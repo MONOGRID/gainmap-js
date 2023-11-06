@@ -1,16 +1,20 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { compress, encode } from 'gainmap-js'
-import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 // load an HDR file
 const loader = new EXRLoader()
 const image = await loader.loadAsync('image.exr')
 
+// find RAW RGB Max value of a texture
+const textureMax = await findTextureMinMax(image)
+
 // Encode the gainmap
 const encodingResult = encode({
   image,
-  maxContentBoost: 4
+  // this will encode the full HDR range
+  maxContentBoost: Math.max.apply(this, textureMax)
 })
 
 

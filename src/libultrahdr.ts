@@ -4,6 +4,8 @@ import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
 import { CompressedImage, GainMapMetadata } from './types'
 
 export * from '../libultrahdr-wasm/build/libultrahdr'
+export * from './loaders/JPEGRLoader'
+
 let library: MainModule | undefined
 
 /**
@@ -26,6 +28,72 @@ export const getLibrary = async () => {
  *
  * @category Encoding
  * @group Encoding
+ *
+ * @example
+ * import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+ * import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+ * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+ *
+ * // load an HDR file
+ * const loader = new EXRLoader()
+ * const image = await loader.loadAsync('image.exr')
+ *
+ * // find RAW RGB Max value of a texture
+ * const textureMax = await findTextureMinMax(image)
+ *
+ * // Encode the gainmap
+ * const encodingResult = encode({
+ *   image,
+ *   maxContentBoost: Math.max.apply(this, textureMax)
+ * })
+ *
+ * // obtain the RAW RGBA SDR buffer and create an ImageData
+ * const sdrImageData = new ImageData(
+ *   encodingResult.sdr.toArray(),
+ *   encodingResult.sdr.width,
+ *   encodingResult.sdr.height
+ * )
+ * // obtain the RAW RGBA Gain map buffer and create an ImageData
+ * const gainMapImageData = new ImageData(
+ *   encodingResult.gainMap.toArray(),
+ *   encodingResult.gainMap.width,
+ *   encodingResult.gainMap.height
+ * )
+ *
+ * // parallel compress the RAW buffers into the specified mimeType
+ * const mimeType = 'image/jpeg'
+ * const quality = 0.9
+ *
+ * const [sdr, gainMap] = await Promise.all([
+ *   compress({
+ *     source: sdrImageData,
+ *     mimeType,
+ *     quality,
+ *     flipY: true // output needs to be flipped
+ *   }),
+ *   compress({
+ *     source: gainMapImageData,
+ *     mimeType,
+ *     quality,
+ *     flipY: true // output needs to be flipped
+ *   })
+ * ])
+ *
+ * // obtain the metadata which will be embedded into
+ * // and XMP tag inside the final JPEG file
+ * const metadata = encodingResult.getMetadata()
+ *
+ * // embed the compressed images + metadata into a single
+ * // JPEG file
+ * const jpeg = await encodeJPEGMetadata({
+ *   ...encodingResult,
+ *   ...metadata,
+ *   sdr,
+ *   gainMap
+ * })
+ *
+ * // `jpeg` will be an `Uint8Array` which can be saved somewhere
+ *
  *
  * @param encodingResult
  * @returns an Uint8Array representing a JPEG-R file
@@ -87,6 +155,16 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  *
  * @category Decoding
  * @group Decoding
+ *
+ * @example
+ * import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+ *
+ * // fetch a JPEG image containing a gainmap as ArrayBuffer
+ * const gainmap = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
+ *
+ * // extract data from the JPEG
+ * const { gainMap, sdr, parsedMetadata } = await decodeJPEGMetadata(gainmap)
+ *
  * @param file A Jpeg file Uint8Array.
  * @returns The decoded data
  * @throws {Error} if the provided file cannot be parsed or does not contain a valid Gainmap

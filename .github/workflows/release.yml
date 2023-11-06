@@ -13,6 +13,8 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
+  pull-requests: write
   actions: read
 
 jobs:
@@ -21,13 +23,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
         - name: 'Checkout'
           uses: actions/checkout@v3 # checkout the repo
           with:
             submodules: recursive
+            token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
         - name: 'Download build artifacts'
           uses: dawidd6/action-download-artifact@v2 # download artifacts
@@ -46,5 +49,5 @@ jobs:
           run: npm ci
 
         - name: 'Release'
-          run: npx semantic-release --dry-run
+          run: npx semantic-release
 

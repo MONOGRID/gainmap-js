@@ -13,14 +13,14 @@
         "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
         "three/examples/": "https://unpkg.com/three@0.157.0/examples/",
 
-        "gainmap-js": "../dist/index.js",
-        "gainmap-js/libultrahdr": "../dist/libultrahdr.js"
+        "@monogrid/gainmap-js": "../dist/index.js",
+        "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js"
       }
     }
   </script>
   <script type="module">
-    import { encodeAndCompress, findTextureMinMax } from 'gainmap-js';
-    import { encodeJPEGMetadata, decodeJPEGMetadata } from 'gainmap-js/libultrahdr';
+    import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js';
+    import { encodeJPEGMetadata, decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr';
     import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
     import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'

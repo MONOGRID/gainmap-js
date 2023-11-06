@@ -1,6 +1,7 @@
 import {
   ByteType,
   ColorSpace,
+  DataTexture,
   FloatType,
   HalfFloatType,
   IntType,
@@ -8,6 +9,7 @@ import {
   LinearMipMapLinearFilter,
   Material,
   Mesh,
+  NoColorSpace,
   OrthographicCamera,
   PlaneGeometry,
   RepeatWrapping,
@@ -17,6 +19,7 @@ import {
   TextureDataType,
   UnsignedByteType,
   UnsignedIntType,
+  UVMapping,
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
@@ -112,9 +115,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
 
   /**
    * Renders the input texture using the specified material
-   *
-   * @param from
-   * @param from
    */
   public render = () => {
     this._renderer.setRenderTarget(this._renderTarget)
@@ -161,6 +161,23 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     }
     this._renderer.readRenderTargetPixels(this._renderTarget, 0, 0, this._width, this._height, out)
     return out as TextureDataTypeToBufferType<TType>
+  }
+
+  public toDataTexture () {
+    return new DataTexture(
+      this.toArray(),
+      this.width,
+      this.height,
+      RGBAFormat,
+      HalfFloatType,
+      UVMapping,
+      RepeatWrapping,
+      RepeatWrapping,
+      LinearFilter,
+      LinearMipMapLinearFilter,
+      1,
+      NoColorSpace
+    )
   }
 
   /**

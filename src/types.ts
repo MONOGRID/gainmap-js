@@ -3,7 +3,7 @@ import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
-import { type WorkerInterfaceImplementation } from './worker/worker-types'
+import { type WorkerInterfaceImplementation } from './worker-types'
 /**
  * This is the Metadata stored in an encoded Gainmap which is used
  * to decode it and return an HDR image
@@ -28,6 +28,8 @@ export type GainMapMetadata = {
    * @remarks
    * * This value also affects how much to apply the gain map based on the display boost.
    * * Must be 0.0 or greater.
+   *
+   * Logarithmic space
    */
   hdrCapacityMin: number
   /**
@@ -37,6 +39,8 @@ export type GainMapMetadata = {
    * * This value also affects how much to apply the gain map based on the display boost.
    * * Must be greater than hdrCapacityMin.
    * * Required.
+   *
+   * Logarithmic space
    */
   hdrCapacityMax: number
   /**
@@ -86,6 +90,8 @@ export type GainmapEncodingParameters = {
    * * If, for example, the value is 0.5, then for any given pixel, the linear luminance of the displayed HDR rendition must be (at the least) 0.5x the linear luminance of the SDR rendition.
    * * In practice, this value is typically equal to or just less than 1.0.
    * * Always less than or equal to Max content boost.
+   *
+   * Non Logarithmic space
    */
   minContentBoost?: number
   /**
@@ -95,6 +101,8 @@ export type GainmapEncodingParameters = {
    * * This value is a constant for a particular image. For example, if the value is four, then for any given pixel, the linear luminance of the displayed HDR rendition must be, at the most, 4x the linear luminance of the SDR rendition. In practice, this means that the brighter parts of the scene can be shown up to 4x brighter.
    * * In practice, this value is typically greater than 1.0.
    * * Always greater than or equal to Min content boost.
+   *
+   * Non Logarithmic space
    */
   maxContentBoost: number
   /**
@@ -122,6 +130,8 @@ export type GainmapDecodingParameters = {
    * @remarks
    * This value can change over time based on device settings and other factors,
    * such as ambient light conditions, or how many bright pixels are on the screen.
+   *
+   * Non Logarithmic space
    */
   maxDisplayBoost: number
 }

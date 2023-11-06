@@ -1,7 +1,34 @@
 {
-  "name": "gainmap-js",
-  "version": "1.0.0",
-  "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gainmap",
+  "name": "@monogrid/gainmap-js",
+  "version": "1.1.0",
+  "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gain map",
+  "homepage": "https://github.com/MONOGRID/gainmap-js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/MONOGRID/gainmap-js.git"
+  },
+  "keywords": [
+    "hdr",
+    "gain map",
+    "gainmap",
+    "three",
+    "threejs"
+  ],
+  "author": "MONOGRID <hello@mono-grid.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MONOGRID/gainmap-js/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "main": "dist/index.umd.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -14,9 +41,6 @@
     "./libultrahdr": {
       "import": "./dist/libultrahdr.js",
       "types": "./dist/libultrahdr.d.ts"
-    },
-    "./wasm": {
-      "import": "./libultrahdr-wasm/build/libultrahdr-esm.js"
     },
     "./worker": {
       "import": "./dist/worker.js",
@@ -46,10 +70,8 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-
     "test": "jest",
     "pretest": "npm run build",
-
     "check": "concurrently -c auto npm:check:*",
     "check:typecheck-src": "tsc --noEmit",
     "check:eslint-src": "eslint \"src/**/*.ts\"",
@@ -57,7 +79,6 @@
     "check:eslint-examples": "eslint \"examples/**/*.ts\"",
     "check:typecheck-tests": "tsc --noEmit --skipLibCheck -p tests",
     "check:eslint-tests": "eslint \"tests/**/*.ts\"",
-
     "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
     "ci:check": "concurrently npm:ci:check:*",
     "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.log",
@@ -67,19 +88,12 @@
     "ci:check:typecheck-tests": "tsc --pretty false --noEmit --skipLibCheck -p tests > reports/typecheck-tests.log",
     "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/MONOGRID/gainmap-js.git"
+  "peerDependencies": {
+    "three": "^0.157.0"
   },
-  "keywords": [
-    "hdr"
-  ],
-  "author": "MONOGRID <hello@mono-grid.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/MONOGRID/gainmap-js/issues"
+  "dependencies": {
+    "promise-worker-transferable": "^1.0.4"
   },
-  "homepage": "https://github.com/MONOGRID/gainmap-js#readme",
   "devDependencies": {
     "@babel/core": "^7.23.2",
     "@rollup/plugin-commonjs": "^25.0.5",
@@ -125,16 +139,5 @@
     "typedoc-github-wiki-theme": "^1.1.0",
     "typedoc-plugin-markdown": "^3.16.0",
     "typescript": "^5.2.2"
-  },
-  "peerDependencies": {
-    "three": "^0.157.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "dependencies": {
-    "promise-worker-transferable": "^1.0.4"
   }
 }

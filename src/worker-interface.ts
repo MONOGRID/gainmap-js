@@ -5,6 +5,7 @@ import { type PromiseWorkerType, type WorkerInterface, type WorkerInterfaceImple
 
 export * from './worker-types'
 /**
+ * Wraps a Regular worker into a `PromiseWorker`
  *
  * @param worker
  * @returns
@@ -13,13 +14,23 @@ export const getPromiseWorker = (worker: Worker) => {
   return new PromiseWorker(worker) as PromiseWorkerType
 }
 /**
+ * Returns an interface where methods of the worker can be called by the host site
+ *
+ * @example
+ * // this assumes a vite-like bundler understands the `?worker` import
+ * import GainMapWorker from '@monogrid/gainmap-js/worker?worker'
+ * import { getPromiseWorker, getWorkerInterface } from '@monogrid/gainmap-js/worker-interface'
+ *
+ * // turn our Worker into a PromiseWorker
+ * const promiseWorker = getPromiseWorker(new GainMapWorker())
+ * // get the interface
+ * const workerInterface = getWorkerInterface(promiseWorker)
  *
  * @param worker
  * @returns
  */
 export const getWorkerInterface = (worker: PromiseWorkerType): WorkerInterfaceImplementation => {
   return {
-    // encodeGainmapBuffers: (payload: WorkerInterface['encodeGainmapBuffers']['request']['payload']) => worker.postMessage({ type: 'encode-gainmap-buffers', payload } as WorkerInterface['encodeGainmapBuffers']['request']),
     compress: (payload: WorkerInterface['compress']['request']['payload']) => worker.postMessage({ type: 'compress', payload } as WorkerInterface['compress']['request'])
   }
 }

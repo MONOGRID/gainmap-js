@@ -13,9 +13,22 @@ module.exports = {
       }
     }],
     '@semantic-release/release-notes-generator',
-    '@semantic-release/npm',
-    '@semantic-release/github',
     ['@semantic-release/changelog', { changelogFile: 'CHANGELOG.md' }],
+    '@semantic-release/npm',
+    ['@semantic-release/github', {
+      assets: [
+        'package.json',
+        '*.md',
+        'dist',
+        'examples',
+        'wiki',
+        'libultrahdr-wasm/LICENSE',
+        'libultrahdr-wasm/README.md',
+        'libultrahdr-wasm/build/*.js',
+        'libultrahdr-wasm/build/*.ts',
+        'libultrahdr-wasm/build/*.wasm'
+      ]
+    }],
     ['@semantic-release/git', { assets: ['package.json', 'CHANGELOG.md'] }]
   ]
 }

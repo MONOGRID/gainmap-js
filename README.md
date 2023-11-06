@@ -7,7 +7,7 @@ A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Tec
 
 ## Installing
 ```bash
-$ npm install gainmap-js threejs
+$ npm install @monogrid/gainmap-js threejs
 ```
 
 ## What is a Gain map?
@@ -26,7 +26,7 @@ $ npm install gainmap-js threejs
 
 ## API
 
-Refer to the [WIKI](./wiki/) for detailed documentation about the API.
+Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed documentation about the API.
 
 ## Examples
 
@@ -35,30 +35,105 @@ Refer to the [WIKI](./wiki/) for detailed documentation about the API.
 The main use case of this library is to decode a JPEG file that contains gain map data
 and use it instead of a traditional `.exr` or `.hdr` image.
 
+
+### Using a single JPEG with embedded Gain map Metadata
+
+This approach lets you load a single file with an embedded Gain Map.
+
+The advantage is to have a single file to load.
+
+The disadvantages are:
+ * No WEBP compression
+ * Uses the `@monogrid/gainmap-js/libultrahdr` package which is heavier and requires loading a `wasm` in order to extract the gainmap from the JPEG.
+ * The JPEG cannot be manipulated in Photoshop, GIMP, or any other software that does not support the gain map technology (no photo editing software supports it at the time of writing 06-11-2023).
+ * Photo sharing websites and/or services (i.e. sharing with Slack) will likely strip the Gain map metadata and the HDR information will be lost, leaving you with only the SDR Representation.
+
 ```ts
-import { decode } from 'gainmap-js'
-import { decodeJPEGMetadata } from 'gainmap-js/libultrahdr'
-import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
-// fetch a JPEG image containing a gainmap as ArrayBuffer
-const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr'
+import {
+  EquirectangularReflectionMapping,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGLRenderer
+} from 'three'
 
-// extract data from the JPEG
-const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
+const renderer = new WebGLRenderer()
 
-// restore the HDR texture
-const result = await decode({
-  sdr,
-  gainMap,
-  // this will restore the full HDR range
-  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
-  ...parsedMetadata
-})
+const loader = new JPEGRLoader(renderer)
 
-// result can be used to populate a Texture
+const result = loader.load('gainmap.jpeg')
+// `result` can be used to populate a Texture
+
+const scene = new Scene()
 const mesh = new Mesh(
   new PlaneGeometry(),
   new MeshBasicMaterial({ map: result.renderTarget.texture })
-  )
+)
+scene.add(mesh)
+renderer.render(scene, new PerspectiveCamera())
+
+// `result.renderTarget.texture` must be
+// converted to `DataTexture` in order
+// to use it as Equirectanmgular scene background
+// if needed
+
+scene.background = result.toDataTexture()
+scene.background.mapping = EquirectangularReflectionMapping
+scene.background.minFilter = LinearFilter
+
+```
+
+### Using separate files
+
+Using separate files will get rid of the limitations of using a single JPEG file but it will force to use three separate files
+
+1. An SDR Representation file
+2. A Gainmap file
+3. A JSON containing the gainmap metadata used for decoding
+
+This solution will use the lighter `@monogrid/gainmap-js` package which will not load a `wasm` file and contains less code.
+
+```ts
+import { GainMapLoader } from '@monogrid/gainmap-js'
+import {
+  EquirectangularReflectionMapping,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGLRenderer
+} from 'three'
+
+const renderer = new WebGLRenderer()
+
+const loader = new GainMapLoader(renderer)
+
+const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+// `result` can be used to populate a Texture
+
+const scene = new Scene()
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+)
+scene.add(mesh)
+renderer.render(scene, new PerspectiveCamera())
+
+// `result.renderTarget.texture` must be
+// converted to `DataTexture` in order
+// to use it as Equirectanmgular scene background
+// if needed
+
+scene.background = result.toDataTexture()
+scene.background.mapping = EquirectangularReflectionMapping
+scene.background.minFilter = LinearFilter
+
 ```
 
 ### Encoding
@@ -69,30 +144,36 @@ This is generally not useful in a `three.js` site but this library exposes metho
 that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
 
 ```ts
-import { compress, encode } from 'gainmap-js'
-import { encodeJPEGMetadata } from 'gainmap-js/libultrahdr'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 // load an HDR file
 const loader = new EXRLoader()
 const image = await loader.loadAsync('image.exr')
 
+// find RAW RGB Max value of a texture
+const textureMax = await findTextureMinMax(image)
+
 // Encode the gainmap
 const encodingResult = encode({
   image,
-  maxContentBoost: 4
+  // this will encode the full HDR range
+  maxContentBoost: Math.max.apply(this, textureMax)
 })
 
 // obtain the RAW RGBA SDR buffer and create an ImageData
 const sdrImageData = new ImageData(
   encodingResult.sdr.toArray(),
-  encodingResult.sdr.width, encodingResult.sdr.height
-  )
+  encodingResult.sdr.width,
+  encodingResult.sdr.height
+)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
 const gainMapImageData = new ImageData(
   encodingResult.gainMap.toArray(),
-  encodingResult.gainMap.width, encodingResult.gainMap.height
-  )
+  encodingResult.gainMap.width,
+  encodingResult.gainMap.height
+)
 
 // parallel compress the RAW buffers into the specified mimeType
 const mimeType = 'image/jpeg'
@@ -129,6 +210,22 @@ const jpeg = await encodeJPEGMetadata({
 // `jpeg` will be an `Uint8Array` which can be saved somewhere
 ```
 
+## Libultrahdr in Vite
+
+If you import `@monogrid/gainmap-js/libultrahdr`
+You will need to exclude it from Vite optimizations.
+
+```js
+// vite.config.js
+
+module.exports = defineConfig({
+  ...
+  optimizeDeps: {
+    exclude: ['@monogrid/gainmap-js/libultrahdr']
+  },
+  ...
+})
+```
 
 ## References
 
