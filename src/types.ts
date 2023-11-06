@@ -29,7 +29,7 @@ export type GainMapMetadata = {
    * * This value also affects how much to apply the gain map based on the display boost.
    * * Must be 0.0 or greater.
    *
-   * @remarks Logarithmic space
+   * Logarithmic space
    */
   hdrCapacityMin: number
   /**
@@ -40,7 +40,7 @@ export type GainMapMetadata = {
    * * Must be greater than hdrCapacityMin.
    * * Required.
    *
-   * @remarks Logarithmic space
+   * Logarithmic space
    */
   hdrCapacityMax: number
   /**
@@ -91,7 +91,7 @@ export type GainmapEncodingParameters = {
    * * In practice, this value is typically equal to or just less than 1.0.
    * * Always less than or equal to Max content boost.
    *
-   * @remarks Non Logarithmic space
+   * Non Logarithmic space
    */
   minContentBoost?: number
   /**
@@ -102,7 +102,7 @@ export type GainmapEncodingParameters = {
    * * In practice, this value is typically greater than 1.0.
    * * Always greater than or equal to Min content boost.
    *
-   * @remarks Non Logarithmic space
+   * Non Logarithmic space
    */
   maxContentBoost: number
   /**
@@ -131,7 +131,7 @@ export type GainmapDecodingParameters = {
    * This value can change over time based on device settings and other factors,
    * such as ambient light conditions, or how many bright pixels are on the screen.
    *
-   * @remarks Non Logarithmic space
+   * Non Logarithmic space
    */
   maxDisplayBoost: number
 }
