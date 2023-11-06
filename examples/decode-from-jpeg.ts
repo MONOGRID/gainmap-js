@@ -77,7 +77,7 @@ const result = await decode({
   // this allows to use `result.renderTarget.texture` directly
   renderer,
   // this will restore the full HDR range
-  maxDisplayBoost: parsedMetadata.hdrCapacityMax,
+  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
   ...parsedMetadata
 })
 
