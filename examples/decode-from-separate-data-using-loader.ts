@@ -15,7 +15,7 @@ const renderer = new WebGLRenderer()
 
 const loader = new GainMapLoader(renderer)
 
-const result = loader.load('gainmap.jpeg')
+const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
 // `result` can be used to populate a Texture
 
 const scene = new Scene()

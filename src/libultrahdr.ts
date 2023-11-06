@@ -4,6 +4,8 @@ import libultrahdr from '../libultrahdr-wasm/build/libultrahdr-esm'
 import { CompressedImage, GainMapMetadata } from './types'
 
 export * from '../libultrahdr-wasm/build/libultrahdr'
+export * from './loaders/JPEGRLoader'
+
 let library: MainModule | undefined
 
 /**
