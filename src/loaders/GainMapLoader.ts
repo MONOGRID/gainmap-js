@@ -114,7 +114,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
    * @param onError
    * @returns
    */
-  public override load (url: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+  public override load (url: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
     const loader = new FileLoader(this.manager)
@@ -129,7 +129,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
 
       await this.render(quadRenderer, gainMapJPEG, jpeg, parsedMetadata)
 
-      if (onLoad) onLoad(quadRenderer)
+      if (typeof onLoad === 'function') onLoad(quadRenderer)
 
       quadRenderer.dispose()
     }, onProgress, onError)
@@ -147,7 +147,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
    * @param onError
    * @returns
    */
-  public loadSeparateData (sdrUrl: string, gainMapUrl: string, metadataUrl: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+  public loadSeparateData (sdrUrl: string, gainMapUrl: string, metadataUrl: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
     let sdr: ArrayBuffer | undefined
@@ -158,7 +158,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
       if (sdr && gainMap && metadata) {
         await this.render(quadRenderer, gainMap, sdr, metadata)
 
-        if (onLoad) onLoad(quadRenderer)
+        if (typeof onLoad === 'function') onLoad(quadRenderer)
 
         quadRenderer.dispose()
       }
