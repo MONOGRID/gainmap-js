@@ -91,7 +91,7 @@ export type GainmapEncodingParameters = {
    * * In practice, this value is typically equal to or just less than 1.0.
    * * Always less than or equal to Max content boost.
    *
-   * @remarks Non Logarithic space
+   * @remarks Non Logarithmic space
    */
   minContentBoost?: number
   /**
@@ -102,7 +102,7 @@ export type GainmapEncodingParameters = {
    * * In practice, this value is typically greater than 1.0.
    * * Always greater than or equal to Min content boost.
    *
-   * @remarks Non Logarithic space
+   * @remarks Non Logarithmic space
    */
   maxContentBoost: number
   /**
