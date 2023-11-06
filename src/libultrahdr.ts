@@ -48,9 +48,17 @@ export const getLibrary = async () => {
  * })
  *
  * // obtain the RAW RGBA SDR buffer and create an ImageData
- * const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
+ * const sdrImageData = new ImageData(
+ *   encodingResult.sdr.toArray(),
+ *   encodingResult.sdr.width,
+ *   encodingResult.sdr.height
+ * )
  * // obtain the RAW RGBA Gain map buffer and create an ImageData
- * const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
+ * const gainMapImageData = new ImageData(
+ *   encodingResult.gainMap.toArray(),
+ *   encodingResult.gainMap.width,
+ *   encodingResult.gainMap.height
+ * )
  *
  * // parallel compress the RAW buffers into the specified mimeType
  * const mimeType = 'image/jpeg'
@@ -149,27 +157,13 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  * @group Decoding
  *
  * @example
- * import { decode } from '@monogrid/gainmap-js'
  * import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
- * import { Mesh, MeshBasicMaterial, PlaneGeometry } from 'three'
+ *
  * // fetch a JPEG image containing a gainmap as ArrayBuffer
- * const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+ * const gainmap = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
  *
  * // extract data from the JPEG
- * const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
- *
- * // restore the HDR texture
- * const result = await decode({
- *   sdr,
- *   gainMap,
- *   // this will restore the full HDR range
- *   maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
- *   ...parsedMetadata
- * })
- *
- * // result can be used to populate a Texture
- * const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ map: result.renderTarget.texture }))
- *
+ * const { gainMap, sdr, parsedMetadata } = await decodeJPEGMetadata(gainmap)
  *
  * @param file A Jpeg file Uint8Array.
  * @returns The decoded data
