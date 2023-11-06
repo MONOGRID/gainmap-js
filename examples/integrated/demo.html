@@ -46,6 +46,7 @@
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 			import { GainMapLoader } from '@monogrid/gainmap-js';
+			import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr';
 
 			const params = {
 				envMap: 'Gain map',
@@ -101,6 +102,11 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
+				pmremGenerator.compileEquirectangularShader();
+
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 					pmremGenerator.dispose();
@@ -118,7 +124,7 @@
 						hdrCubeMap.needsUpdate = true;
 					})
 
-				gainMap = new GainMapLoader(renderer)
+				gainMap = new JPEGRLoader(renderer)
 					.load('textures/pisa-4k.jpg', function (response) {
 						gainmapRenderTarget = pmremGenerator.fromEquirectangular( gainMap.renderTarget.texture );
 
@@ -140,7 +146,7 @@
 					})
 
 				separateGainMap = new GainMapLoader(renderer)
-					.loadSeparateData('textures/pisa-4k.webp','textures/pisa-4k-gainmap.webp','textures/pisa-4k.json', function (response) {
+					.load(['textures/pisa-4k.webp','textures/pisa-4k-gainmap.webp','textures/pisa-4k.json'], function (response) {
 
 						separateGainmapRenderTarget = pmremGenerator.fromEquirectangular( separateGainMap.renderTarget.texture );
 
@@ -161,9 +167,7 @@
 						separateGainmapBackground.needsUpdate = true
 					})
 
-				const pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileCubemapShader();
-				pmremGenerator.compileEquirectangularShader();
+
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
