@@ -36,9 +36,10 @@ The main use case of this library is to decode a JPEG file that contains gain ma
 and use it instead of a traditional `.exr` or `.hdr` image.
 
 ```ts
-import { decode } from '@monogrid/gainmap-js'
-import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+import { GainMapLoader } from '@monogrid/gainmap-js'
 import {
+  EquirectangularReflectionMapping,
+  LinearFilter,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -49,31 +50,28 @@ import {
 
 const renderer = new WebGLRenderer()
 
-// fetch a JPEG image containing a gainmap as ArrayBuffer
-const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+const loader = new GainMapLoader(renderer)
 
-// extract data from the JPEG
-const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
-
-// restore the HDR texture
-const result = await decode({
-  sdr,
-  gainMap,
-  // this allows to use `result.renderTarget.texture` directly
-  renderer,
-  // this will restore the full HDR range
-  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
-  ...parsedMetadata
-})
+const result = loader.load('gainmap.jpeg')
+// `result` can be used to populate a Texture
 
 const scene = new Scene()
-// `result` can be used to populate a Texture
 const mesh = new Mesh(
   new PlaneGeometry(),
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
 renderer.render(scene, new PerspectiveCamera())
+
+// `result.renderTarget.texture` must be
+// converted to `DataTexture` in order
+// to use it as Equirectanmgular scene background
+// if needed
+
+scene.background = result.toDataTexture()
+scene.background.mapping = EquirectangularReflectionMapping
+scene.background.minFilter = LinearFilter
+
 ```
 
 ### Encoding

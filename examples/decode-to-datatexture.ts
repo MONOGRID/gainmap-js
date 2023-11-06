@@ -3,8 +3,7 @@
 import { decode } from '@monogrid/gainmap-js'
 import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import {
-  DataTexture,
-  HalfFloatType,
+  ClampToEdgeWrapping,
   LinearFilter,
   LinearMipMapLinearFilter,
   Mesh,
@@ -12,18 +11,62 @@ import {
   NoColorSpace,
   PerspectiveCamera,
   PlaneGeometry,
-  RepeatWrapping,
   RGBAFormat,
   Scene,
+  SRGBColorSpace,
+  Texture,
+  UnsignedByteType,
   UVMapping,
   WebGLRenderer
 } from 'three'
 
 // fetch a JPEG image containing a gainmap as ArrayBuffer
-const gainmap = await (await fetch('gainmap.jpeg')).arrayBuffer()
+const gainmap = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
 
 // extract data from the JPEG
-const { sdr, gainMap, parsedMetadata } = await decodeJPEGMetadata(new Uint8Array(gainmap))
+const { gainMap: gainMapBuffer, parsedMetadata } = await decodeJPEGMetadata(gainmap)
+
+// create data blobs
+const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
+// TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
+// we use the original image buffer instead
+const sdrBlob = new Blob([gainmap], { type: 'image/jpeg' })
+
+// create ImageBitmap data
+const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([
+  createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
+  createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
+])
+
+// create textures
+const gainMap = new Texture(gainMapImageBitmap,
+  UVMapping,
+  ClampToEdgeWrapping,
+  ClampToEdgeWrapping,
+  LinearFilter,
+  LinearMipMapLinearFilter,
+  RGBAFormat,
+  UnsignedByteType,
+  1,
+  NoColorSpace
+)
+
+gainMap.needsUpdate = true
+
+// create textures
+const sdr = new Texture(sdrImageBitmap,
+  UVMapping,
+  ClampToEdgeWrapping,
+  ClampToEdgeWrapping,
+  LinearFilter,
+  LinearMipMapLinearFilter,
+  RGBAFormat,
+  UnsignedByteType,
+  1,
+  SRGBColorSpace
+)
+
+sdr.needsUpdate = true
 
 // restore the HDR texture
 // !!!
@@ -38,26 +81,12 @@ const result = await decode({
   ...parsedMetadata
 })
 
-// create the datatexture from the result array
-const map = new DataTexture(
-  result.toArray(), // get data
-  result.width, // width is provided
-  result.height, // height is provided
-  RGBAFormat, // must be RGBAFormat
-  HalfFloatType, // must be HalfFloatType
-  UVMapping,
-  RepeatWrapping,
-  RepeatWrapping,
-  LinearFilter,
-  LinearMipMapLinearFilter,
-  1,
-  NoColorSpace // must be NoColorSpace
-)
-
 const scene = new Scene()
 const mesh = new Mesh(
   new PlaneGeometry(),
-  new MeshBasicMaterial({ map })
+  new MeshBasicMaterial({
+    map: result.toDataTexture()
+  })
 )
 scene.add(mesh)
 
