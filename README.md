@@ -163,9 +163,17 @@ const encodingResult = encode({
 })
 
 // obtain the RAW RGBA SDR buffer and create an ImageData
-const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
+const sdrImageData = new ImageData(
+  encodingResult.sdr.toArray(),
+  encodingResult.sdr.width,
+  encodingResult.sdr.height
+)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
-const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
+const gainMapImageData = new ImageData(
+  encodingResult.gainMap.toArray(),
+  encodingResult.gainMap.width,
+  encodingResult.gainMap.height
+)
 
 // parallel compress the RAW buffers into the specified mimeType
 const mimeType = 'image/jpeg'

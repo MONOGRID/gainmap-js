@@ -31,7 +31,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
   }
 
   /**
-   *
+   * @private
    * @returns
    */
   protected prepareQuadRenderer () {
@@ -54,6 +54,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
 
   /**
    *
+   * @private
    * @param quadRenderer
    * @param gainMapBuffer
    * @param sdrBuffer
