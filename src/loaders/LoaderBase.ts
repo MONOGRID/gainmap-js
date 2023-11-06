@@ -108,7 +108,9 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
     quadRenderer.material.offsetHdr = metadata.offsetHdr
     quadRenderer.material.offsetSdr = metadata.offsetSdr
     quadRenderer.material.gamma = metadata.gamma
-    quadRenderer.material.maxDisplayBoost = metadata.hdrCapacityMax
+    quadRenderer.material.hdrCapacityMin = metadata.hdrCapacityMin
+    quadRenderer.material.hdrCapacityMax = metadata.hdrCapacityMax
+    quadRenderer.material.maxDisplayBoost = Math.pow(2, metadata.hdrCapacityMax)
     quadRenderer.material.needsUpdate = true
 
     quadRenderer.render()
