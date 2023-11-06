@@ -12,12 +12,12 @@ import {
 
 const renderer = new WebGLRenderer()
 
-const loader = new TextureLoader()
+const textureLoader = new TextureLoader()
 
 // load SDR Representation
-const sdr = await loader.loadAsync('sdr.jpg')
+const sdr = await textureLoader.loadAsync('sdr.jpg')
 // load Gain map recovery image
-const gainMap = await loader.loadAsync('gainmap.jpg')
+const gainMap = await textureLoader.loadAsync('gainmap.jpg')
 // load metadata
 const metadata = await (await fetch('metadata.json')).json()
 

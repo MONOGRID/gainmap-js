@@ -20,6 +20,47 @@ import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { GainMapMetadata } from '../types'
 import { QuadRenderer } from '../utils/QuadRenderer'
 /**
+ * A Three.js Loader for the gain map format.
+ *
+ * @category Loaders
+ * @group Loaders
+ *
+ * @example
+ * import { GainMapLoader } from '@monogrid/gainmap-js'
+ * import {
+ *   EquirectangularReflectionMapping,
+ *   LinearFilter,
+ *   Mesh,
+ *   MeshBasicMaterial,
+ *   PerspectiveCamera,
+ *   PlaneGeometry,
+ *   Scene,
+ *   WebGLRenderer
+ * } from 'three'
+ *
+ * const renderer = new WebGLRenderer()
+ *
+ * const loader = new GainMapLoader(renderer)
+ *
+ * const result = loader.load('gainmap.jpeg')
+ * // `result` can be used to populate a Texture
+ *
+ * const scene = new Scene()
+ * const mesh = new Mesh(
+ *   new PlaneGeometry(),
+ *   new MeshBasicMaterial({ map: result.renderTarget.texture })
+ * )
+ * scene.add(mesh)
+ * renderer.render(scene, new PerspectiveCamera())
+ *
+ * // `result.renderTarget.texture` must be
+ * // converted to `DataTexture` in order
+ * // to use it as Equirectanmgular scene background
+ * // if needed
+ *
+ * scene.background = result.toDataTexture()
+ * scene.background.mapping = EquirectangularReflectionMapping
+ * scene.background.minFilter = LinearFilter
  *
  */
 export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>> {
@@ -34,6 +75,10 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
     this.renderer = renderer
   }
 
+  /**
+   *
+   * @returns
+   */
   private prepareQuadRenderer () {
     // temporary values
     const material = new GainMapDecoderMaterial({
@@ -52,6 +97,13 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
     return new QuadRenderer(16, 16, HalfFloatType, NoColorSpace, material, this.renderer)
   }
 
+  /**
+   *
+   * @param quadRenderer
+   * @param gainMapBuffer
+   * @param sdrBuffer
+   * @param metadata
+   */
   private async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, gainMapBuffer: ArrayBuffer | string, sdrBuffer: ArrayBuffer | string, metadata: GainMapMetadata) {
     const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
     // TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
@@ -114,7 +166,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
    * @param onError
    * @returns
    */
-  public override load (url: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+  public override load (url: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
     const loader = new FileLoader(this.manager)
@@ -129,7 +181,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
 
       await this.render(quadRenderer, gainMapJPEG, jpeg, parsedMetadata)
 
-      if (onLoad) onLoad(quadRenderer)
+      if (typeof onLoad === 'function') onLoad(quadRenderer)
 
       quadRenderer.dispose()
     }, onProgress, onError)
@@ -138,6 +190,12 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
   }
 
   /**
+   * Loads a gainmap using separate data
+   * * sdr image
+   * * gain map image
+   * * metadata json
+   *
+   * useful for webp gainmaps
    *
    * @param sdrUrl
    * @param gainMapUrl
@@ -147,7 +205,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
    * @param onError
    * @returns
    */
-  public loadSeparateData (sdrUrl: string, gainMapUrl: string, metadataUrl: string, onLoad: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
+  public loadSeparateData (sdrUrl: string, gainMapUrl: string, metadataUrl: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
     let sdr: ArrayBuffer | undefined
@@ -158,7 +216,7 @@ export class GainMapLoader extends Loader<QuadRenderer<typeof HalfFloatType, Gai
       if (sdr && gainMap && metadata) {
         await this.render(quadRenderer, gainMap, sdr, metadata)
 
-        if (onLoad) onLoad(quadRenderer)
+        if (typeof onLoad === 'function') onLoad(quadRenderer)
 
         quadRenderer.dispose()
       }
