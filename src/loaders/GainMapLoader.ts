@@ -43,7 +43,7 @@ import { LoaderBase } from './LoaderBase'
  *
  * // `result.renderTarget.texture` must be
  * // converted to `DataTexture` in order
- * // to use it as Equirectanmgular scene background
+ * // to use it as Equirectangular scene background
  * // if needed
  *
  * scene.background = result.toDataTexture()
@@ -59,7 +59,7 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
    * * gain map image
    * * metadata json
    *
-   * useful for webp gainmaps
+   * useful for webp gain maps
    *
    * @param sdrUrl
    * @param gainMapUrl

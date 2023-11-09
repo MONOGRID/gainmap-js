@@ -175,8 +175,8 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
   if (!result.success) throw new Error(result.errorMessage)
 
   const parser = new DOMParser()
-  const xmldocuemnt = parser.parseFromString(result.metadata as string, 'text/xml')
-  const description = xmldocuemnt.getElementsByTagName('rdf:Description')[0]
+  const xmlDocument = parser.parseFromString(result.metadata as string, 'text/xml')
+  const description = xmlDocument.getElementsByTagName('rdf:Description')[0]
 
   const gainMapMin = getAttribute(description, 'hdrgm:GainMapMin', '0')
   const gainMapMax = getAttribute(description, 'hdrgm:GainMapMax')

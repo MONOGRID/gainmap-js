@@ -17,8 +17,8 @@ export { SDRMaterial }
  * @group Encoding Functions
  *
  * @param hdrTexture The HDR image to be rendered
- * @param renderer (optional) WebGLRenderer to use diring the rendering, a disposable renderer will be create and destroyed if this is not provided.
- * @param toneMapping (optional) Tonemapping to be applied to the SDR Rendition
+ * @param renderer (optional) WebGLRenderer to use during the rendering, a disposable renderer will be create and destroyed if this is not provided.
+ * @param toneMapping (optional) Tone mapping to be applied to the SDR Rendition
  * @throws {Error} if the WebGLRenderer fails to render the SDR image
  */
 export const getSDRRendition = (hdrTexture: DataTexture, renderer?: WebGLRenderer, toneMapping?: ToneMapping): InstanceType<typeof QuadRenderer<typeof UnsignedByteType, InstanceType<typeof SDRMaterial>>> => {

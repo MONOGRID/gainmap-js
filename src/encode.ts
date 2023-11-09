@@ -51,7 +51,7 @@ import { getDataTexture } from './utils/get-data-texture'
  * encodingResult.sdr.dispose()
  * encodingResult.gainMap.dispose()
  *
- * @param params Encoding Paramaters
+ * @param params Encoding Parameters
  * @returns
  */
 export const encode = (params: EncodingParametersBase) => {
@@ -129,7 +129,7 @@ export const encode = (params: EncodingParametersBase) => {
  * // `jpeg` will be an `Uint8Array` which can be saved somewhere
  *
  *
- * @param params Encoding Paramaters
+ * @param params Encoding Parameters
  * @throws {Error} if the browser does not support [createImageBitmap](https://caniuse.com/createimagebitmap)
  */
 export const encodeAndCompress = async (params: EncodingParametersWithCompression) => {

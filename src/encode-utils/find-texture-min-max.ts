@@ -92,7 +92,7 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
 
   const quadRenderer = new QuadRenderer(w, h, srcTex.type, srcTex.colorSpace, mat, renderer)
 
-  const framebuffers: WebGLRenderTarget[] = []
+  const frameBuffers: WebGLRenderTarget[] = []
 
   while (w > 1 || h > 1) {
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
@@ -109,12 +109,12 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
       depthBuffer: false,
       stencilBuffer: false
     })
-    framebuffers.push(fb)
+    frameBuffers.push(fb)
   }
 
   w = srcTex.image.width
   h = srcTex.image.height
-  framebuffers.forEach((fbi) => {
+  frameBuffers.forEach((fbi) => {
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
 
@@ -129,7 +129,7 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
   const out = quadRenderer.toArray()
 
   quadRenderer.dispose()
-  framebuffers.forEach(fb => fb.dispose())
+  frameBuffers.forEach(fb => fb.dispose())
 
   return [DataUtils.fromHalfFloat(out[0]), DataUtils.fromHalfFloat(out[1]), DataUtils.fromHalfFloat(out[2])]
 }
