@@ -3,7 +3,7 @@ import {
   HalfFloatType
 } from 'three'
 
-import { decodeJPEGMetadata } from '../libultrahdr'
+import { decodeJPEGMetadata } from '../libultrahdr/decode-jpeg-metadata'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { QuadRenderer } from '../utils/QuadRenderer'
 import { LoaderBase } from './LoaderBase'
@@ -43,7 +43,7 @@ import { LoaderBase } from './LoaderBase'
  *
  * // `result.renderTarget.texture` must be
  * // converted to `DataTexture` in order
- * // to use it as Equirectanmgular scene background
+ * // to use it as Equirectangular scene background
  * // if needed
  *
  * scene.background = result.toDataTexture()

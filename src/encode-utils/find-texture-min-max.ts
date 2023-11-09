@@ -2,6 +2,7 @@ import {
   ClampToEdgeWrapping,
   DataTexture,
   DataUtils,
+  FloatType,
   NearestFilter,
   ShaderMaterial,
   Vector2,
@@ -90,7 +91,14 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
   let w = srcTex.image.width
   let h = srcTex.image.height
 
-  const quadRenderer = new QuadRenderer(w, h, srcTex.type, srcTex.colorSpace, mat, renderer)
+  const quadRenderer = new QuadRenderer(
+    w,
+    h,
+    srcTex.type,
+    srcTex.colorSpace,
+    mat,
+    renderer
+  )
 
   const frameBuffers: WebGLRenderTarget[] = []
 
@@ -98,9 +106,9 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
     const fb = new WebGLRenderTarget(w, h, {
-      type: srcTex.type,
+      type: quadRenderer.type,
       format: srcTex.format,
-      colorSpace: srcTex.colorSpace,
+      colorSpace: quadRenderer.colorSpace,
       minFilter: NearestFilter,
       magFilter: NearestFilter,
       wrapS: ClampToEdgeWrapping,
@@ -131,5 +139,9 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
   quadRenderer.dispose()
   frameBuffers.forEach(fb => fb.dispose())
 
-  return [DataUtils.fromHalfFloat(out[0]), DataUtils.fromHalfFloat(out[1]), DataUtils.fromHalfFloat(out[2])]
+  return [
+    quadRenderer.type === FloatType ? out[0] : DataUtils.fromHalfFloat(out[0]),
+    quadRenderer.type === FloatType ? out[1] : DataUtils.fromHalfFloat(out[1]),
+    quadRenderer.type === FloatType ? out[2] : DataUtils.fromHalfFloat(out[2])
+  ]
 }

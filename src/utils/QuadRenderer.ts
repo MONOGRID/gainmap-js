@@ -54,6 +54,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   private _width: number
   private _height: number
   private _type: TType
+  private _colorSpace: ColorSpace
   /**
    *
    * @param sourceTexture
@@ -63,6 +64,10 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._width = width
     this._height = height
     this._type = type
+    this._colorSpace = colorSpace
+    if (type === HalfFloatType && navigator.userAgent.toLowerCase().includes('firefox')) {
+      this._type = FloatType as TType
+    }
     this._material = material
     if (renderer) {
       this._renderer = renderer
@@ -85,7 +90,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._scene.add(this._quad)
 
     this._renderTarget = new WebGLRenderTarget(width, height, {
-      type,
+      type: this._type,
       colorSpace,
       format: RGBAFormat,
       magFilter: LinearFilter,
@@ -169,7 +174,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
       this.width,
       this.height,
       RGBAFormat,
-      HalfFloatType,
+      this._type,
       UVMapping,
       RepeatWrapping,
       RepeatWrapping,
@@ -229,6 +234,11 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * The `Material` used.
    */
   public get material () { return this._material }
+  /**
+   *
+   */
+  public get type () { return this._type }
+  public get colorSpace () { return this._colorSpace }
   // public set material (value: TMaterial) { this._material = value }
 
   // public get rendererIsDisposable () { return this._rendererIsDisposable }

@@ -49,7 +49,14 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       sdr: new Texture()
     })
 
-    return new QuadRenderer(16, 16, HalfFloatType, NoColorSpace, material, this.renderer)
+    return new QuadRenderer(
+      16,
+      16,
+      HalfFloatType,
+      NoColorSpace,
+      material,
+      this.renderer
+    )
   }
 
   /**
