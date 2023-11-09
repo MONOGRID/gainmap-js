@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/MONOGRID/gainmap-js/compare/v1.1.0...v1.1.1) (2023-11-09)
+
+
+### Bug Fixes
+
+* fixes Firefox Compatibility ([1cec657](https://github.com/MONOGRID/gainmap-js/commit/1cec65708127b6fd064277f4f923fc0f65610fa2))
+* **libultrahdr:** fixes circular dependency between JPEGRLoader and libultrahdr ([f30f786](https://github.com/MONOGRID/gainmap-js/commit/f30f7865fb27a601635168b8a104a9935653e758))
+
 # [1.1.0](https://github.com/MONOGRID/gainmap-js/compare/v1.0.2...v1.1.0) (2023-11-06)
 
 
