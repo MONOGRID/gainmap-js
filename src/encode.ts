@@ -95,7 +95,7 @@ export const encode = (params: EncodingParametersBase) => {
  * @remarks
  * if a `renderer` parameter is not provided
  * This function will automatically dispose its "disposable"
- * renderer, no need to disapose it manually later
+ * renderer, no need to dispose it manually later
  *
  * @category Encoding Functions
  * @group Encoding Functions

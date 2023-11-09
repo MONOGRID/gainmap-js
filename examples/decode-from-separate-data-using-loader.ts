@@ -28,7 +28,7 @@ renderer.render(scene, new PerspectiveCamera())
 
 // `result.renderTarget.texture` must be
 // converted to `DataTexture` in order
-// to use it as Equirectanmgular scene background
+// to use it as Equirectangular scene background
 // if needed
 
 scene.background = result.toDataTexture()

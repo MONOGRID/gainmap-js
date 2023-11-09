@@ -21,7 +21,7 @@ export type WorkerInterfaceImplementation = {
 
 export type WorkerRequest = WorkerInterface[keyof WorkerInterface]['request']
 
-export type WithTranferListFunction = <T>(payload: T, transferList: Transferable[]) => T
+export type WithTransferListFunction = <T>(payload: T, transferList: Transferable[]) => T
 
 export type PromiseWorkerType = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
