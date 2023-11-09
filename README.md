@@ -33,6 +33,8 @@ $ npm install @monogrid/gainmap-js three
 > * The **gain map**. This is a secondary “image” embedded in the file. It is not a real image, but rather contains data to convert each pixel from the base image into the other (SDR or HDR) version of the image.
 >* Gain map **metadata**. This tells the browser how the gain map is encoded as well as critical information to optimize rendering on any display.
 
+Please note that Google [is adopting the gain map technology in Android 14](https://support.google.com/photos/answer/14159275) but its naming of the technology refers to it as **Ultra HDR Image Format** and a JPEG file with embedded gain map is called `JPEGR` in their terminology.
+
 ## API
 
 Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed documentation about the API.
