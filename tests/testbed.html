@@ -10,8 +10,8 @@
   <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
-        "three/examples/": "https://unpkg.com/three@0.157.0/examples/",
+        "three": "../node_modules/three/build/three.module.js",
+        "three/examples/": "../node_modules/three/examples/",
 
         "@monogrid/gainmap-js": "../dist/index.js",
         "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js"
@@ -22,8 +22,8 @@
     import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js';
     import { encodeJPEGMetadata, decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr';
     import { ACESFilmicToneMapping } from 'three'
-    import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader'
-    import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader'
+    import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+    import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
     const getArrayBuffer = (file) => {
       return new Promise((resolve, reject) => {
