@@ -1,9 +1,9 @@
 # gainmap-js
 A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Technology for storing HDR Images using an SDR Image + a "Gain map"
 
-> :warning: This library **is primarly intended** for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
+> :warning: This library **is primarily intended** for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
 >
-> It can be used for general encode/decode of gain maps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gainmaps.
+> It can be used for general encode/decode of gain maps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gain maps.
 
 ## Live Demo
 
@@ -16,7 +16,7 @@ Compares loading:
 
 ## Installing
 ```bash
-$ npm install @monogrid/gainmap-js threejs
+$ npm install @monogrid/gainmap-js three
 ```
 
 ## What is a Gain map?
@@ -87,7 +87,7 @@ renderer.render(scene, new PerspectiveCamera())
 
 // `result.renderTarget.texture` must be
 // converted to `DataTexture` in order
-// to use it as Equirectanmgular scene background
+// to use it as Equirectangular scene background
 // if needed
 
 scene.background = result.toDataTexture()
@@ -136,7 +136,7 @@ renderer.render(scene, new PerspectiveCamera())
 
 // `result.renderTarget.texture` must be
 // converted to `DataTexture` in order
-// to use it as Equirectanmgular scene background
+// to use it as Equirectangular scene background
 // if needed
 
 scene.background = result.toDataTexture()
