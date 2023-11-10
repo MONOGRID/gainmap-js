@@ -112,7 +112,7 @@
 				};
 
 				hdrCubeMap = new RGBELoader()
-					.load('textures/pisa-1k.hdr', function (response) {
+					.load('textures/spruit_sunrise_1k.hdr', function (response) {
 
 						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( response );
 
@@ -123,7 +123,7 @@
 					})
 
 				gainMap = new JPEGRLoader(renderer)
-					.load('textures/pisa-4k.jpg', function (response) {
+					.load('textures/spruit_sunrise_4k.jpg', function (response) {
 						gainmapRenderTarget = pmremGenerator.fromEquirectangular( gainMap.renderTarget.texture );
 
 						// this would be ideal but it doesn't work:
@@ -144,7 +144,7 @@
 					})
 
 				separateGainMap = new GainMapLoader(renderer)
-					.load(['textures/pisa-4k.webp','textures/pisa-4k-gainmap.webp','textures/pisa-4k.json'], function (response) {
+					.load(['textures/spruit_sunrise_4k.webp','textures/spruit_sunrise_4k-gainmap.webp','textures/spruit_sunrise_4k.json'], function (response) {
 
 						separateGainmapRenderTarget = pmremGenerator.fromEquirectangular( separateGainMap.renderTarget.texture );
 
