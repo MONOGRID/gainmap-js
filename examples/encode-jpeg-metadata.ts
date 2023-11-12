@@ -1,5 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js/encode'
 import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 

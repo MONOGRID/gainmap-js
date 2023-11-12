@@ -1,12 +1,10 @@
 /* eslint-disable unused-imports/no-unused-vars */
+import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js/encode'
 import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 // this assumes a vite-like bundler understands the `?worker` import
 import GainMapWorker from '@monogrid/gainmap-js/worker?worker'
 import { getPromiseWorker, getWorkerInterface } from '@monogrid/gainmap-js/worker-interface'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
-
-import { encodeAndCompress } from '../dist/encode'
-import { findTextureMinMax } from '../dist/encode-utils/find-texture-min-max'
 
 // turn our Worker into a PromiseWorker
 const promiseWorker = getPromiseWorker(new GainMapWorker())

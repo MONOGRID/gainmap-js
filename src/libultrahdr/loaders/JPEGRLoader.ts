@@ -3,10 +3,11 @@ import {
   HalfFloatType
 } from 'three'
 
-import { decodeJPEGMetadata } from '../libultrahdr/decode-jpeg-metadata'
-import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { QuadRenderer } from '../utils/QuadRenderer'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBase } from '../../core/LoaderBase'
+import { QuadRenderer } from '../../core/QuadRenderer'
+import { GainMapDecoderMaterial } from '../../decode/materials/GainMapDecoderMaterial'
+import { decodeJPEGMetadata } from '../decode-jpeg-metadata'
+
 /**
  * A Three.js Loader for a JPEG with embedded gainmap metadata.
  *

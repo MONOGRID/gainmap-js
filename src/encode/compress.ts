@@ -1,4 +1,4 @@
-import { CompressedImage, CompressParameters } from '../types'
+import { CompressedImage, CompressParameters } from './types'
 
 /**
  * Used internally

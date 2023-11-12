@@ -1,10 +1,8 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import {
-  GainmapEncodingParameters,
-  // eslint-disable-next-line unused-imports/no-unused-imports
-  GainMapMetadata
-} from '../types'
+// eslint-disable-next-line unused-imports/no-unused-imports
+import { GainMapMetadata } from '../../core/types'
+import { GainmapEncodingParameters } from '../types'
 
 const vertexShader = /* glsl */`
 varying vec2 vUv;

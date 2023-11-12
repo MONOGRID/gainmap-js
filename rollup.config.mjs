@@ -50,7 +50,8 @@ const configBase = defineConfig({
 export default [
   defineConfig({
     input: {
-      index: './src/index.ts',
+      encode: './src/encode.ts',
+      decode: './src/decode.ts',
       libultrahdr: './src/libultrahdr.ts',
       worker: './src/worker.ts',
       'worker-interface': './src/worker-interface.ts'
@@ -64,11 +65,21 @@ export default [
     ...configBase
   }),
   defineConfig({
-    input: './src/index.ts',
+    input: './src/encode.ts',
     output: {
       format: 'umd',
       name,
-      file: 'dist/index.umd.js',
+      file: 'dist/encode.umd.js',
+      ...settings
+    },
+    ...configBase
+  }),
+  defineConfig({
+    input: './src/decode.ts',
+    output: {
+      format: 'umd',
+      name,
+      file: 'dist/decode.umd.js',
       ...settings
     },
     ...configBase

@@ -1,11 +1,7 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import {
-  GainmapDecodingParameters,
-  // eslint-disable-next-line unused-imports/no-unused-imports
-  GainmapEncodingParameters,
-  GainMapMetadata
-} from '../types'
+import { GainMapMetadata } from '../../core/types'
+import { GainmapDecodingParameters } from '../types'
 
 const vertexShader = /* glsl */`
 varying vec2 vUv;
@@ -108,7 +104,7 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
   set gainMapMax (value: [number, number, number]) { (this.uniforms.gainMapMax.value as Vector3).fromArray(value) }
 
   /**
-   * @see {@link GainmapEncodingParameters.gamma}
+   * @see {@link GainMapMetadata.gamma}
    */
   get gamma () {
     const g = (this.uniforms.gamma.value as Vector3)

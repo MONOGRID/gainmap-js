@@ -14,9 +14,9 @@ import {
   WebGLRenderer
 } from 'three'
 
-import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { GainMapMetadata } from '../types'
-import { QuadRenderer } from '../utils/QuadRenderer'
+import { type GainMapMetadata } from '../core/types'
+import { GainMapDecoderMaterial } from '../decode/materials/GainMapDecoderMaterial'
+import { QuadRenderer } from './QuadRenderer'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private renderer: WebGLRenderer

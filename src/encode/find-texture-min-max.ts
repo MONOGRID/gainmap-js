@@ -13,8 +13,8 @@ import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
-import { getDataTexture } from '../utils/get-data-texture'
-import { QuadRenderer } from '../utils/QuadRenderer'
+import { getDataTexture } from '../core/get-data-texture'
+import { QuadRenderer } from '../core/QuadRenderer'
 const vertexShader = /* glsl */`
 varying vec2 vUv;
 void main() {

@@ -6,7 +6,7 @@ import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
 import { ACESFilmicToneMapping, LinearToneMapping } from 'three'
 
-import { encodeAndCompress } from '../src/encode'
+import { encodeAndCompress } from '../../src/encode'
 import { getTestbed } from './common'
 
 describe('encoder', () => {
@@ -27,7 +27,7 @@ describe('encoder', () => {
     { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: LinearToneMapping },
     { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: LinearToneMapping }
   ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
-    // we need to launch puppetteer with a
+    // we need to launch puppeteer with a
     // custom written "testbed.html" page
     // because our encoder works by
     // rendering the SDR image with THREEjs
@@ -46,7 +46,7 @@ describe('encoder', () => {
     // expect no calls to page log except the one indicated
     expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
 
-    // we receive Arrays because puppetteer can't transfer Uint8Array data
+    // we receive Arrays because puppeteer can't transfer Uint8Array data
     result.gainMap.data = Uint8Array.from(result.gainMap.data)
     result.sdr.data = Uint8Array.from(result.sdr.data)
 

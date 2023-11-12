@@ -3,10 +3,10 @@ import {
   HalfFloatType
 } from 'three'
 
+import { LoaderBase } from '../../core/LoaderBase'
+import { QuadRenderer } from '../../core/QuadRenderer'
+import { GainMapMetadata } from '../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { GainMapMetadata } from '../types'
-import { QuadRenderer } from '../utils/QuadRenderer'
-import { LoaderBase } from './LoaderBase'
 /**
  * A Three.js Loader for the gain map format.
  *

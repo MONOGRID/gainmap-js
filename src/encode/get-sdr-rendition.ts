@@ -6,10 +6,9 @@ import {
   WebGLRenderer
 } from 'three'
 
-import { SDRMaterial } from '../materials/SDRMaterial'
-import { QuadRenderer } from '../utils/QuadRenderer'
+import { QuadRenderer } from '../core/QuadRenderer'
+import { SDRMaterial } from './materials/SDRMaterial'
 
-export { SDRMaterial }
 /**
  * Renders an SDR Representation of an HDR Image
  *

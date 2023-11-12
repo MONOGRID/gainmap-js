@@ -1,0 +1,385 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`xmp finds hdr xmp data in 01.jpg 1`] = `
+{
+  "gainMapMax": [
+    2.474807,
+    2.453772,
+    2.44652,
+  ],
+  "gainMapMin": [
+    -0.141127,
+    -0.107269,
+    -0.309696,
+  ],
+  "gamma": [
+    0.250409,
+    0.25,
+    0.325208,
+  ],
+  "hdrCapacityMax": 2.8,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.183221,
+    0.183221,
+    0.183221,
+  ],
+  "offsetSdr": [
+    0.183221,
+    0.183221,
+    0.183221,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 02.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.522114,
+    3.060263,
+    2.706481,
+  ],
+  "gainMapMin": [
+    0.000312,
+    0.034719,
+    0.053824,
+  ],
+  "gamma": [
+    0.336811,
+    0.357914,
+    0.386615,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.225551,
+    0.225551,
+    0.225551,
+  ],
+  "offsetSdr": [
+    0.225551,
+    0.225551,
+    0.225551,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 03.jpg 1`] = `
+{
+  "gainMapMax": [
+    0.849514,
+    0.748561,
+    0.753096,
+  ],
+  "gainMapMin": [
+    0.000017,
+    -0.000003,
+    0.000012,
+  ],
+  "gamma": [
+    0.25,
+    0.25,
+    0.25,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    10.308957,
+    10.308957,
+    10.308957,
+  ],
+  "offsetSdr": [
+    10.308957,
+    10.308957,
+    10.308957,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 04.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.527605,
+    2.830234,
+    1.537243,
+  ],
+  "gainMapMin": [
+    0.023869,
+    0.075191,
+    0.142298,
+  ],
+  "gamma": [
+    0.506828,
+    0.590032,
+    1.517708,
+  ],
+  "hdrCapacityMax": 3.9,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.046983,
+    0.046983,
+    0.046983,
+  ],
+  "offsetSdr": [
+    0.046983,
+    0.046983,
+    0.046983,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 05.jpg 1`] = `
+{
+  "gainMapMax": [
+    1.560281,
+    1.560309,
+    1.560328,
+  ],
+  "gainMapMin": [
+    -0.014377,
+    -0.005596,
+    -0.004277,
+  ],
+  "gamma": [
+    0.25,
+    0.25,
+    0.25,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    6.695587,
+    6.695587,
+    6.695587,
+  ],
+  "offsetSdr": [
+    6.695587,
+    6.695587,
+    6.695587,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 06.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.482396,
+    3.126128,
+    2.75434,
+  ],
+  "gainMapMin": [
+    -0.144892,
+    -0.140972,
+    -0.065712,
+  ],
+  "gamma": [
+    0.252136,
+    0.263644,
+    0.25,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.37841,
+    0.37841,
+    0.37841,
+  ],
+  "offsetSdr": [
+    0.37841,
+    0.37841,
+    0.37841,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 07.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.961703,
+    3.737166,
+    3.259504,
+  ],
+  "gainMapMin": [
+    -0.950004,
+    -1.06685,
+    -1.203979,
+  ],
+  "gamma": [
+    0.622845,
+    0.726034,
+    0.869492,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.028746,
+    0.028746,
+    0.028746,
+  ],
+  "offsetSdr": [
+    0.028746,
+    0.028746,
+    0.028746,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 08.jpg 1`] = `
+{
+  "gainMapMax": [
+    2.668896,
+    2.580987,
+    2.457281,
+  ],
+  "gainMapMin": [
+    -0.012107,
+    -0.028537,
+    -0.071069,
+  ],
+  "gamma": [
+    0.260823,
+    0.354576,
+    0.47235,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.09302,
+    0.09302,
+    0.09302,
+  ],
+  "offsetSdr": [
+    0.09302,
+    0.09302,
+    0.09302,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 09.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.270427,
+    3.225892,
+    3.196919,
+  ],
+  "gainMapMin": [
+    -0.551779,
+    -0.542884,
+    -0.529494,
+  ],
+  "gamma": [
+    0.42047,
+    0.420672,
+    0.421504,
+  ],
+  "hdrCapacityMax": 3.9,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.017543,
+    0.017543,
+    0.017543,
+  ],
+  "offsetSdr": [
+    0.017543,
+    0.017543,
+    0.017543,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in 10.jpg 1`] = `
+{
+  "gainMapMax": [
+    2.941015,
+    2.410044,
+    1.595006,
+  ],
+  "gainMapMin": [
+    -0.135098,
+    -0.133564,
+    -0.128712,
+  ],
+  "gamma": [
+    0.36099,
+    0.406118,
+    0.538082,
+  ],
+  "hdrCapacityMax": 4,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.02503,
+    0.02503,
+    0.02503,
+  ],
+  "offsetSdr": [
+    0.02503,
+    0.02503,
+    0.02503,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in pisa-4k.jpg 1`] = `
+{
+  "gainMapMax": [
+    3.13443,
+    3.13443,
+    3.13443,
+  ],
+  "gainMapMin": [
+    0,
+    0,
+    0,
+  ],
+  "gamma": [
+    1,
+    1,
+    1,
+  ],
+  "hdrCapacityMax": 3.13443,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+  "offsetSdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+}
+`;
+
+exports[`xmp finds hdr xmp data in spruit_sunrise_4k.jpg 1`] = `
+{
+  "gainMapMax": [
+    15.9993,
+    15.9993,
+    15.9993,
+  ],
+  "gainMapMin": [
+    0,
+    0,
+    0,
+  ],
+  "gamma": [
+    1,
+    1,
+    1,
+  ],
+  "hdrCapacityMax": 15.9993,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+  "offsetSdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+}
+`;

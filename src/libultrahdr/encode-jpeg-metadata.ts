@@ -1,4 +1,5 @@
-import { type CompressedImage, type GainMapMetadata } from '../types'
+import { type GainMapMetadata } from '../core/types'
+import { type CompressedImage } from '../encode/types'
 import { getLibrary } from './library'
 
 /**

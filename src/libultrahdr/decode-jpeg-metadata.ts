@@ -1,4 +1,4 @@
-import { GainMapMetadata } from '../types'
+import { GainMapMetadata } from '../core/types'
 import { getLibrary } from './library'
 
 /**

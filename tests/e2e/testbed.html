@@ -10,16 +10,17 @@
   <script type="importmap">
     {
       "imports": {
-        "three": "../node_modules/three/build/three.module.js",
-        "three/examples/": "../node_modules/three/examples/",
+        "three": "../../node_modules/three/build/three.module.js",
+        "three/examples/": "../../node_modules/three/examples/",
 
-        "@monogrid/gainmap-js": "../dist/index.js",
-        "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js"
+        "@monogrid/gainmap-js": "../../dist/decode.js",
+        "@monogrid/gainmap-js/encode": "../../dist/encode.js",
+        "@monogrid/gainmap-js/libultrahdr": "../../dist/libultrahdr.js"
       }
     }
   </script>
   <script type="module">
-    import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js';
+    import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js/encode';
     import { encodeJPEGMetadata, decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr';
     import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
@@ -52,7 +53,7 @@
         maxContentBoost: Math.max.apply(this, textureMax),
         toneMapping
       })
-      // Uint8Arrays can't be transferred outside puppetteer
+      // Uint8Arrays can't be transferred outside puppeteer
       result.gainMap.data = Array.from(result.gainMap.data)
       result.sdr.data = Array.from(result.sdr.data)
 
@@ -81,7 +82,7 @@
       })
 
       const jpeg = await encodeJPEGMetadata(result)
-      // Uint8Arrays can't be transferred outside puppetteer
+      // Uint8Arrays can't be transferred outside puppeteer
       return Array.from(jpeg)
     }
     window.decodeJPEGMetadata = async (url) => {
@@ -89,7 +90,7 @@
       const buf = await response.arrayBuffer()
       const result = await decodeJPEGMetadata(new Uint8Array(buf))
 
-      // Uint8Arrays can't be transferred outside puppetteer
+      // Uint8Arrays can't be transferred outside puppeteer
       result.gainMap = Array.from(result.gainMap)
       result.sdr = Array.from(result.sdr)
       return result

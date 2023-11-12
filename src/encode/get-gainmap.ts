@@ -3,10 +3,10 @@ import {
   UnsignedByteType
 } from 'three'
 
-import { GainMapEncoderMaterial } from '../materials/GainMapEncoderMaterial'
-import { EncodingParametersBase } from '../types'
-import { getDataTexture } from '../utils/get-data-texture'
-import { QuadRenderer } from '../utils/QuadRenderer'
+import { getDataTexture } from '../core/get-data-texture'
+import { QuadRenderer } from '../core/QuadRenderer'
+import { GainMapEncoderMaterial } from './materials/GainMapEncoderMaterial'
+import { EncodingParametersBase } from './types'
 /**
  *
  * @param params
