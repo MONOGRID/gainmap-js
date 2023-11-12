@@ -3,7 +3,7 @@ import { existsSync } from 'fs'
 import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
 
-import { type UltraHDRUnpacked } from '../../../libultrahdr-wasm/build/libultrahdr'
+import { type UltraHDRUnpacked } from '../../libultrahdr-wasm/build/libultrahdr'
 import { getTestbed } from './common'
 
 describe('wasm', () => {
