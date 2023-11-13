@@ -320,6 +320,38 @@ exports[`xmp finds hdr xmp data in 10.jpg 1`] = `
 }
 `;
 
+exports[`xmp finds hdr xmp data in abandoned_bakery_16k.jpg 1`] = `
+{
+  "gainMapMax": [
+    12.6294,
+    12.6294,
+    12.6294,
+  ],
+  "gainMapMin": [
+    0,
+    0,
+    0,
+  ],
+  "gamma": [
+    1,
+    1,
+    1,
+  ],
+  "hdrCapacityMax": 12.6294,
+  "hdrCapacityMin": 0,
+  "offsetHdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+  "offsetSdr": [
+    0.015625,
+    0.015625,
+    0.015625,
+  ],
+}
+`;
+
 exports[`xmp finds hdr xmp data in pisa-4k.jpg 1`] = `
 {
   "gainMapMax": [
