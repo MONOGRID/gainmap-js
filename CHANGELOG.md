@@ -1,3 +1,17 @@
+# [2.0.0](https://github.com/MONOGRID/gainmap-js/compare/v1.1.1...v2.0.0) (2023-11-13)
+
+
+### Features
+
+* removes libultrahdr wasm from the decoding part of the library, allows users to load JPEGR files using pure js ([#9](https://github.com/MONOGRID/gainmap-js/issues/9)) ([3ad16f9](https://github.com/MONOGRID/gainmap-js/commit/3ad16f97fec6040fdfdfb4cd5e71b1ac8e504e28))
+
+
+### BREAKING CHANGES
+
+* The encoder portion of the library has been separated and moved to `@monogrid/gainmap-js/encode`, in order to save file size on user's bundles, all encoding functions must now be imported with that path.
+
+`JPEGRLoader` has been moved from `@monogrid/gainmap-js/libultrahdr` to `@monogrid/gainmap-js` because it now uses a pure js approach
+
 ## [1.1.1](https://github.com/MONOGRID/gainmap-js/compare/v1.1.0...v1.1.1) (2023-11-09)
 
 
