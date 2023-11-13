@@ -28,15 +28,19 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "main": "dist/index.umd.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/decode.umd.js",
+  "module": "dist/decode.js",
+  "types": "dist/decode.d.ts",
   "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/decode.js",
+      "types": "./dist/decode.d.ts"
+    },
+    "./encode": {
+      "import": "./dist/encode.js",
+      "types": "./dist/encode.d.ts"
     },
     "./libultrahdr": {
       "import": "./dist/libultrahdr.js",
@@ -54,7 +58,10 @@
   "typesVersions": {
     "*": {
       ".": [
-        "./dist/index.d.ts"
+        "./dist/decode.d.ts"
+      ],
+      "encode": [
+        "./dist/encode.d.ts"
       ],
       "libultrahdr": [
         "./dist/libultrahdr.d.ts"
@@ -125,6 +132,7 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-unused-imports": "^3.0.0",
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "jest-extended": "^4.0.2",
     "jest-junit": "^16.0.0",
     "puppeteer": "^21.5.1",

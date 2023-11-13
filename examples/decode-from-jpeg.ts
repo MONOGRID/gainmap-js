@@ -1,7 +1,6 @@
 /* eslint-disable unused-imports/no-unused-vars */
 
-import { decode } from '@monogrid/gainmap-js'
-import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+import { decode, extractGainmapFromJPEG } from '@monogrid/gainmap-js'
 import {
   ClampToEdgeWrapping,
   LinearFilter,
@@ -26,7 +25,7 @@ const renderer = new WebGLRenderer()
 const gainmap = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
 
 // extract data from the JPEG
-const { gainMap: gainMapBuffer, parsedMetadata } = await decodeJPEGMetadata(gainmap)
+const { gainMap: gainMapBuffer, metadata } = await extractGainmapFromJPEG(gainmap)
 
 // create data blobs
 const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
@@ -77,8 +76,8 @@ const result = await decode({
   // this allows to use `result.renderTarget.texture` directly
   renderer,
   // this will restore the full HDR range
-  maxDisplayBoost: Math.pow(2, parsedMetadata.hdrCapacityMax),
-  ...parsedMetadata
+  maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax),
+  ...metadata
 })
 
 const scene = new Scene()

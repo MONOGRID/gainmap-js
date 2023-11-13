@@ -1,4 +1,4 @@
-import { CompressedImage, type CompressParameters } from './types'
+import { CompressedImage, type CompressParameters } from './encode/types'
 
 export type WorkerInterface = {
   compress: {

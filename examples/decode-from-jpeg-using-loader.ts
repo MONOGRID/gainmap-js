@@ -1,5 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr'
+import { JPEGRLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
   LinearFilter,

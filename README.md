@@ -59,12 +59,11 @@ The advantage is to have a single file to load.
 
 The disadvantages are:
  * No WEBP compression
- * Uses the `@monogrid/gainmap-js/libultrahdr` package which is heavier and requires loading a `wasm` in order to extract the gainmap from the JPEG.
  * The JPEG cannot be manipulated in Photoshop, GIMP, or any other software that does not support the gain map technology (no photo editing software supports it at the time of writing 06-11-2023).
  * Photo sharing websites and/or services (i.e. sharing with Slack) will likely strip the Gain map metadata and the HDR information will be lost, leaving you with only the SDR Representation.
 
 ```ts
-import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr'
+import { JPEGRLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
   LinearFilter,
@@ -110,7 +109,6 @@ Using separate files will get rid of the limitations of using a single JPEG file
 2. A Gainmap file
 3. A JSON containing the gainmap metadata used for decoding
 
-This solution will use the lighter `@monogrid/gainmap-js` package which will not load a `wasm` file and contains less code.
 
 ```ts
 import { GainMapLoader } from '@monogrid/gainmap-js'

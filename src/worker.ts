@@ -1,7 +1,7 @@
 // @ts-expect-error untyped lib
 import registerPromiseWorker from 'promise-worker-transferable/register'
 
-import { compress } from './encode-utils/compress'
+import { compress } from './encode/compress'
 import { type WithTransferListFunction, type WorkerInterface, type WorkerRequest } from './worker-types'
 
 const _compress = async (message: WorkerInterface['compress']['request'], withTransferList: WithTransferListFunction): Promise<WorkerInterface['compress']['result']> => {

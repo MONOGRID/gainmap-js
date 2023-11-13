@@ -27,8 +27,7 @@
 				"imports": {
 					"three": "https://unpkg.com/three@0.158.0/build/three.module.js",
 					"three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/",
-					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@1.1.1/dist/index.js",
-					"@monogrid/gainmap-js/libultrahdr": "https://unpkg.com/@monogrid/gainmap-js@1.1.1/dist/libultrahdr.js"
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.0/dist/index.js",
 				}
 			}
 		</script>
@@ -43,8 +42,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-			import { GainMapLoader } from '@monogrid/gainmap-js';
-			import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr';
+			import { GainMapLoader, JPEGRLoader } from '@monogrid/gainmap-js';
 
 			const params = {
 				envMap: 'Gain map',
