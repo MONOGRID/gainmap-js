@@ -28,9 +28,9 @@
       "path": "./node_modules/cz-conventional-changelog"
     }
   },
-  "main": "dist/index.umd.js",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/decode.umd.js",
+  "module": "dist/decode.js",
+  "types": "dist/decode.d.ts",
   "sideEffects": false,
   "type": "module",
   "exports": {
@@ -78,7 +78,6 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "test": "jest",
-    "pretest": "npm run build",
     "check": "concurrently -c auto npm:check:*",
     "check:typecheck-src": "tsc --noEmit",
     "check:eslint-src": "eslint \"src/**/*.ts\"",
