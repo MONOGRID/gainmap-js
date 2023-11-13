@@ -15,7 +15,7 @@ import { extractGainmapFromJPEG } from '../extract'
  * @group Loaders
  *
  * @example
- * import { JPEGRLoader } from '@monogrid/gainmap-js/libultrahdr'
+ * import { JPEGRLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
  *   LinearFilter,
