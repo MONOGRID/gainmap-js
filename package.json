@@ -78,6 +78,7 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "test": "jest",
+    "pretest": "npm run build",
     "check": "concurrently -c auto npm:check:*",
     "check:typecheck-src": "tsc --noEmit",
     "check:eslint-src": "eslint \"src/**/*.ts\"",
