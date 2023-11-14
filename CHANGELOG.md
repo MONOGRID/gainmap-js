@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/MONOGRID/gainmap-js/compare/v2.0.0...v2.0.1) (2023-11-14)
+
+
+### Bug Fixes
+
+* **decode:** implements proper feature testing for QuadRenderer.toArray ([20109ad](https://github.com/MONOGRID/gainmap-js/commit/20109ad31977124c1169f096e8ccd36628599f89))
+
 # [2.0.0](https://github.com/MONOGRID/gainmap-js/compare/v1.1.1...v2.0.0) (2023-11-13)
 
 
