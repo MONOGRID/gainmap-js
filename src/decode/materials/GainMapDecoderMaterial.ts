@@ -13,6 +13,13 @@ void main() {
 `
 
 const fragmentShader = /* glsl */`
+// this should be the max float value according to https://stackoverflow.com/a/47543127
+// #define FLT_MAX vec3( 3.402823466e+38, 3.402823466e+38, 3.402823466e+38)
+
+// in practice, this works for us with iOS problems
+// we encountered
+#define FLT_MAX vec3( 3.402823e+38, 3.402823e+38, 3.402823e+38 )
+
 uniform sampler2D sdr;
 uniform sampler2D gainMap;
 uniform vec3 gamma;
@@ -30,7 +37,7 @@ void main() {
   vec3 logRecovery = pow(recovery, gamma);
   vec3 logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery;
   vec3 hdrColor = (rgb + offsetSdr) * exp2(logBoost * weightFactor) - offsetHdr;
-  gl_FragColor = vec4(hdrColor, 1.0);
+  gl_FragColor = vec4( min(FLT_MAX, hdrColor), 1.0 );
 }
 `
 /**
@@ -144,11 +151,12 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
    */
   get maxDisplayBoost () { return this._maxDisplayBoost }
   set maxDisplayBoost (value: number) {
-    this._maxDisplayBoost = value
+    this._maxDisplayBoost = Math.max(1, Math.min(65504, value))
     this.calculateWeight()
   }
 
   private calculateWeight () {
-    this.uniforms.weightFactor.value = (Math.log2(this._maxDisplayBoost) - this._hdrCapacityMin) / (this._hdrCapacityMax - this._hdrCapacityMin)
+    const val = (Math.log2(this._maxDisplayBoost) - this._hdrCapacityMin) / (this._hdrCapacityMax - this._hdrCapacityMin)
+    this.uniforms.weightFactor.value = Math.max(0, Math.min(1, val))
   }
 }
