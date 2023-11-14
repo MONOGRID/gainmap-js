@@ -16,6 +16,8 @@ jobs:
 
         - name: 'Setup Emscripten'
           uses: mymindstorm/setup-emsdk@v11
+          with:
+            version: 3.1.47
 
         - name: 'Setup Python'
           uses: actions/setup-python@v4
