@@ -1,3 +1,11 @@
+## [2.0.2](https://github.com/MONOGRID/gainmap-js/compare/v2.0.1...v2.0.2) (2023-11-14)
+
+
+### Bug Fixes
+
+* **decode:** improves compatibility with browsers with no createImageBitmap ([12c7609](https://github.com/MONOGRID/gainmap-js/commit/12c7609ee815a460f95419aab328b412e759f012))
+* **decoder:** fix bug when using decodeResult.renderTarget.texture as source for PMREMGenerator ([4ebb983](https://github.com/MONOGRID/gainmap-js/commit/4ebb983d5bbc7f524e4b1231f630e3714cf1f870))
+
 ## [2.0.1](https://github.com/MONOGRID/gainmap-js/compare/v2.0.0...v2.0.1) (2023-11-14)
 
 
