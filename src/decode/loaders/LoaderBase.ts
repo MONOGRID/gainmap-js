@@ -14,9 +14,9 @@ import {
   WebGLRenderer
 } from 'three'
 
-import { type GainMapMetadata } from '../core/types'
-import { GainMapDecoderMaterial } from '../decode/materials/GainMapDecoderMaterial'
-import { QuadRenderer } from './QuadRenderer'
+import { QuadRenderer } from '../../core/QuadRenderer'
+import { type GainMapMetadata } from '../../core/types'
+import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private renderer: WebGLRenderer
@@ -69,8 +69,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
    */
   protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, gainMapBuffer: ArrayBuffer | string, sdrBuffer: ArrayBuffer | string, metadata: GainMapMetadata) {
     const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
-    // TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
-    // we use the original image buffer instead
+
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
     const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([

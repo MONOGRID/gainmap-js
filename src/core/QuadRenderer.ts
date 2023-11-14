@@ -9,6 +9,7 @@ import {
   LinearMipMapLinearFilter,
   Material,
   Mesh,
+  MeshBasicMaterial,
   NoColorSpace,
   OrthographicCamera,
   PlaneGeometry,
@@ -37,6 +38,78 @@ export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   TType extends typeof FloatType ? Float32Array :
   never
 
+const getBufferForType = (type: TextureDataType, width: number, height: number) => {
+  let out: ArrayLike<number>
+  switch (type) {
+    case UnsignedByteType:
+      out = new Uint8ClampedArray(width * height * 4)
+      break
+    case HalfFloatType:
+      out = new Uint16Array(width * height * 4)
+      break
+    case UnsignedIntType:
+      out = new Uint32Array(width * height * 4)
+      break
+    case ByteType:
+      out = new Int8Array(width * height * 4)
+      break
+    case ShortType:
+      out = new Int16Array(width * height * 4)
+      break
+    case IntType:
+      out = new Int32Array(width * height * 4)
+      break
+    case FloatType:
+      out = new Float32Array(width * height * 4)
+      break
+    default:
+      throw new Error('Unsupported data type')
+  }
+  return out
+}
+
+let _canReadPixelsResult: boolean | undefined
+/**
+ * Test if this browser implementation can correctly read pixels from the specified
+ * Render target type.
+ *
+ * Runs only once
+ *
+ * @param type
+ * @param renderer
+ * @param camera
+ * @returns
+ */
+const canReadPixels = (type: TextureDataType, renderer: WebGLRenderer, camera: OrthographicCamera) => {
+  if (_canReadPixelsResult !== undefined) return _canReadPixelsResult
+
+  const testRT = new WebGLRenderTarget(1, 1, {
+    type,
+    colorSpace: NoColorSpace,
+    format: RGBAFormat,
+    magFilter: LinearFilter,
+    minFilter: LinearFilter,
+    wrapS: RepeatWrapping,
+    wrapT: RepeatWrapping,
+    depthBuffer: false,
+    stencilBuffer: false,
+    generateMipmaps: true
+  })
+
+  renderer.setRenderTarget(testRT)
+  const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ color: 0xffffff }))
+  renderer.render(mesh, camera)
+  renderer.setRenderTarget(null)
+
+  const out = getBufferForType(type, testRT.width, testRT.height)
+  renderer.readRenderTargetPixels(testRT, 0, 0, testRT.width, testRT.height, out)
+  testRT.dispose()
+  mesh.geometry.dispose()
+  mesh.material.dispose()
+  _canReadPixelsResult = out[0] !== 0
+  return _canReadPixelsResult
+}
+
 /**
  * Utility structure used for rendering a texture with a material
  *
@@ -55,6 +128,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   private _height: number
   private _type: TType
   private _colorSpace: ColorSpace
+  private _supportsReadPixels: boolean = true
   /**
    *
    * @param sourceTexture
@@ -65,9 +139,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._height = height
     this._type = type
     this._colorSpace = colorSpace
-    if (type === HalfFloatType && navigator.userAgent.toLowerCase().includes('firefox')) {
-      this._type = FloatType as TType
-    }
+
     this._material = material
     if (renderer) {
       this._renderer = renderer
@@ -75,6 +147,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
       this._renderer = QuadRenderer.instantiateRenderer()
       this._rendererIsDisposable = true
     }
+
     this._scene = new Scene()
     this._camera = new OrthographicCamera()
     this._camera.position.set(0, 0, 10)
@@ -83,6 +156,22 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._camera.top = 0.5
     this._camera.bottom = -0.5
     this._camera.updateProjectionMatrix()
+
+    if (!canReadPixels(this._type, this._renderer, this._camera)) {
+      let alternativeType: TextureDataType | undefined
+      switch (this._type) {
+        case HalfFloatType:
+          alternativeType = this._renderer.extensions.has('EXT_color_buffer_float') ? FloatType : undefined
+          break
+      }
+      if (alternativeType !== undefined) {
+        console.warn(`This browser does not support reading pixels from ${this._type} RenderTargets, switching to ${FloatType}`)
+        this._type = alternativeType as TType
+      } else {
+        this._supportsReadPixels = false
+        console.warn('This browser dos not support toArray or toDataTexture, calls to those methods will result in an error thrown')
+      }
+    }
 
     this._quad = new Mesh(new PlaneGeometry(), this._material)
 
@@ -135,35 +224,12 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   /**
    * Obtains a Buffer containing the rendered texture.
    *
-   * @returns
+   * @throws Error if the browser cannot read pixels from this RenderTarget type.
+   * @returns a TypedArray containing RGBA values from this renderer
    */
   public toArray (): TextureDataTypeToBufferType<TType> {
-    let out: ArrayBufferLike
-    switch (this._type) {
-      case UnsignedByteType:
-        out = new Uint8ClampedArray(this._width * this._height * 4)
-        break
-      case HalfFloatType:
-        out = new Uint16Array(this._width * this._height * 4)
-        break
-      case UnsignedIntType:
-        out = new Uint32Array(this._width * this._height * 4)
-        break
-      case ByteType:
-        out = new Int8Array(this._width * this._height * 4)
-        break
-      case ShortType:
-        out = new Int16Array(this._width * this._height * 4)
-        break
-      case IntType:
-        out = new Int32Array(this._width * this._height * 4)
-        break
-      case FloatType:
-        out = new Float32Array(this._width * this._height * 4)
-        break
-      default:
-        throw new Error('Unsupported data type')
-    }
+    if (!this._supportsReadPixels) throw new Error('Can\'t read pixels in this browser')
+    const out = getBufferForType(this._type, this._width, this._height)
     this._renderer.readRenderTargetPixels(this._renderTarget, 0, 0, this._width, this._height, out)
     return out as TextureDataTypeToBufferType<TType>
   }
