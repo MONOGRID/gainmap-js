@@ -1,0 +1,140 @@
+<html>
+	<body>
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+					"three/src/": "https://unpkg.com/three@0.158.0/src/",
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.2/dist/decode.js"
+				}
+			}
+		</script>
+		<script type="module">
+			import { FileLoader, ImageLoader,  DataUtils } from 'three'
+			import { SRGBToLinear } from 'three/src/math/ColorManagement.js'
+
+			export const cpuDecode = ({ sdr, gainMap, gamma, hdrCapacityMin, hdrCapacityMax, offsetHdr, offsetSdr, gainMapMin, gainMapMax, maxDisplayBoost }) => {
+				const originalChannels = sdr.data.length / sdr.width / sdr.height
+
+				const targetChannels = 4
+				const out = new Uint16Array(sdr.width * sdr.height * targetChannels)
+				let outIndex = 0
+
+				const unclampedWeightFactor = (Math.log2(maxDisplayBoost) - hdrCapacityMin) / (hdrCapacityMax - hdrCapacityMin)
+				const weightFactor = Math.max(0, Math.min(1, unclampedWeightFactor))
+
+
+				for (let i = 0, l = sdr.data.length; i < l; i += originalChannels) {
+					// these need to be converted to Linear from sRGB
+					const r = SRGBToLinear(sdr.data[i + 0] / 255.0)
+					const g = SRGBToLinear(sdr.data[i + 1] / 255.0)
+					const b = SRGBToLinear(sdr.data[i + 2] / 255.0)
+
+					// these are already in linear space
+					const recoveryR = gainMap.data[i + 0] / 255.0
+					const recoveryG = gainMap.data[i + 1] / 255.0
+					const recoveryB = gainMap.data[i + 2] / 255.0
+
+					const logRecoveryR = Math.pow(recoveryR, 1.0 / gamma[0])
+					const logRecoveryG = Math.pow(recoveryG, 1.0 / gamma[1])
+					const logRecoveryB = Math.pow(recoveryB, 1.0 / gamma[2])
+
+					const logBoostR = gainMapMin[0] * (1.0 - logRecoveryR) + gainMapMax[0] * logRecoveryR
+					const logBoostG = gainMapMin[1] * (1.0 - logRecoveryG) + gainMapMax[1] * logRecoveryG
+					const logBoostB = gainMapMin[2] * (1.0 - logRecoveryB) + gainMapMax[2] * logRecoveryB
+
+					const R = (r + offsetSdr[0]) * Math.pow(2, logBoostR * weightFactor) - offsetHdr[0]
+					const G = (g + offsetSdr[1]) * Math.pow(2, logBoostG * weightFactor) - offsetHdr[1]
+					const B = (b + offsetSdr[2]) * Math.pow(2, logBoostB * weightFactor) - offsetHdr[2]
+
+					out[outIndex + 0] = DataUtils.toHalfFloat(Math.min(65504, Math.max(-65504, R)))
+					out[outIndex + 1] = DataUtils.toHalfFloat(Math.min(65504, Math.max(-65504, G)))
+					out[outIndex + 2] = DataUtils.toHalfFloat(Math.min(65504, Math.max(-65504, B)))
+					out[outIndex + 3] = DataUtils.toHalfFloat(Math.min(65504, Math.max(-65504, 1)))
+
+					outIndex += targetChannels
+				}
+
+				return out
+			}
+
+
+			const imgToRGBA = (img) => {
+				const canvas  = new OffscreenCanvas(img.width, img.height)
+				const ctx = canvas.getContext('2d')
+				ctx.drawImage(img, 0, 0, img.width, img.height)
+				return ctx.getImageData(0, 0, img.width, img.height)
+			}
+
+			let printed = ''
+			const print = (str) => {
+				printed += '<br />' + str
+				document.body.innerHTML = printed
+			}
+
+			print('Loading 4k images')
+
+			const startDownloadTime = Date.now()
+			const sdrLoader = new ImageLoader();
+			const sdrImage = await sdrLoader.loadAsync('textures/gainmap/spruit_sunrise_4k.webp');
+
+			const sdr = imgToRGBA(sdrImage)
+
+			const gainmapLoader = new ImageLoader();
+			const gainmapImage = await gainmapLoader.loadAsync('textures/gainmap/spruit_sunrise_4k-gainmap.webp');
+
+			const gainMap = imgToRGBA(gainmapImage)
+
+			const metadataLoader = new FileLoader()
+			metadataLoader.setResponseType('json')
+			const metadata = await metadataLoader.loadAsync('textures/gainmap/spruit_sunrise_4k.json')
+
+			print('Download 4k images time: ' + (Date.now() - startDownloadTime) + 'ms')
+
+			const startDecodeTime = Date.now()
+			cpuDecode({
+				sdr,
+				gainMap,
+				...metadata,
+				maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax)
+			})
+
+			print('CPU Decode time for 4k image: ' + (Date.now() - startDecodeTime) + 'ms')
+
+
+			print('Loading 8k images')
+
+			const start8kDownloadTime = Date.now()
+			const sdr8kLoader = new ImageLoader();
+			const sdr8kImage = await sdr8kLoader.loadAsync('textures/gainmap/qwantani_puresky_8k.jpg');
+
+			const sdr8k = imgToRGBA(sdr8kImage)
+
+			const gainmap8kLoader = new ImageLoader();
+			const gainmap8kImage = await gainmap8kLoader.loadAsync('textures/gainmap/qwantani_puresky_8k-gainmap.jpg');
+
+			const gainMap8k = imgToRGBA(gainmap8kImage)
+
+			const metadata8kLoader = new FileLoader()
+			metadata8kLoader.setResponseType('json')
+			const metadata8k = await metadata8kLoader.loadAsync('textures/gainmap/qwantani_puresky_8k.json')
+
+			print('Download 8k images time: ' + (Date.now() - start8kDownloadTime) + 'ms')
+
+			const start8kDecodeTime = Date.now()
+			cpuDecode({
+				sdr: sdr8k,
+				gainMap: gainMap8k,
+				...metadata8k,
+				maxDisplayBoost: Math.pow(2, metadata8k.hdrCapacityMax)
+			})
+
+			print('CPU Decode time for 4k image: ' + (Date.now() - start8kDecodeTime) + 'ms')
+
+
+		</script>
+
+	</body>
+</html>
+
+
