@@ -18,6 +18,21 @@ import { QuadRenderer } from '../../core/QuadRenderer'
 import { type GainMapMetadata } from '../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 
+/**
+ * private function, async get image from blob
+ *
+ * @param blob
+ * @returns
+ */
+const getImage = (blob: Blob) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = document.createElement('img')
+    img.onload = () => { resolve(img) }
+    img.onerror = (e) => { reject(e) }
+    img.src = URL.createObjectURL(blob)
+  })
+}
+
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private renderer: WebGLRenderer
   /**
@@ -72,12 +87,32 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
 
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
-    const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([
-      createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
-      createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
-    ])
+    let sdrImage: ImageBitmap | HTMLImageElement
+    let gainMapImage: ImageBitmap | HTMLImageElement
 
-    const gainMap = new Texture(gainMapImageBitmap,
+    let needsFlip = false
+
+    if (typeof createImageBitmap === 'undefined') {
+      const res = await Promise.all([
+        getImage(gainMapBlob),
+        getImage(sdrBlob)
+      ])
+
+      gainMapImage = res[0]
+      sdrImage = res[1]
+
+      needsFlip = true
+    } else {
+      const res = await Promise.all([
+        createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
+        createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
+      ])
+
+      gainMapImage = res[0]
+      sdrImage = res[1]
+    }
+
+    const gainMap = new Texture(gainMapImage,
       UVMapping,
       ClampToEdgeWrapping,
       ClampToEdgeWrapping,
@@ -89,9 +124,10 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       NoColorSpace
     )
 
+    gainMap.flipY = needsFlip
     gainMap.needsUpdate = true
 
-    const sdr = new Texture(sdrImageBitmap,
+    const sdr = new Texture(sdrImage,
       UVMapping,
       ClampToEdgeWrapping,
       ClampToEdgeWrapping,
@@ -103,10 +139,11 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       SRGBColorSpace
     )
 
+    sdr.flipY = needsFlip
     sdr.needsUpdate = true
 
-    quadRenderer.width = sdrImageBitmap.width
-    quadRenderer.height = sdrImageBitmap.height
+    quadRenderer.width = sdrImage.width
+    quadRenderer.height = sdrImage.height
     quadRenderer.material.gainMap = gainMap
     quadRenderer.material.sdr = sdr
     quadRenderer.material.gainMapMin = metadata.gainMapMin
