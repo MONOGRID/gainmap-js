@@ -13,12 +13,10 @@ void main() {
 `
 
 const fragmentShader = /* glsl */`
-// this should be the max float value according to https://stackoverflow.com/a/47543127
-// #define FLT_MAX vec3( 3.402823466e+38, 3.402823466e+38, 3.402823466e+38)
-
-// in practice, this works for us with iOS problems
-// we encountered
-#define FLT_MAX vec3( 3.402823e+38, 3.402823e+38, 3.402823e+38 )
+// min half float value
+#define HALF_FLOAT_MIN vec3( -65504, -65504, -65504 )
+// max half float value
+#define HALF_FLOAT_MAX vec3( 65504, 65504, 65504 )
 
 uniform sampler2D sdr;
 uniform sampler2D gainMap;
@@ -32,12 +30,13 @@ uniform float weightFactor;
 varying vec2 vUv;
 
 void main() {
-  vec3 rgb = texture2D(sdr, vUv).rgb;
-  vec3 recovery = texture2D(gainMap, vUv).rgb;
-  vec3 logRecovery = pow(recovery, gamma);
-  vec3 logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery;
-  vec3 hdrColor = (rgb + offsetSdr) * exp2(logBoost * weightFactor) - offsetHdr;
-  gl_FragColor = vec4( min(FLT_MAX, hdrColor), 1.0 );
+  vec3 rgb = texture2D( sdr, vUv ).rgb;
+  vec3 recovery = texture2D( gainMap, vUv ).rgb;
+  vec3 logRecovery = pow( recovery, gamma );
+  vec3 logBoost = gainMapMin * ( 1.0 - logRecovery ) + gainMapMax * logRecovery;
+  vec3 hdrColor = (rgb + offsetSdr) * exp2( logBoost * weightFactor ) - offsetHdr;
+  vec3 clampedHdrColor = max( HALF_FLOAT_MIN, min( HALF_FLOAT_MAX, hdrColor ));
+  gl_FragColor = vec4( clampedHdrColor , 1.0 );
 }
 `
 /**
