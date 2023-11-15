@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - gainmap hdr</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			.lbl {
+				color: #fff;
+				font-size: 16px;
+				font-weight: bold;
+				position: absolute;
+				bottom: 0px;
+				z-index: 100;
+				text-shadow: #000 1px 1px 1px;
+				background-color: rgba(0,0,0,0.85);
+				padding: 1em;
+			}
+
+			#lbl_left {
+				text-align:left;
+				left:0px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - KTX gain maps (ultra hdr) <br/>
+			Gain map images converted from hdr with <a href="https://gainmap-creator.mono-grid.com/" target="_blank" rel="noopener">Gain map converter</a>. <br />
+			See external <a href="https://github.com/MONOGRID/gainmap-js" target="_blank" rel="noopener">gainmap-js</a> for more information on how to use and create gain map images.
+		</div>
+
+		<div id="lbl_left" class="lbl"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+					"three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/",
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js@2.0.3/dist/decode.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import Stats from 'three/addons/libs/stats.module.js';
+
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { decode } from '@monogrid/gainmap-js'
+
+			const params = {
+				roughness: 0.0,
+				metalness: 0.0,
+				exposure: 1.0,
+				debug: false
+			};
+
+			let container, stats;
+			let camera, scene, renderer, controls;
+			let torusMesh, planeMesh;
+
+			let loader
+			let separateGainMap, separateGainmapRenderTarget, separateGainmapBackground;
+
+
+			const fileSizes = {};
+			const resolutions = {};
+
+			init();
+			animate();
+
+			async function init() {
+
+				const lbl = document.getElementById( 'lbl_left' );
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set( 0, 0, 120 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x000000 );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				//
+
+				let geometry = new THREE.TorusKnotGeometry( 18, 8, 150, 20 );
+				// let geometry = new THREE.SphereGeometry( 26, 64, 32 );
+				let material = new THREE.MeshStandardMaterial( {
+					color: 0xffffff,
+					metalness: params.metalness,
+					roughness: params.roughness
+				} );
+
+				torusMesh = new THREE.Mesh( geometry, material );
+				scene.add( torusMesh );
+
+
+				geometry = new THREE.PlaneGeometry( 200, 200 );
+				material = new THREE.MeshBasicMaterial();
+
+				planeMesh = new THREE.Mesh( geometry, material );
+				planeMesh.position.y = - 50;
+				planeMesh.rotation.x = - Math.PI * 0.5;
+				scene.add( planeMesh );
+
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+					pmremGenerator.dispose();
+
+				};
+
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 300;
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				const gui = new GUI();
+
+				gui.add( params, 'roughness', 0, 1, 0.01 );
+				gui.add( params, 'metalness', 0, 1, 0.01 );
+				gui.add( params, 'exposure', 0, 2, 0.01 );
+				gui.add( params, 'debug' );
+				gui.open();
+
+				loader = new KTX2Loader()
+					.setTranscoderPath( 'libs/basis/' )
+					.detectSupport( renderer );
+
+				const [sdr, gainMap, metadata] = await Promise.all([
+					loader.loadAsync( './textures/gainmap/qwantani_puresky_8k.ktx2' ),
+					loader.loadAsync( './textures/gainmap/qwantani_puresky_8k-gainmap.ktx2' ),
+					new THREE.FileLoader().setResponseType('json').loadAsync('./textures/gainmap/qwantani_puresky_8k.json')
+				])
+
+				gainMap.colorSpace = THREE.NoColorSpace
+
+				const result = await decode({
+					sdr,
+					gainMap,
+					// this allows to use `result.renderTarget.texture` directly
+					renderer,
+					// this will restore the full HDR range
+					maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax),
+					...metadata
+				})
+				const env = pmremGenerator.fromEquirectangular( result.renderTarget.texture )
+				torusMesh.material.envMap = env.texture
+				torusMesh.material.needsUpdate = true
+
+				scene.background = result.toDataTexture();
+				scene.background.mapping = THREE.EquirectangularReflectionMapping;
+				scene.background.minFilter = THREE.LinearFilter;
+				scene.background.magFilter = THREE.LinearFilter;
+				scene.background.needsUpdate = true
+			}
+
+
+
+			function onWindowResize() {
+
+				const width = window.innerWidth;
+				const height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				stats.begin();
+				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				torusMesh.material.roughness = params.roughness;
+				torusMesh.material.metalness = params.metalness;
+
+				torusMesh.rotation.y += 0.005;
+				planeMesh.visible = params.debug;
+
+				renderer.toneMappingExposure = params.exposure;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>
