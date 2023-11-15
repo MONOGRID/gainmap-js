@@ -86,9 +86,24 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       }
     }
 
-    const progressHandler = (e: ProgressEvent) => {
+    let sdrLengthComputable = true
+    let sdrTotal = 0
+    let sdrLoaded = 0
+
+    let gainMapLengthComputable = true
+    let gainMapTotal = 0
+    let gainMapLoaded = 0
+
+    let metadataLengthComputable = true
+    let metadataTotal = 0
+    let metadataLoaded = 0
+
+    const progressHandler = () => {
       if (typeof onProgress === 'function') {
-        // TODO: progress / 3
+        const total = sdrTotal + gainMapTotal + metadataTotal
+        const loaded = sdrLoaded + gainMapLoaded + metadataLoaded
+        const lengthComputable = sdrLengthComputable && gainMapLengthComputable && metadataLengthComputable
+        onProgress(new ProgressEvent('progress', { lengthComputable, loaded, total }))
       }
     }
 
@@ -101,7 +116,12 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       if (typeof buffer === 'string') throw new Error('Invalid sdr buffer')
       sdr = buffer
       loadCheck()
-    }, progressHandler, onError)
+    }, (e: ProgressEvent) => {
+      sdrLengthComputable = e.lengthComputable
+      sdrLoaded = e.loaded
+      sdrTotal = e.total
+      progressHandler()
+    }, onError)
 
     const gainMapLoader = new FileLoader(this.manager)
     gainMapLoader.setResponseType('arraybuffer')
@@ -112,7 +132,12 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       if (typeof buffer === 'string') throw new Error('Invalid gainmap buffer')
       gainMap = buffer
       loadCheck()
-    }, progressHandler, onError)
+    }, (e: ProgressEvent) => {
+      gainMapLengthComputable = e.lengthComputable
+      gainMapLoaded = e.loaded
+      gainMapTotal = e.total
+      progressHandler()
+    }, onError)
 
     const metadataLoader = new FileLoader(this.manager)
     // metadataLoader.setResponseType('json')
@@ -123,7 +148,12 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       if (typeof json !== 'string') throw new Error('Invalid metadata string')
       metadata = JSON.parse(json)
       loadCheck()
-    }, progressHandler, onError)
+    }, (e: ProgressEvent) => {
+      metadataLengthComputable = e.lengthComputable
+      metadataLoaded = e.loaded
+      metadataTotal = e.total
+      progressHandler()
+    }, onError)
 
     return quadRenderer
   }
