@@ -1,3 +1,10 @@
+## [2.0.4](https://github.com/MONOGRID/gainmap-js/compare/v2.0.3...v2.0.4) (2023-11-15)
+
+
+### Bug Fixes
+
+* **decode:** clamp max values in the decode shader to min/max half float ([96986be](https://github.com/MONOGRID/gainmap-js/commit/96986be23dd95825d19fac3b3de520d59d8ad936))
+
 ## [2.0.3](https://github.com/MONOGRID/gainmap-js/compare/v2.0.2...v2.0.3) (2023-11-15)
 
 
