@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/MONOGRID/gainmap-js/compare/v2.0.2...v2.0.3) (2023-11-15)
+
+
+### Bug Fixes
+
+* **gainmaploader:** fix GainMapLoader progress handler not being calculated correctly ([a8e556a](https://github.com/MONOGRID/gainmap-js/commit/a8e556ab1d465a9bd705960d175464cf8d434ea1))
+
 ## [2.0.2](https://github.com/MONOGRID/gainmap-js/compare/v2.0.1...v2.0.2) (2023-11-14)
 
 
