@@ -32,8 +32,6 @@
 			See external <a href="https://github.com/MONOGRID/gainmap-js" target="_blank" rel="noopener">gainmap-js</a> for more information on how to use and create gain map images.
 		</div>
 
-		<div id="lbl_left" class="lbl"></div>
-
 		<script type="importmap">
 			{
 				"imports": {
@@ -67,8 +65,6 @@
 			let torusMesh, planeMesh;
 
 			let loader
-			let separateGainMap, separateGainmapRenderTarget, separateGainmapBackground;
-
 
 			const fileSizes = {};
 			const resolutions = {};
@@ -166,11 +162,13 @@
 					maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax),
 					...metadata
 				})
+
 				const env = pmremGenerator.fromEquirectangular( result.renderTarget.texture )
 				torusMesh.material.envMap = env.texture
 				torusMesh.material.needsUpdate = true
 
 				scene.background = result.toDataTexture();
+				scene.background.flipY = true;
 				scene.background.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background.minFilter = THREE.LinearFilter;
 				scene.background.magFilter = THREE.LinearFilter;
