@@ -45,7 +45,7 @@
 		</script>
 
 		<script type="module">
-
+			// @ts-check
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -54,7 +54,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-			import { GainMapLoader, JPEGRLoader } from '@monogrid/gainmap-js';
+			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js';
 
 			const params = {
 				envMap: 'JPEG Gain map',
@@ -128,7 +128,7 @@
 
 
 
-				gainMap = new JPEGRLoader( renderer )
+				gainMap = new HDRJPGLoader( renderer )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( response ) {
 
 						resolutions[ 'JPEG Gain map' ] = response.width + 'x' + response.height;

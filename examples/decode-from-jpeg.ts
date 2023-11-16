@@ -22,16 +22,14 @@ import {
 const renderer = new WebGLRenderer()
 
 // fetch a JPEG image containing a gainmap as ArrayBuffer
-const gainmap = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
+const jpeg = new Uint8Array(await (await fetch('gainmap.jpeg')).arrayBuffer())
 
 // extract data from the JPEG
-const { gainMap: gainMapBuffer, metadata } = await extractGainmapFromJPEG(gainmap)
+const { gainMap: gainMapBuffer, sdr: sdrBuffer, metadata } = await extractGainmapFromJPEG(jpeg)
 
 // create data blobs
 const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
-// TODO: figure out why result.sdr is not usable here, problem is in the libultrahdr-wasm repo
-// we use the original image buffer instead
-const sdrBlob = new Blob([gainmap], { type: 'image/jpeg' })
+const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
 // create ImageBitmap data
 const [gainMapImageBitmap, sdrImageBitmap] = await Promise.all([
@@ -70,7 +68,7 @@ const sdr = new Texture(sdrImageBitmap,
 sdr.needsUpdate = true
 
 // restore the HDR texture
-const result = await decode({
+const result = decode({
   sdr,
   gainMap,
   // this allows to use `result.renderTarget.texture` directly
