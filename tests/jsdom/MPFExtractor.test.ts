@@ -1,18 +1,22 @@
 import { describe, expect, it } from '@jest/globals'
-import { existsSync } from 'fs'
-import { mkdir, readFile, writeFile } from 'fs/promises'
+import { readFile } from 'fs/promises'
+import { toMatchImageSnapshot } from 'jest-image-snapshot'
 import path from 'path'
+import sharp from 'sharp'
 
 import { MPFExtractor } from '../../src/decode/utils/MPFExtractor'
+
+expect.extend({ toMatchImageSnapshot })
 
 const blobToArrayBuffer = (r: Blob) => {
   return new Promise<ArrayBuffer>((resolve, reject) => {
     const fr = new FileReader()
-    fr.onload = async (e) => {
+    fr.onload = (e) => {
       if (fr.result instanceof ArrayBuffer) {
         resolve(fr.result)
       }
     }
+    fr.onerror = reject
     fr.readAsArrayBuffer(r)
   })
 }
@@ -36,24 +40,22 @@ describe('MPFExtractor', () => {
   ])('finds the gainmap in $fileName', async ({ fileName }) => {
     const file = await readFile(path.join(__dirname, `../fixtures/${fileName}`))
 
-    // performance.mark(`${fileName} mpf extract start`)
     const extractor = new MPFExtractor({ extractFII: true, extractNonFII: true })
     const result = await extractor.extract(new Uint8Array(file.buffer))
-    // performance.mark(`${fileName} mpf extract end`)
-
-    // const measure = performance.measure(`${fileName} mpf extraction`, `${fileName} mpf extract start`, `${fileName} mpf extract end`)
-    // console.log(measure.name, measure.duration, 'ms')
 
     expect(result).not.toBeUndefined()
     expect(result).toBeArrayOfSize(2)
 
-    if (!existsSync(path.join(__dirname, './results'))) {
-      await mkdir(path.join(__dirname, './results/'))
-    }
+    const sdr = await blobToArrayBuffer(result[0])
+    expect(await sharp(sdr).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
 
-    for (let i = 0; i < result.length; i++) {
-      const r = await blobToArrayBuffer(result[i])
-      await writeFile(path.join(__dirname, `./results/${fileName}-mpf-extracted.image-${i}.jpg`), Buffer.from(r))
-    }
-  })
+    const gainMap = await blobToArrayBuffer(result[1])
+    expect(await sharp(gainMap).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
+  }, 900000 /* 15 minutes */)
 })

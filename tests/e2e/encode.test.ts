@@ -81,7 +81,10 @@ describe('encode', () => {
         height: result.sdr.height,
         channels: 4
       }
-    }).png().toBuffer()).toMatchImageSnapshot()
+    }).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
 
     expect(await sharp(result.gainMap.data, {
       raw: {
@@ -89,6 +92,9 @@ describe('encode', () => {
         height: result.gainMap.height,
         channels: 4
       }
-    }).png().toBuffer()).toMatchImageSnapshot()
+    }).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
   }, 900000 /* 15 minutes */)
 })

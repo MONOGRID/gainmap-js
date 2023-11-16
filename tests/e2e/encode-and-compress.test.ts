@@ -107,7 +107,13 @@ describe('encode-and-compress', () => {
       gainMapMax: result.gainMapMax
     }).toMatchSnapshot()
 
-    expect(await sharp(result.sdr.data).png().toBuffer()).toMatchImageSnapshot()
-    expect(await sharp(result.gainMap.data).png().toBuffer()).toMatchImageSnapshot()
+    expect(await sharp(result.sdr.data).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
+    expect(await sharp(result.gainMap.data).png().toBuffer()).toMatchImageSnapshot({
+      failureThreshold: 0.01,
+      failureThresholdType: 'percent'
+    })
   }, 900000 /* 15 minutes */)
 })

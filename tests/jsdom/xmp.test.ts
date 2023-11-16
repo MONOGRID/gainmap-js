@@ -22,11 +22,7 @@ describe('xmp', () => {
 
   ])('finds hdr xmp data in $fileName', async ({ fileName }) => {
     const file = await readFile(path.join(__dirname, `../fixtures/${fileName}`))
-    // performance.mark(`${fileName} xmp extract start`)
     const results = extractXMP(file)
-    // performance.mark(`${fileName} xmp extract end`)
-    // const measure = performance.measure(`${fileName} xmp extraction`, `${fileName} xmp extract start`, `${fileName} xmp extract end`)
-    // console.log(measure.name, measure.duration, 'ms')
     expect(results).not.toBeUndefined()
     expect(results).toMatchSnapshot()
   })
