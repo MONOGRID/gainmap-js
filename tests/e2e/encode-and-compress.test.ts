@@ -10,26 +10,28 @@ import { getPage } from './common'
 
 expect.extend({ toMatchImageSnapshot })
 
+const matrix: [string, string, number, number][] = [
+  ['memorial.exr', 'jpg', 0.7, ACESFilmicToneMapping],
+  ['memorial.exr', 'webp', 0.7, ACESFilmicToneMapping],
+  ['memorial.exr', 'png', 0.7, ACESFilmicToneMapping],
+
+  ['memorial.hdr', 'jpg', 0.7, ACESFilmicToneMapping],
+  ['memorial.hdr', 'webp', 0.7, ACESFilmicToneMapping],
+  ['memorial.hdr', 'png', 0.7, ACESFilmicToneMapping],
+
+  ['memorial.exr', 'jpg', 0.7, LinearToneMapping],
+  ['memorial.exr', 'webp', 0.7, LinearToneMapping],
+  ['memorial.exr', 'png', 0.7, LinearToneMapping],
+
+  ['memorial.hdr', 'jpg', 0.7, LinearToneMapping],
+  ['memorial.hdr', 'webp', 0.7, LinearToneMapping],
+  ['memorial.hdr', 'png', 0.7, LinearToneMapping],
+
+  ['spruit_sunrise_1k.hdr', 'jpg', 0.95, LinearToneMapping]
+]
+
 describe('encode-and-compress', () => {
-  it.each([
-    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-
-    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: ACESFilmicToneMapping },
-
-    { file: 'memorial.exr', format: 'jpg', quality: 0.7, tonemapping: LinearToneMapping },
-    { file: 'memorial.exr', format: 'webp', quality: 0.7, tonemapping: LinearToneMapping },
-    { file: 'memorial.exr', format: 'png', quality: 0.7, tonemapping: LinearToneMapping },
-
-    { file: 'memorial.hdr', format: 'jpg', quality: 0.7, tonemapping: LinearToneMapping },
-    { file: 'memorial.hdr', format: 'webp', quality: 0.7, tonemapping: LinearToneMapping },
-    { file: 'memorial.hdr', format: 'png', quality: 0.7, tonemapping: LinearToneMapping },
-
-    { file: 'spruit_sunrise_1k.hdr', format: 'jpg', quality: 0.95, tonemapping: LinearToneMapping }
-  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, format, quality, tonemapping }) => {
+  it.each(matrix)('encodes %p to %p using quality %p, tonemapping: %p', async (file, format, quality, tonemapping) => {
     // we need to launch puppeteer with a
     // custom written "testbed.html" page
     // because our encoder works by
@@ -108,10 +110,12 @@ describe('encode-and-compress', () => {
     }).toMatchSnapshot()
 
     expect(await sharp(result.sdr.data).png().toBuffer()).toMatchImageSnapshot({
+      comparisonMethod: 'ssim',
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })
     expect(await sharp(result.gainMap.data).png().toBuffer()).toMatchImageSnapshot({
+      comparisonMethod: 'ssim',
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })

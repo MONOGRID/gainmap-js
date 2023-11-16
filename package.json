@@ -86,7 +86,7 @@
     "check:eslint-examples": "eslint \"examples/**/*.ts\"",
     "check:typecheck-tests": "tsc --noEmit --skipLibCheck -p tests",
     "check:eslint-tests": "eslint \"tests/**/*.ts\"",
-    "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
+    "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --runInBand --reporters=jest-junit",
     "ci:check": "concurrently npm:ci:check:*",
     "ci:check:typecheck-src": "tsc --pretty false --noEmit > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",

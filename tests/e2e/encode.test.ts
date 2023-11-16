@@ -9,26 +9,21 @@ import { getPage } from './common'
 
 expect.extend({ toMatchImageSnapshot })
 
+const matrix: [string, number][] = [
+  ['memorial.exr', ACESFilmicToneMapping],
+  ['memorial.hdr', ACESFilmicToneMapping],
+  ['memorial.exr', LinearToneMapping],
+  ['memorial.hdr', LinearToneMapping],
+  ['chcaus2-bloom.exr', ACESFilmicToneMapping],
+  ['chcaus2-bloom.hdr', ACESFilmicToneMapping],
+  ['chcaus2-bloom.exr', LinearToneMapping],
+  ['chcaus2-bloom.hdr', LinearToneMapping],
+  ['spruit_sunrise_1k.hdr', LinearToneMapping],
+  ['spruit_sunrise_1k.hdr', ACESFilmicToneMapping]
+]
+
 describe('encode', () => {
-  it.each([
-    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
-
-    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
-    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
-
-    { file: 'memorial.exr', tonemapping: LinearToneMapping },
-    { file: 'memorial.exr', tonemapping: LinearToneMapping },
-    { file: 'memorial.exr', tonemapping: LinearToneMapping },
-
-    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
-    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
-    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
-
-    { file: 'spruit_sunrise_1k.hdr', tonemapping: LinearToneMapping }
-  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, tonemapping }) => {
+  it.each(matrix)('encodes %p using tonemapping %p', async (file, tonemapping) => {
     // we need to launch puppeteer with a
     // custom written "testbed.html" page
     // because our encoder works by
@@ -82,6 +77,7 @@ describe('encode', () => {
         channels: 4
       }
     }).png().toBuffer()).toMatchImageSnapshot({
+      comparisonMethod: 'ssim',
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })
@@ -93,6 +89,7 @@ describe('encode', () => {
         channels: 4
       }
     }).png().toBuffer()).toMatchImageSnapshot({
+      comparisonMethod: 'ssim',
       failureThreshold: 0.01,
       failureThresholdType: 'percent'
     })
