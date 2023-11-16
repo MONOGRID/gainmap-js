@@ -11,8 +11,8 @@ import { DecodeParameters } from './types'
 /**
  * Decodes a gain map using a WebGLRenderTarget
  *
- * @category Decoding
- * @group Decoding
+ * @category Decoding Functions
+ * @group Decoding Functions
  * @example
  * import { decode } from '@monogrid/gainmap-js'
  * import {

@@ -50,7 +50,6 @@ import { LoaderBase } from './LoaderBase'
  * scene.background.mapping = EquirectangularReflectionMapping
  * scene.background.minFilter = LinearFilter
  *
- *
  */
 export class GainMapLoader extends LoaderBase<[string, string, string]> {
   /**
@@ -61,12 +60,10 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
    *
    * useful for webp gain maps
    *
-   * @param sdrUrl
-   * @param gainMapUrl
-   * @param metadataUrl
-   * @param onLoad
-   * @param onProgress
-   * @param onError
+   * @param urls An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+   * @param onLoad Load complete callback, will receive the result
+   * @param onProgress Progress callback, will receive a {@link ProgressEvent}
+   * @param onError Error callback
    * @returns
    */
   public load ([sdrUrl, gainMapUrl, metadataUrl]: [string, string, string], onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {

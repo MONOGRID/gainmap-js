@@ -54,14 +54,15 @@ import { LoaderBase } from './LoaderBase'
  *
  */
 export class JPEGRLoader extends LoaderBase<string> {
-  /**
-   *
-   * @param url
-   * @param onLoad
-   * @param onProgress
-   * @param onError
-   * @returns
-   */
+/**
+ * Loads a JPEGR Image
+ *
+ * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+ * @param onLoad Load complete callback, will receive the result
+ * @param onProgress Progress callback, will receive a {@link ProgressEvent}
+ * @param onError Error callback
+ * @returns
+ */
   public override load (url: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 

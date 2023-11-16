@@ -2,8 +2,8 @@
  * This is the Metadata stored in an encoded Gainmap which is used
  * to decode it and return an HDR image
  *
- * @category Gainmap Specifications
- * @group Gainmap Specifications
+ * @category Specs
+ * @group Specs
  */
 export type GainMapMetadata = {
   /**

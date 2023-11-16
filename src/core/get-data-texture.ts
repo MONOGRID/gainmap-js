@@ -5,8 +5,8 @@ import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 /**
  * Utility function to obtain a `DataTexture` from various input formats
  *
- * @category General
- * @group General
+ * @category Utility
+ * @group Utility
  *
  * @param image
  * @returns

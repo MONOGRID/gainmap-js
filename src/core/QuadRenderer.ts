@@ -25,8 +25,10 @@ import {
   WebGLRenderTarget
 } from 'three'
 /**
- * @category General
- * @group General
+ * Utility Type that translates `three` texture types to their TypedArray counterparts.
+ *
+ * @category Utility
+ * @group Utility
  */
 export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   TType extends typeof UnsignedByteType ? Uint8ClampedArray :
@@ -111,10 +113,10 @@ const canReadPixels = (type: TextureDataType, renderer: WebGLRenderer, camera: O
 }
 
 /**
- * Utility structure used for rendering a texture with a material
+ * Utility class used for rendering a texture with a material
  *
- * @category General
- * @group General
+ * @category Core
+ * @group Core
  */
 export class QuadRenderer<TType extends TextureDataType, TMaterial extends Material> {
   private _renderer: WebGLRenderer

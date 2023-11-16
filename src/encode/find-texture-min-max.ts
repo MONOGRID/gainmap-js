@@ -61,8 +61,8 @@ void main() {
 `
 /**
  *
- * @category Encoding Functions
- * @group Encoding Functions
+ * @category Utility
+ * @group Utility
  *
  * @param srcTex
  * @param mode

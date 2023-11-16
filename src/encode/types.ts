@@ -7,8 +7,8 @@ import { WorkerInterfaceImplementation } from '../worker-types'
 
 /**
  * Parameters used by content Creators in order to create a GainMap
- * @category Gainmap Specifications
- * @group Gainmap Specifications
+ * @category Specs
+ * @group Specs
  */
 export type GainmapEncodingParameters = {
   /**
@@ -98,16 +98,16 @@ export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
 /**
  * Accepted HDR image buffers, definitions coming from the THREE.js Library types
  *
- * @category General
- * @group General
+ * @category Utility
+ * @group Utility
  */
 export type HDRRawImageBuffer = EXR['data'] | RGBE['data'] | LogLuv['data']
 
 /**
  * Raw HDR image data
  *
- * @category General
- * @group General
+ * @category Utility
+ * @group Utility
  */
 export type HDRRawImage = {
   data: HDRRawImageBuffer

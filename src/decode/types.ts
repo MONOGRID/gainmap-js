@@ -3,10 +3,10 @@ import { type Texture, type WebGLRenderer } from 'three'
 import { type GainMapMetadata } from '../core/types'
 
 /**
- * Parameters for decoding a Gainmap
+ * Necessary parameters for decoding a Gainmap
  *
- * @category Gainmap Specifications
- * @group Gainmap Specifications
+ * @category Specs
+ * @group Specs
  */
 export type GainmapDecodingParameters = {
   /**
@@ -21,8 +21,8 @@ export type GainmapDecodingParameters = {
   maxDisplayBoost: number
 }
 /**
- * @category Decoding
- * @group Decoding
+ * @category Decoding Functions
+ * @group Decoding Functions
  */
 export type DecodeParameters = {
   /**
