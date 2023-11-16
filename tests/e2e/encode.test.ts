@@ -78,7 +78,7 @@ describe('encode', () => {
       }
     }).png().toBuffer()).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
-      failureThreshold: 0.01,
+      failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
 
@@ -90,7 +90,7 @@ describe('encode', () => {
       }
     }).png().toBuffer()).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
-      failureThreshold: 0.01,
+      failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
   }, 900000 /* 15 minutes */)

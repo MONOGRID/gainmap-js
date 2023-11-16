@@ -162,3 +162,4 @@ jobs:
               libultrahdr-wasm/build/*.wasm
               dist/
               reports/
+              tests/**/__image_snapshots__/__diff_output__/*

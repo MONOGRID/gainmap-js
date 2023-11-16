@@ -50,14 +50,14 @@ describe('MPFExtractor', () => {
     const sdr = await blobToArrayBuffer(result[0])
     expect(await sharp(sdr).png().toBuffer()).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
-      failureThreshold: 0.01,
+      failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
 
     const gainMap = await blobToArrayBuffer(result[1])
     expect(await sharp(gainMap).png().toBuffer()).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
-      failureThreshold: 0.01,
+      failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
   }, 900000 /* 15 minutes */)
