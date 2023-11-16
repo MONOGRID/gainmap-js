@@ -4,8 +4,8 @@ import {
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapDecoderMaterial } from '../../decode/materials/GainMapDecoderMaterial'
 import { extractGainmapFromJPEG } from '../extract'
+import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBase } from './LoaderBase'
 
 /**
@@ -53,7 +53,7 @@ import { LoaderBase } from './LoaderBase'
 
  *
  */
-export class JPEGRLoader extends LoaderBase<string> {
+export class HDRJPGLoader extends LoaderBase<string> {
 /**
  * Loads a JPEGR Image
  *

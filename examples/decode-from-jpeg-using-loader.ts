@@ -1,5 +1,5 @@
 /* eslint-disable unused-imports/no-unused-vars */
-import { JPEGRLoader } from '@monogrid/gainmap-js'
+import { HDRJPGLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
   LinearFilter,
@@ -13,7 +13,7 @@ import {
 
 const renderer = new WebGLRenderer()
 
-const loader = new JPEGRLoader(renderer)
+const loader = new HDRJPGLoader(renderer)
 
 const result = loader.load('gainmap.jpeg')
 // `result` can be used to populate a Texture
