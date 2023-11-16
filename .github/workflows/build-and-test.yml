@@ -10,10 +10,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
         - name: 'Checkout'
-          uses: actions/checkout@v3
+          uses: nschloe/action-cached-lfs-checkout@v1
           with:
             submodules: recursive
-            lfs: true
+            # lfs: true
 
         - name: 'Setup Emscripten'
           uses: mymindstorm/setup-emsdk@v11

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`JPEGRLoader reconstructs an HDR image from "01.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "01.jpg": max HDR value 1`] = `
 [
   6.390625,
   6.296875,
@@ -8,7 +8,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "01.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "02.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "02.jpg": max HDR value 1`] = `
 [
   13.8515625,
   9.9921875,
@@ -16,7 +16,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "02.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "03.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "03.jpg": max HDR value 1`] = `
 [
   10.0625,
   8.6875,
@@ -24,7 +24,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "03.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "04.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "04.jpg": max HDR value 1`] = `
 [
   12.0234375,
   6.53515625,
@@ -32,7 +32,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "04.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "05.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "05.jpg": max HDR value 1`] = `
 [
   15.9921875,
   16,
@@ -40,7 +40,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "05.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "06.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "06.jpg": max HDR value 1`] = `
 [
   15.0234375,
   11.65625,
@@ -48,7 +48,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "06.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "07.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "07.jpg": max HDR value 1`] = `
 [
   16,
   13.6875,
@@ -56,7 +56,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "07.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "08.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "08.jpg": max HDR value 1`] = `
 [
   6.85546875,
   6.1171875,
@@ -64,7 +64,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "08.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "09.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "09.jpg": max HDR value 1`] = `
 [
   9.796875,
   9.5,
@@ -72,7 +72,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "09.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "10.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "10.jpg": max HDR value 1`] = `
 [
   7.84375,
   5.421875,
@@ -80,7 +80,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "10.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "pisa-4k.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "pisa-4k.jpg": max HDR value 1`] = `
 [
   8.8984375,
   8.3125,
@@ -88,7 +88,7 @@ exports[`JPEGRLoader reconstructs an HDR image from "pisa-4k.jpg" 1`] = `
 ]
 `;
 
-exports[`JPEGRLoader reconstructs an HDR image from "spruit_sunrise_4k.jpg" 1`] = `
+exports[`JPEGRLoader reconstructs an HDR image from "spruit_sunrise_4k.jpg": max HDR value 1`] = `
 [
   65504,
   65504,

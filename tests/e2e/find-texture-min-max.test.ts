@@ -31,6 +31,6 @@ describe('find-texture-min-max', () => {
     // expect no calls to page log except the one indicated
     expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
 
-    expect(result).toMatchSnapshot()
+    expect(result).toMatchSnapshot('min & max')
   }, 900000 /* 15 minutes */)
 })

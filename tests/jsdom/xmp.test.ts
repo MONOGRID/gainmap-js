@@ -24,6 +24,6 @@ describe('xmp', () => {
     const file = await readFile(path.join(__dirname, `../fixtures/${fileName}`))
     const results = extractXMP(file)
     expect(results).not.toBeUndefined()
-    expect(results).toMatchSnapshot()
+    expect(results).toMatchSnapshot('metadata')
   })
 })

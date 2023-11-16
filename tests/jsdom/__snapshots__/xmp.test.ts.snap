@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`xmp finds hdr xmp data in 01.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 01.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     2.474807,
@@ -32,7 +32,7 @@ exports[`xmp finds hdr xmp data in 01.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 02.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 02.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.522114,
@@ -64,7 +64,7 @@ exports[`xmp finds hdr xmp data in 02.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 03.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 03.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     0.849514,
@@ -96,7 +96,7 @@ exports[`xmp finds hdr xmp data in 03.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 04.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 04.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.527605,
@@ -128,7 +128,7 @@ exports[`xmp finds hdr xmp data in 04.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 05.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 05.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     1.560281,
@@ -160,7 +160,7 @@ exports[`xmp finds hdr xmp data in 05.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 06.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 06.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.482396,
@@ -192,7 +192,7 @@ exports[`xmp finds hdr xmp data in 06.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 07.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 07.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.961703,
@@ -224,7 +224,7 @@ exports[`xmp finds hdr xmp data in 07.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 08.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 08.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     2.668896,
@@ -256,7 +256,7 @@ exports[`xmp finds hdr xmp data in 08.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 09.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 09.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.270427,
@@ -288,7 +288,7 @@ exports[`xmp finds hdr xmp data in 09.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in 10.jpg 1`] = `
+exports[`xmp finds hdr xmp data in 10.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     2.941015,
@@ -320,7 +320,7 @@ exports[`xmp finds hdr xmp data in 10.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in abandoned_bakery_16k.jpg 1`] = `
+exports[`xmp finds hdr xmp data in abandoned_bakery_16k.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     12.6294,
@@ -352,7 +352,7 @@ exports[`xmp finds hdr xmp data in abandoned_bakery_16k.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in pisa-4k.jpg 1`] = `
+exports[`xmp finds hdr xmp data in pisa-4k.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     3.13443,
@@ -384,7 +384,7 @@ exports[`xmp finds hdr xmp data in pisa-4k.jpg 1`] = `
 }
 `;
 
-exports[`xmp finds hdr xmp data in spruit_sunrise_4k.jpg 1`] = `
+exports[`xmp finds hdr xmp data in spruit_sunrise_4k.jpg: metadata 1`] = `
 {
   "gainMapMax": [
     15.9993,

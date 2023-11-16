@@ -107,7 +107,7 @@ describe('encode-and-compress', () => {
       hdrCapacityMax: result.hdrCapacityMax,
       gainMapMin: result.gainMapMin,
       gainMapMax: result.gainMapMax
-    }).toMatchSnapshot()
+    }).toMatchSnapshot('metadata')
 
     expect(await sharp(result.sdr.data).png().toBuffer()).toMatchImageSnapshot({
       comparisonMethod: 'ssim',

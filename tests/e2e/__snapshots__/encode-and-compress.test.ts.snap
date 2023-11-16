@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -32,7 +32,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -64,7 +64,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "jpg" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -96,7 +96,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -128,7 +128,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "png" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -160,7 +160,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7,
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.098032082960527,
@@ -192,7 +192,7 @@ exports[`encode-and-compress encodes "memorial.exr" to "webp" using quality 0.7,
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -224,7 +224,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -256,7 +256,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "jpg" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -288,7 +288,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -320,7 +320,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "png" using quality 0.7, 
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -352,7 +352,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7,
 }
 `;
 
-exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7, tonemapping: 4 1`] = `
+exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7, tonemapping: 4: metadata 1`] = `
 {
   "gainMapMax": [
     8.103287808412022,
@@ -384,7 +384,7 @@ exports[`encode-and-compress encodes "memorial.hdr" to "webp" using quality 0.7,
 }
 `;
 
-exports[`encode-and-compress encodes "spruit_sunrise_1k.hdr" to "jpg" using quality 0.95, tonemapping: 1 1`] = `
+exports[`encode-and-compress encodes "spruit_sunrise_1k.hdr" to "jpg" using quality 0.95, tonemapping: 1: metadata 1`] = `
 {
   "gainMapMax": [
     15.99929538702341,
