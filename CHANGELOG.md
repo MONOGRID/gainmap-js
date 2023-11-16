@@ -1,3 +1,10 @@
+## [2.0.5](https://github.com/MONOGRID/gainmap-js/compare/v2.0.4...v2.0.5) (2023-11-16)
+
+
+### Bug Fixes
+
+* **jpegrloader:** rename JPEGRLoader to HDRJPEGLoader, old name kept for compatibility ([ac6e386](https://github.com/MONOGRID/gainmap-js/commit/ac6e38610886b7adec5806a7ad301bff1ec00d62))
+
 ## [2.0.4](https://github.com/MONOGRID/gainmap-js/compare/v2.0.3...v2.0.4) (2023-11-15)
 
 
