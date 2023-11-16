@@ -5,7 +5,7 @@ import path from 'path'
 import { extractXMP } from '../../src/decode/utils/extract-metadata-from-jpeg'
 
 describe('xmp', () => {
-  it.concurrent.each([
+  it.each([
     { fileName: '01.jpg' },
     { fileName: '02.jpg' },
     { fileName: '03.jpg' },
