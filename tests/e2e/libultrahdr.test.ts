@@ -32,10 +32,13 @@ describe('wasm', () => {
       'memorial.jpg'
     )`) as UltraHDRUnpacked
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     result.gainMap = Uint8Array.from(result.gainMap)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     result.sdr = Uint8Array.from(result.sdr)
 
     expect(pageError).not.toBeCalled()
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
     // console.log(result)
     // const file = await readFile(join(__dirname, './fixtures/memorial.jpg'))

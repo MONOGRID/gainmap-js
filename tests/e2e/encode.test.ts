@@ -44,6 +44,7 @@ describe('encoder', () => {
 
     expect(pageError).not.toBeCalled()
     // expect no calls to page log except the one indicated
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data

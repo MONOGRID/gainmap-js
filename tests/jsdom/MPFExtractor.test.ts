@@ -9,7 +9,7 @@ import { MPFExtractor } from '../../src/decode/utils/MPFExtractor'
 const blobToArrayBuffer = (r: Blob) => {
   return new Promise<ArrayBuffer>((resolve, reject) => {
     const fr = new FileReader()
-    fr.onload = async (e) => {
+    fr.onload = (e) => {
       if (fr.result instanceof ArrayBuffer) {
         resolve(fr.result)
       }
