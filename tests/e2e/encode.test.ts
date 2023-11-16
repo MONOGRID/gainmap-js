@@ -1,6 +1,6 @@
 import 'jest-extended'
 
-import { expect, it } from '@jest/globals'
+import { describe, expect, it } from '@jest/globals'
 import { toMatchImageSnapshot } from 'jest-image-snapshot'
 import sharp from 'sharp'
 import { ACESFilmicToneMapping, LinearToneMapping } from 'three'
@@ -9,84 +9,86 @@ import { getPage } from './common'
 
 expect.extend({ toMatchImageSnapshot })
 
-it.each([
-  { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
-  { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
-  { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
+describe('encode', () => {
+  it.each([
+    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.exr', tonemapping: ACESFilmicToneMapping },
 
-  { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
-  { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
-  { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
+    { file: 'memorial.hdr', tonemapping: ACESFilmicToneMapping },
 
-  { file: 'memorial.exr', tonemapping: LinearToneMapping },
-  { file: 'memorial.exr', tonemapping: LinearToneMapping },
-  { file: 'memorial.exr', tonemapping: LinearToneMapping },
+    { file: 'memorial.exr', tonemapping: LinearToneMapping },
+    { file: 'memorial.exr', tonemapping: LinearToneMapping },
+    { file: 'memorial.exr', tonemapping: LinearToneMapping },
 
-  { file: 'memorial.hdr', tonemapping: LinearToneMapping },
-  { file: 'memorial.hdr', tonemapping: LinearToneMapping },
-  { file: 'memorial.hdr', tonemapping: LinearToneMapping },
+    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
+    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
+    { file: 'memorial.hdr', tonemapping: LinearToneMapping },
 
-  { file: 'spruit_sunrise_1k.hdr', tonemapping: LinearToneMapping }
-])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, tonemapping }) => {
-  // we need to launch puppeteer with a
-  // custom written "testbed.html" page
-  // because our encoder works by
-  // rendering the SDR image with THREEjs
-  // which only works in webgl (not here in node where we test)
-  const { page, pageError, pageLog } = await getPage('encode')
+    { file: 'spruit_sunrise_1k.hdr', tonemapping: LinearToneMapping }
+  ])('encodes $file to $format using quality $quality, tonemapping: $tonemapping', async ({ file, tonemapping }) => {
+    // we need to launch puppeteer with a
+    // custom written "testbed.html" page
+    // because our encoder works by
+    // rendering the SDR image with THREEjs
+    // which only works in webgl (not here in node where we test)
+    const { page, pageError, pageLog } = await getPage('encode')
 
-  // we receive Arrays because puppeteer can't transfer Uint8Array data
-  const result = await page.evaluate(`
-      encode(
-        '${file}',
-        ${tonemapping}
-    )`) as { sdr: { width: number, height: number, data: Uint8Array }, gainMap: { width: number, height: number, data: Uint8Array } }
+    // we receive Arrays because puppeteer can't transfer Uint8Array data
+    const result = await page.evaluate(`
+        encode(
+          '${file}',
+          ${tonemapping}
+      )`) as { sdr: { width: number, height: number, data: Uint8Array }, gainMap: { width: number, height: number, data: Uint8Array } }
 
-  // we receive Arrays because puppeteer can't transfer Uint8Array data
-  result.gainMap.data = Uint8Array.from(result.gainMap.data)
-  result.sdr.data = Uint8Array.from(result.sdr.data)
+    // we receive Arrays because puppeteer can't transfer Uint8Array data
+    result.gainMap.data = Uint8Array.from(result.gainMap.data)
+    result.sdr.data = Uint8Array.from(result.sdr.data)
 
-  expect(pageError).not.toBeCalled()
-  // expect no calls to page log except the one indicated
-  expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
+    expect(pageError).not.toBeCalled()
+    // expect no calls to page log except the one indicated
+    expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
 
-  expect(result.gainMap).toBeObject()
-  expect(result.gainMap.data).toBeInstanceOf(Uint8Array)
-  expect(result.gainMap.data.length).toBeGreaterThan(4)
+    expect(result.gainMap).toBeObject()
+    expect(result.gainMap.data).toBeInstanceOf(Uint8Array)
+    expect(result.gainMap.data.length).toBeGreaterThan(4)
 
-  expect(result.gainMap.width).toBeNumber()
-  expect(result.gainMap.width).not.toBeNaN()
-  expect(result.gainMap.width).not.toBe(0)
+    expect(result.gainMap.width).toBeNumber()
+    expect(result.gainMap.width).not.toBeNaN()
+    expect(result.gainMap.width).not.toBe(0)
 
-  expect(result.gainMap.height).toBeNumber()
-  expect(result.gainMap.height).not.toBeNaN()
-  expect(result.gainMap.height).not.toBe(0)
+    expect(result.gainMap.height).toBeNumber()
+    expect(result.gainMap.height).not.toBeNaN()
+    expect(result.gainMap.height).not.toBe(0)
 
-  expect(result.sdr).toBeObject()
-  expect(result.sdr.data).toBeInstanceOf(Uint8Array)
-  expect(result.sdr.data.length).toBeGreaterThan(4)
+    expect(result.sdr).toBeObject()
+    expect(result.sdr.data).toBeInstanceOf(Uint8Array)
+    expect(result.sdr.data.length).toBeGreaterThan(4)
 
-  expect(result.sdr.width).toBeNumber()
-  expect(result.sdr.height).not.toBeNaN()
-  expect(result.sdr.width).not.toBe(0)
+    expect(result.sdr.width).toBeNumber()
+    expect(result.sdr.height).not.toBeNaN()
+    expect(result.sdr.width).not.toBe(0)
 
-  expect(result.sdr.height).toBeNumber()
-  expect(result.sdr.height).not.toBeNaN()
-  expect(result.sdr.height).not.toBe(0)
+    expect(result.sdr.height).toBeNumber()
+    expect(result.sdr.height).not.toBeNaN()
+    expect(result.sdr.height).not.toBe(0)
 
-  expect(await sharp(result.sdr.data, {
-    raw: {
-      width: result.sdr.width,
-      height: result.sdr.height,
-      channels: 4
-    }
-  }).png().toBuffer()).toMatchImageSnapshot()
+    expect(await sharp(result.sdr.data, {
+      raw: {
+        width: result.sdr.width,
+        height: result.sdr.height,
+        channels: 4
+      }
+    }).png().toBuffer()).toMatchImageSnapshot()
 
-  expect(await sharp(result.gainMap.data, {
-    raw: {
-      width: result.gainMap.width,
-      height: result.gainMap.height,
-      channels: 4
-    }
-  }).png().toBuffer()).toMatchImageSnapshot()
-}, 900000 /* 15 minutes */)
+    expect(await sharp(result.gainMap.data, {
+      raw: {
+        width: result.gainMap.width,
+        height: result.gainMap.height,
+        channels: 4
+      }
+    }).png().toBuffer()).toMatchImageSnapshot()
+  }, 900000 /* 15 minutes */)
+})

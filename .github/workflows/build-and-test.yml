@@ -5,7 +5,7 @@ on: [push]
 jobs:
     Build-And-Test:
       name: 'Build and Test'
-      runs-on: ubuntu-latest
+      runs-on: macos-latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
