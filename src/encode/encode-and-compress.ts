@@ -15,7 +15,7 @@ import { CompressedImage, EncodingParametersWithCompression } from './types'
  * @category Encoding Functions
  * @group Encoding Functions
  * @example
- * import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js'
+ * import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js/encode'
  * import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
  * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  *

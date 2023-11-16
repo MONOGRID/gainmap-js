@@ -1,0 +1,76 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`find-texture-min-max finds min and max in "chcaus2-bloom.exr" 1`] = `
+{
+  "max": [
+    94.875,
+    94.875,
+    94.875,
+  ],
+  "min": [
+    0,
+    0,
+    0,
+  ],
+}
+`;
+
+exports[`find-texture-min-max finds min and max in "chcaus2-bloom.hdr" 1`] = `
+{
+  "max": [
+    94.8125,
+    94.8125,
+    94.8125,
+  ],
+  "min": [
+    0,
+    0,
+    0,
+  ],
+}
+`;
+
+exports[`find-texture-min-max finds min and max in "memorial.exr" 1`] = `
+{
+  "max": [
+    274,
+    218,
+    126,
+  ],
+  "min": [
+    0,
+    0,
+    0,
+  ],
+}
+`;
+
+exports[`find-texture-min-max finds min and max in "memorial.hdr" 1`] = `
+{
+  "max": [
+    275,
+    218.75,
+    126.4375,
+  ],
+  "min": [
+    0,
+    0,
+    0,
+  ],
+}
+`;
+
+exports[`find-texture-min-max finds min and max in "spruit_sunrise_1k.hdr" 1`] = `
+{
+  "max": [
+    65504,
+    65504,
+    44192,
+  ],
+  "min": [
+    0,
+    0,
+    0,
+  ],
+}
+`;

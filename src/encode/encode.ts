@@ -24,7 +24,7 @@ import { EncodingParametersBase } from './types'
  * @group Encoding Functions
  *
  * @example
- * import { encode, findTextureMinMax } from '@monogrid/gainmap-js'
+ * import { encode, findTextureMinMax } from '@monogrid/gainmap-js/encode'
  * import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  *
  * // load an HDR file
