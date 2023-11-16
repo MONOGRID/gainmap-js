@@ -130,7 +130,9 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
     quadRenderer.render()
 
     mat.uniforms.map.value = fbi.texture
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     mat.uniforms.u_srcResolution.value.x = w
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     mat.uniforms.u_srcResolution.value.y = h
   })
 

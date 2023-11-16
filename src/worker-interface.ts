@@ -11,6 +11,7 @@ export * from './worker-types'
  * @returns
  */
 export const getPromiseWorker = (worker: Worker) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   return new PromiseWorker(worker) as PromiseWorkerType
 }
 /**
