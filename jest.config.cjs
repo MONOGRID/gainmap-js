@@ -4,7 +4,7 @@ module.exports = {
     displayName: 'e2e',
     testMatch: ['<rootDir>/tests/e2e/**/*.test.ts'],
     preset: 'ts-jest/presets/js-with-ts',
-    setupFilesAfterEnv: ['jest-extended/all'],
+    setupFilesAfterEnv: ['jest-extended/all', '<rootDir>/tests/e2e/setup-jest.ts'],
     transformIgnorePatterns: ['node_modules/(?!(three|image-info-extractor))'],
     transform: { '^.+\\.[tj]s[xm]?$': ['ts-jest', { tsconfig: 'tests/tsconfig.json' }] }
   }, {

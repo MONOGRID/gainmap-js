@@ -2,7 +2,6 @@ import { describe, expect, it } from '@jest/globals'
 import { existsSync } from 'fs'
 import { mkdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
-import { performance } from 'perf_hooks'
 
 import { MPFExtractor } from '../../src/decode/utils/MPFExtractor'
 
@@ -37,13 +36,13 @@ describe('MPFExtractor', () => {
   ])('finds the gainmap in $fileName', async ({ fileName }) => {
     const file = await readFile(path.join(__dirname, `../fixtures/${fileName}`))
 
-    performance.mark(`${fileName} mpf extract start`)
+    // performance.mark(`${fileName} mpf extract start`)
     const extractor = new MPFExtractor({ extractFII: true, extractNonFII: true })
     const result = await extractor.extract(new Uint8Array(file.buffer))
-    performance.mark(`${fileName} mpf extract end`)
+    // performance.mark(`${fileName} mpf extract end`)
 
-    const measure = performance.measure(`${fileName} mpf extraction`, `${fileName} mpf extract start`, `${fileName} mpf extract end`)
-    console.log(measure.name, measure.duration, 'ms')
+    // const measure = performance.measure(`${fileName} mpf extraction`, `${fileName} mpf extract start`, `${fileName} mpf extract end`)
+    // console.log(measure.name, measure.duration, 'ms')
 
     expect(result).not.toBeUndefined()
     expect(result).toBeArrayOfSize(2)

@@ -1,0 +1,50 @@
+<body>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../../../node_modules/three/build/three.module.js",
+        "three/examples/": "../../../node_modules/three/examples/",
+
+        "@monogrid/gainmap-js": "../../../dist/decode.js",
+        "@monogrid/gainmap-js/encode": "../../../dist/encode.js",
+        "@monogrid/gainmap-js/libultrahdr": "../../../dist/libultrahdr.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import { encode, findTextureMinMax } from '@monogrid/gainmap-js/encode';
+    import { ACESFilmicToneMapping } from 'three'
+    import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+    import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+
+    window.encode = async (url, toneMapping = ACESFilmicToneMapping) => {
+      let loader
+      if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
+      if (url.indexOf('.hdr') !== -1) loader = new RGBELoader()
+      const image = await loader.loadAsync(`https://local/${url}`)
+      image.flipY = url.indexOf('.exr') !== -1
+
+      const textureMax = findTextureMinMax(image)
+
+      const result = await encode({
+        image,
+        maxContentBoost: Math.max.apply(this, textureMax),
+        toneMapping
+      })
+      // Uint8Arrays can't be transferred outside puppeteer
+      return {
+        sdr: {
+          width: result.sdr.width,
+          height: result.sdr.height,
+          data: Array.from( result.sdr.toArray() )
+        },
+        gainMap: {
+          width: result.gainMap.width,
+          height: result.gainMap.height,
+          data: Array.from( result.gainMap.toArray() )
+        },
+      }
+    }
+
+  </script>
+</body>

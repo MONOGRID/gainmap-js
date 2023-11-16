@@ -1,25 +1,9 @@
-import { afterAll, beforeAll, expect, jest } from '@jest/globals'
+import { expect, jest } from '@jest/globals'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
-import puppeteer, { ConsoleMessage } from 'puppeteer'
+import { ConsoleMessage } from 'puppeteer'
 
-beforeAll(async () => {
-  globalThis.browser = await puppeteer.launch({
-    args: [
-      '--disable-web-security',
-      '--enable-gpu',
-      '--use-gl=angle',
-      '--enable-webgl'
-    ],
-    headless: true
-  })
-})
-
-afterAll(async () => {
-  await globalThis.browser.close()
-})
-
-export const getTestbed = async () => {
+export const getPage = async (pageName: string) => {
   const pageError = jest.fn((e: string) => {
     console.error(e)
   })
@@ -51,7 +35,7 @@ export const getTestbed = async () => {
     request.continue()
   })
 
-  const response = await page.goto(`file://${join(__dirname, './testbed.html')}`, { timeout: 0 })
+  const response = await page.goto(`file://${join(__dirname, `./pages/${pageName}.html`)}`, { timeout: 0 })
   expect(response).not.toBeNull()
   expect(response?.status()).toBe(200)
 
