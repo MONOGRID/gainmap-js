@@ -5,7 +5,7 @@ on: [push]
 jobs:
     Build-And-Test:
       name: 'Build and Test'
-      runs-on: macos-latest
+      runs-on: ubuntu-latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
@@ -13,6 +13,7 @@ jobs:
           uses: actions/checkout@v3
           with:
             submodules: recursive
+            lfs: true
 
         - name: 'Setup Emscripten'
           uses: mymindstorm/setup-emsdk@v11
