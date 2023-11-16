@@ -23,7 +23,7 @@ const matrix: [string, number][] = [
 ]
 
 describe('encode', () => {
-  it.each(matrix)('encodes %p using tonemapping %p', async (file, tonemapping) => {
+  it.each(matrix)('encodes %p using tonemapping %p', async (file, toneMapping) => {
     // we need to launch puppeteer with a
     // custom written "testbed.html" page
     // because our encoder works by
@@ -35,7 +35,7 @@ describe('encode', () => {
     const result = await page.evaluate(`
         encode(
           '${file}',
-          ${tonemapping}
+          ${toneMapping}
       )`) as { sdr: { width: number, height: number, data: Uint8Array }, gainMap: { width: number, height: number, data: Uint8Array } }
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data
@@ -44,6 +44,7 @@ describe('encode', () => {
 
     expect(pageError).not.toBeCalled()
     // expect no calls to page log except the one indicated
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
 
     expect(result.gainMap).toBeObject()

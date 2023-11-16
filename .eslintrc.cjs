@@ -4,13 +4,12 @@ module.exports = {
   // Remove this if you have an higher level ESLint config file (it usually happens into a monorepos)
   root: true,
 
-  // https://eslint.vuejs.org/user-guide/#how-to-use-a-custom-parser
-  // Must use parserOptions instead of "parser" to allow vue-eslint-parser to keep working
-  // `parser: 'vue-eslint-parser'` is already included with any 'plugin:vue/**' config and should be omitted
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    parser: require.resolve('@typescript-eslint/parser')
+    project: true,
+    tsconfigRootDir: __dirname,
+    extraFileExtensions: ['.html']
   },
-
   env: {
     browser: true,
     es2021: true,
@@ -25,15 +24,16 @@ module.exports = {
     // https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#usage
     // ESLint typescript rules
     'plugin:@typescript-eslint/recommended',
-
+    'plugin:@typescript-eslint/recommended-type-checked',
     'standard'
 
   ],
 
   plugins: [
-    'jest-extended',
     // required to apply rules which need type information
     '@typescript-eslint',
+    // 'html', // TODO: enable this to check examples, but with less rules :)
+    'jest-extended',
     'simple-import-sort', // https://github.com/lydell/eslint-plugin-simple-import-sort/
     'unused-imports' // https://github.com/sweepline/eslint-plugin-unused-imports
 
@@ -55,6 +55,13 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    "@typescript-eslint/no-misused-promises": [
+      "error",
+      {
+        "checksVoidReturn": false
+      }
+    ],
+    "@typescript-eslint/no-duplicate-type-constituents": "off",
     // https://github.com/lydell/eslint-plugin-simple-import-sort/#usage
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',

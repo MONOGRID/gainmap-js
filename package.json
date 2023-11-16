@@ -1,6 +1,6 @@
 {
   "name": "@monogrid/gainmap-js",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gain map",
   "homepage": "https://github.com/MONOGRID/gainmap-js#readme",
   "repository": {
@@ -125,6 +125,7 @@
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.53.0",
     "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-html": "^7.1.0",
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-jest-extended": "^2.0.0",
     "eslint-plugin-n": "^16.3.1",

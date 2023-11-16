@@ -4,6 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolvePackageJsonExports": true,
+    "allowJs": true,
+    "checkJs": true,
     "paths": {
       "@monogrid/gainmap-js": ["../dist"],
       "@monogrid/gainmap-js/libultrahdr": ["../dist/libultrahdr"],
@@ -11,5 +13,5 @@
       "@monogrid/gainmap-js/worker-interface": ["../dist/worker-interface"]
     },
   },
-  "exclude": []
+  "exclude": ["./integrated/libs"]
 }

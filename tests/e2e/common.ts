@@ -20,19 +20,19 @@ export const getPage = async (pageName: string) => {
     pageError(`${e.name}: ${e.message}\nSTACKTRACE:\n ${e.stack}`)
   })
 
-  page.setRequestInterception(true)
+  await page.setRequestInterception(true)
   page.on('request', async (request) => {
     const splt = request.url().split('https://local/')
     if (splt.length > 1) {
       const file = await readFile(join(__dirname, `../fixtures/${splt[1]}`))
-      request.respond({
+      await request.respond({
         status: 200,
         contentType: 'binary/octet-stream',
         body: file
       })
       return
     }
-    request.continue()
+    await request.continue()
   })
 
   const response = await page.goto(`file://${join(__dirname, `./pages/${pageName}.html`)}`, { timeout: 0 })

@@ -52,7 +52,7 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
 export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const lib = await getLibrary()
   const result = lib.extractJpegR(file, file.length)
-  if (!result.success) throw new Error(result.errorMessage)
+  if (!result.success) throw new Error(`${result.errorMessage}`)
 
   const parser = new DOMParser()
   const xmlDocument = parser.parseFromString(result.metadata as string, 'text/xml')

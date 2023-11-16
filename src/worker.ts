@@ -12,6 +12,7 @@ const _compress = async (message: WorkerInterface['compress']['request'], withTr
   }, [result.data.buffer, message.payload.source instanceof ImageData ? message.payload.source.data.buffer : message.payload.source.buffer])
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 registerPromiseWorker(async (message: WorkerRequest, withTransferList: WithTransferListFunction) => {
   switch (message.type) {
     // case 'encode-gainmap-buffers':

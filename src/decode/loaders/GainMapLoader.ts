@@ -112,7 +112,7 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     sdrLoader.load(sdrUrl, async (buffer) => {
       if (typeof buffer === 'string') throw new Error('Invalid sdr buffer')
       sdr = buffer
-      loadCheck()
+      await loadCheck()
     }, (e: ProgressEvent) => {
       sdrLengthComputable = e.lengthComputable
       sdrLoaded = e.loaded
@@ -128,7 +128,7 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     gainMapLoader.load(gainMapUrl, async (buffer) => {
       if (typeof buffer === 'string') throw new Error('Invalid gainmap buffer')
       gainMap = buffer
-      loadCheck()
+      await loadCheck()
     }, (e: ProgressEvent) => {
       gainMapLengthComputable = e.lengthComputable
       gainMapLoaded = e.loaded
@@ -143,8 +143,10 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     metadataLoader.setWithCredentials(this.withCredentials)
     metadataLoader.load(metadataUrl, async (json) => {
       if (typeof json !== 'string') throw new Error('Invalid metadata string')
+      // TODO: implement check on JSON file and remove this eslint disable
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       metadata = JSON.parse(json)
-      loadCheck()
+      await loadCheck()
     }, (e: ProgressEvent) => {
       metadataLengthComputable = e.lengthComputable
       metadataLoaded = e.loaded

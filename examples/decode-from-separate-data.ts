@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable unused-imports/no-unused-vars */
 import { decode } from '@monogrid/gainmap-js'
 import {
@@ -21,7 +24,7 @@ const gainMap = await textureLoader.loadAsync('gainmap.jpg')
 // load metadata
 const metadata = await (await fetch('metadata.json')).json()
 
-const result = await decode({
+const result = decode({
   sdr,
   gainMap,
   // this allows to use `result.renderTarget.texture` directly

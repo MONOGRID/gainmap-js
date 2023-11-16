@@ -37,7 +37,7 @@ $ npm install @monogrid/gainmap-js three
 > * The **gain map**. This is a secondary “image” embedded in the file. It is not a real image, but rather contains data to convert each pixel from the base image into the other (SDR or HDR) version of the image.
 >* Gain map **metadata**. This tells the browser how the gain map is encoded as well as critical information to optimize rendering on any display.
 
-Please note that Google [is adopting the gain map technology in Android 14](https://support.google.com/photos/answer/14159275) but its naming of the technology refers to it as **Ultra HDR Image Format** and a JPEG file with embedded gain map is called `JPEGR` in their terminology.
+Please note that Google [is adopting the gain map technology in Android 14](https://support.google.com/photos/answer/14159275) but its naming of the technology refers to it as **Ultra HDR Image Format** and a JPEG file with embedded gain map is [apparently called JPEGR](https://github.com/google/libultrahdr/blob/3a3a752a5da0b2304b1b6de0ef383bbe41256a67/lib/jpegr.h#L28C16-L28C21) in their terminology, we call it `HDRJPEG` for the moment.
 
 ## API
 
@@ -63,7 +63,7 @@ The disadvantages are:
  * Photo sharing websites and/or services (i.e. sharing with Slack) will likely strip the Gain map metadata and the HDR information will be lost, leaving you with only the SDR Representation.
 
 ```ts
-import { JPEGRLoader } from '@monogrid/gainmap-js'
+import { HDRJPGLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
   LinearFilter,
@@ -77,7 +77,7 @@ import {
 
 const renderer = new WebGLRenderer()
 
-const loader = new JPEGRLoader(renderer)
+const loader = new HDRJPGLoader(renderer)
 
 const result = loader.load('gainmap.jpeg')
 // `result` can be used to populate a Texture
