@@ -8,6 +8,7 @@ module.exports = {
   parserOptions: {
     project: true,
     tsconfigRootDir: __dirname,
+    extraFileExtensions: ['.html']
   },
   env: {
     browser: true,
@@ -29,9 +30,10 @@ module.exports = {
   ],
 
   plugins: [
-    'jest-extended',
     // required to apply rules which need type information
     '@typescript-eslint',
+    // 'html', // TODO: enable this to check examples, but with less rules :)
+    'jest-extended',
     'simple-import-sort', // https://github.com/lydell/eslint-plugin-simple-import-sort/
     'unused-imports' // https://github.com/sweepline/eslint-plugin-unused-imports
 
