@@ -46,6 +46,7 @@
 
 		<script type="module">
 			// @ts-check
+
 			import * as THREE from 'three';
 
 			import Stats from 'three/addons/libs/stats.module.js';
@@ -57,7 +58,7 @@
 			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js';
 
 			const params = {
-				envMap: 'JPEG Gain map',
+				envMap: 'HDR JPG',
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
@@ -131,8 +132,8 @@
 				gainMap = new HDRJPGLoader( renderer )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( response ) {
 
-						resolutions[ 'JPEG Gain map' ] = response.width + 'x' + response.height;
-						displayStats( 'JPEG Gain map' );
+						resolutions[ 'HDR JPG' ] = response.width + 'x' + response.height;
+						displayStats( 'HDR JPG' );
 
 						gainmapRenderTarget = pmremGenerator.fromEquirectangular( response.renderTarget.texture );
 
@@ -146,7 +147,7 @@
 
 					}, function ( progress ) {
 
-						fileSizes[ 'JPEG Gain map' ] = humanFileSize( progress.total );
+						fileSizes[ 'HDR JPG' ] = humanFileSize( progress.total );
 
 					} );
 
@@ -204,7 +205,7 @@
 
 				const gui = new GUI();
 
-				gui.add( params, 'envMap', [ 'JPEG Gain map', 'Webp Gain map (separate)', 'HDR' ] ).onChange( displayStats );
+				gui.add( params, 'envMap', [ 'HDR JPG', 'Webp Gain map (separate)', 'HDR' ] ).onChange( displayStats );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -279,7 +280,7 @@
 
 				switch ( params.envMap ) {
 
-					case 'JPEG Gain map':
+					case 'HDR JPG':
 						renderTarget = gainmapRenderTarget;
 						cubeMap = gainmapBackground || gainMap.renderTarget.texture;
 						break;
