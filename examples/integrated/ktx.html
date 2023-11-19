@@ -51,7 +51,7 @@
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
-			import { decode } from '@monogrid/gainmap-js'
+			import { decode } from '@monogrid/gainmap-js';
 
 			const params = {
 				roughness: 0.0,
@@ -64,17 +64,12 @@
 			let camera, scene, renderer, controls;
 			let torusMesh, planeMesh;
 
-			let loader
-
-			const fileSizes = {};
-			const resolutions = {};
+			let loader;
 
 			init();
 			animate();
 
 			async function init() {
-
-				const lbl = document.getElementById( 'lbl_left' );
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -145,35 +140,36 @@
 					.setTranscoderPath( 'libs/basis/' )
 					.detectSupport( renderer );
 
-				const [sdr, gainMap, metadata] = await Promise.all([
+				const [ sdr, gainMap, metadata ] = await Promise.all( [
 					loader.loadAsync( './textures/gainmap/qwantani_puresky_8k.ktx2' ),
 					loader.loadAsync( './textures/gainmap/qwantani_puresky_8k-gainmap.ktx2' ),
-					new THREE.FileLoader().setResponseType('json').loadAsync('./textures/gainmap/qwantani_puresky_8k.json')
-				])
+					new THREE.FileLoader().setResponseType( 'json' ).loadAsync( './textures/gainmap/qwantani_puresky_8k.json' )
+				] );
 
-				gainMap.colorSpace = THREE.NoColorSpace
+				gainMap.colorSpace = THREE.NoColorSpace;
 
-				const result = await decode({
+				const result = await decode( {
 					sdr,
 					gainMap,
 					// this allows to use `result.renderTarget.texture` directly
 					renderer,
 					// this will restore the full HDR range
-					maxDisplayBoost: Math.pow(2, metadata.hdrCapacityMax),
+					maxDisplayBoost: Math.pow( 2, metadata.hdrCapacityMax ),
 					...metadata
-				})
+				} );
 
-				const env = pmremGenerator.fromEquirectangular( result.renderTarget.texture )
-				torusMesh.material.envMap = env.texture
-				torusMesh.material.needsUpdate = true
+				const env = pmremGenerator.fromEquirectangular( result.renderTarget.texture );
+				torusMesh.material.envMap = env.texture;
+				torusMesh.material.needsUpdate = true;
 
 				scene.background = result.toDataTexture();
 				scene.background.flipY = true;
 				scene.background.mapping = THREE.EquirectangularReflectionMapping;
 				scene.background.minFilter = THREE.LinearFilter;
 				scene.background.magFilter = THREE.LinearFilter;
-				scene.background.needsUpdate = true
-			}
+				scene.background.needsUpdate = true;
+
+}
 
 
 

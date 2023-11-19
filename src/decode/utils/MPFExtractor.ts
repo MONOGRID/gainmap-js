@@ -44,7 +44,7 @@ export class MPFExtractor {
       // If you're executing this line on a big endian machine, it'll be reversed.
       // bigEnd further down though, refers to the endianness of the image itself.
       if (dataView.getUint16(0) !== 0xffd8) {
-        reject('Not a valid jpeg')
+        reject(new Error('Not a valid jpeg'))
         return
       }
 
@@ -55,11 +55,11 @@ export class MPFExtractor {
 
       while (offset < length) {
         if (++loops > 250) {
-          reject(`Found no marker after ${loops} loops 😵`)
+          reject(new Error(`Found no marker after ${loops} loops 😵`))
           return
         }
         if (dataView.getUint8(offset) !== 0xff) {
-          reject(`Not a valid marker at offset 0x${offset.toString(16)}, found: 0x${dataView.getUint8(offset).toString(16)}`)
+          reject(new Error(`Not a valid marker at offset 0x${offset.toString(16)}, found: 0x${dataView.getUint8(offset).toString(16)}`))
           return
         }
 
@@ -100,12 +100,12 @@ export class MPFExtractor {
             } else if (dataView.getUint16(tiffOffset) === 0x4d4d) {
               bigEnd = true
             } else {
-              reject('No valid endianness marker found in TIFF header')
+              reject(new Error('No valid endianness marker found in TIFF header'))
               return
             }
 
             if (dataView.getUint16(tiffOffset + 2, !bigEnd) !== 0x002a) {
-              reject('Not valid TIFF data! (no 0x002A marker)')
+              reject(new Error('Not valid TIFF data! (no 0x002A marker)'))
               return
             }
 
@@ -117,7 +117,7 @@ export class MPFExtractor {
             )
 
             if (firstIFDOffset < 0x00000008) {
-              reject('Not valid TIFF data! (First offset less than 8)')
+              reject(new Error('Not valid TIFF data! (First offset less than 8)'))
               return
             }
 

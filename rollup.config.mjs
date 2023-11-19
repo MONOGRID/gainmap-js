@@ -6,6 +6,7 @@ import { defineConfig } from 'rollup'
 import copy from 'rollup-plugin-copy'
 import license from 'rollup-plugin-license'
 
+// @ts-expect-error tsc + rollup fight each other
 import pkgJSON from './package.json' assert { type: 'json' }
 
 const { author, name, version } = pkgJSON
@@ -27,6 +28,7 @@ const configBase = defineConfig({
       ]
     }),
     typescript({
+      tsconfig: 'src/tsconfig.json',
       declaration: true,
       declarationDir: 'dist',
       include: ['src/**/*.ts']

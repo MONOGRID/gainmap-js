@@ -1,11 +1,21 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
+    "strict": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noErrorTruncation": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "module": "ES2022",
+    "target": "ES2018",
     "moduleResolution": "Bundler",
     "resolvePackageJsonExports": true,
+    "resolvePackageJsonImports": true,
     "allowJs": true,
     "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM"],
     "paths": {
       "@monogrid/gainmap-js": ["../dist"],
       "@monogrid/gainmap-js/libultrahdr": ["../dist/libultrahdr"],
