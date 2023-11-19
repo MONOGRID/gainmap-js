@@ -24,12 +24,12 @@ const matrix: [string, number][] = [
 
 describe('encode', () => {
   it.each(matrix)('encodes %p using tonemapping %p', async (file, toneMapping) => {
-    // we need to launch puppeteer with a
-    // custom written "testbed.html" page
-    // because our encoder works by
-    // rendering the SDR image with THREEjs
-    // which only works in webgl (not here in node where we test)
-    const { page, pageError, pageLog } = await getPage('encode')
+    const { page, pageError, pageLog } = await getPage('base')
+
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/encode.js'
+    })
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data
     const result = await page.evaluate(`
@@ -71,25 +71,35 @@ describe('encode', () => {
     expect(result.sdr.height).not.toBeNaN()
     expect(result.sdr.height).not.toBe(0)
 
-    expect(await sharp(result.sdr.data, {
-      raw: {
-        width: result.sdr.width,
-        height: result.sdr.height,
-        channels: 4
-      }
-    }).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(result.sdr.data, {
+        raw: {
+          width: result.sdr.width,
+          height: result.sdr.height,
+          channels: 4
+        }
+      })
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
 
-    expect(await sharp(result.gainMap.data, {
-      raw: {
-        width: result.gainMap.width,
-        height: result.gainMap.height,
-        channels: 4
-      }
-    }).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(result.gainMap.data, {
+        raw: {
+          width: result.gainMap.width,
+          height: result.gainMap.height,
+          channels: 4
+        }
+      })
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'

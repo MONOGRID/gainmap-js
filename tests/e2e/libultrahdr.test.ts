@@ -8,7 +8,12 @@ import { getPage } from './common'
 
 describe('libultrahdr', () => {
   it('wasm appends an encoding result to a jpeg', async () => {
-    const { page, pageError } = await getPage('testbed')
+    const { page, pageError } = await getPage('base')
+
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/encode-jpeg-metadata.js'
+    })
 
     const result = await page.evaluate(`
         encodeJPEGMetadata('memorial.exr')
@@ -26,11 +31,14 @@ describe('libultrahdr', () => {
   }, 100000)
 
   it('extracts metadata', async () => {
-    const { page, pageError, pageLog } = await getPage('testbed')
+    const { page, pageError, pageLog } = await getPage('base')
 
-    const result = await page.evaluate(`decodeJPEGMetadata(
-        'memorial.jpg'
-      )`) as UltraHDRUnpacked
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/decode-jpeg-metadata.js'
+    })
+
+    const result = await page.evaluate('decodeJPEGMetadata(\'memorial.jpg\')') as UltraHDRUnpacked
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     result.gainMap = Uint8Array.from(result.gainMap)

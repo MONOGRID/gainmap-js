@@ -48,14 +48,24 @@ describe('MPFExtractor', () => {
     expect(result).toBeArrayOfSize(2)
 
     const sdr = await blobToArrayBuffer(result[0])
-    expect(await sharp(sdr).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(sdr)
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
 
     const gainMap = await blobToArrayBuffer(result[1])
-    expect(await sharp(gainMap).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(gainMap)
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'

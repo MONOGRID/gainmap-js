@@ -32,12 +32,12 @@ const matrix: [string, string, number, number][] = [
 
 describe('encode-and-compress', () => {
   it.each(matrix)('encodes %p to %p using quality %p, tonemapping: %p', async (file, format, quality, tonemapping) => {
-    // we need to launch puppeteer with a
-    // custom written "testbed.html" page
-    // because our encoder works by
-    // rendering the SDR image with THREEjs
-    // which only works in webgl (not here in node where we test)
-    const { page, pageError, pageLog } = await getPage('encode-and-compress')
+    const { page, pageError, pageLog } = await getPage('base')
+
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/encode-and-compress.js'
+    })
 
     const result = await page.evaluate(`
         encodeAndCompress(
@@ -49,7 +49,10 @@ describe('encode-and-compress', () => {
 
     expect(pageError).not.toBeCalled()
     // expect no calls to page log except the one indicated
-    expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
+    expect(pageLog).not.toBeCalledWith(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      expect.not.stringMatching(/GPU stall due to ReadPixels/)
+    )
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data
     result.gainMap.data = Uint8Array.from(result.gainMap.data)
@@ -109,12 +112,22 @@ describe('encode-and-compress', () => {
       gainMapMax: result.gainMapMax
     }).toMatchSnapshot('metadata')
 
-    expect(await sharp(result.sdr.data).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(result.sdr.data)
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
-    expect(await sharp(result.gainMap.data).png().toBuffer()).toMatchImageSnapshot({
+    expect(
+      await sharp(result.gainMap.data)
+        .resize({ width: 500, height: 500, fit: 'inside' })
+        .png({ compressionLevel: 9, effort: 10 })
+        .toBuffer()
+    ).toMatchImageSnapshot({
       comparisonMethod: 'ssim',
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'

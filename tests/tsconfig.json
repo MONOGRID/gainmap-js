@@ -11,6 +11,13 @@
     "skipLibCheck": true,
     "allowJs": true,
     "checkJs": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@monogrid/gainmap-js": ["../dist/decode"],
+      "@monogrid/gainmap-js/encode": ["../dist/encode"],
+      "@monogrid/gainmap-js/libultrahdr": ["../dist/libultrahdr"],
+      "@monogrid/gainmap-js/worker": ["../dist/worker"],
+      "@monogrid/gainmap-js/worker-interface": ["../dist/worker-interface"]
+    },
   }
 }

@@ -25,18 +25,19 @@ const matrix = [
 
 describe('JPEGRLoader', () => {
   it.each(matrix)('reconstructs an HDR image from %p', async (file) => {
-    // we need to launch puppeteer with a
-    // custom written "testbed.html" page
-    // because our encoder works by
-    // rendering the SDR image with THREEjs
-    // which only works in webgl (not here in node where we test)
-    const { page, pageError, pageLog } = await getPage('jpegrloader')
-
+    const { page, pageError, pageLog } = await getPage('base')
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/jpegrloader.js'
+    })
     const result = await page.evaluate(`JPEGRLoader('${file}')`) as { width: number, height: number, data: Uint16Array, max: number }
 
     expect(pageError).not.toBeCalled()
     // expect no calls to page log except the one indicated
-    expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
+    expect(pageLog).not.toBeCalledWith(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      expect.not.stringMatching(/GPU stall due to ReadPixels/)
+    )
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data
     result.data = Uint16Array.from(result.data)

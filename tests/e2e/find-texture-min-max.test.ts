@@ -17,19 +17,22 @@ const matrix = [
 
 describe('find-texture-min-max', () => {
   it.each(matrix)('finds min and max in %p', async (file) => {
-    // we need to launch puppeteer with a
-    // custom written "testbed.html" page
-    // because our lib works by
-    // rendering the SDR image with THREEjs
-    // which only works in webgl (not here in node where we test)
-    const { page, pageError, pageLog } = await getPage('find-texture-min-max')
+    const { page, pageError, pageLog } = await getPage('base')
+
+    await page.addScriptTag({
+      type: 'module',
+      url: 'scripts/find-texture-min-max.js'
+    })
 
     // we receive Arrays because puppeteer can't transfer Uint8Array data
     const result = await page.evaluate(`findTextureMinMax('${file}')`) as { min: number, max: number }
 
     expect(pageError).not.toBeCalled()
     // expect no calls to page log except the one indicated
-    expect(pageLog).not.toBeCalledWith(expect.not.stringMatching(/GPU stall due to ReadPixels/))
+    expect(pageLog).not.toBeCalledWith(
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      expect.not.stringMatching(/GPU stall due to ReadPixels/)
+    )
 
     expect(result).toMatchSnapshot('min & max')
   }, 900000 /* 15 minutes */)

@@ -13,6 +13,7 @@ export const getPage = async (pageName: string) => {
   })
 
   const page = await globalThis.browser.newPage()
+
   page.on('console', (e: ConsoleMessage) => {
     pageLog(`PAGE MESSAGE: ${e.text()}\nSTACKTRACE:\n ${e.stackTrace().map(e => `at ${e.url}${e.lineNumber ? ':' + e.lineNumber : ''}:${e.columnNumber ? ':' + e.columnNumber : ''}`).join('\n')}`)
   })
@@ -35,7 +36,7 @@ export const getPage = async (pageName: string) => {
     await request.continue()
   })
 
-  const response = await page.goto(`file://${join(__dirname, `./pages/${pageName}.html`)}`, { timeout: 0 })
+  const response = await page.goto(`file://${join(__dirname, `./${pageName}.html`)}`, { timeout: 0 })
   expect(response).not.toBeNull()
   expect(response?.status()).toBe(200)
 
