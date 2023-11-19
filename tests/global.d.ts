@@ -12,6 +12,5 @@ declare module 'expect' {
 
     export interface AsymmetricMatchers extends JestExtendedMatchers {}
 
-    // eslint-disable-next-line unused-imports/no-unused-vars
-    export interface Matchers<R> extends JestExtendedMatchers {}
+    export interface Matchers extends JestExtendedMatchers {}
 }

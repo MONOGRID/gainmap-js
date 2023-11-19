@@ -6,11 +6,10 @@
     "noErrorTruncation": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowJs": true,
-    "checkJs": true,
+
+    "target": "ES2018",
+    "lib": ["ES2018", "DOM"],
     "noEmit": true
   }
 }

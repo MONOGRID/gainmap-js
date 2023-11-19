@@ -6,13 +6,12 @@
     "noErrorTruncation": true,
     "noImplicitAny": true,
     "noImplicitThis": true,
-    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "checkJs": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
-
-    "target": "ES2017",
-    "lib": ["ES2017", "DOM"],
-    "noEmit": true
+    "noEmit": true,
+    "skipLibCheck": true
   },
-  "exclude": ["dist", "libultrahdr-wasm", "tests", "examples"]
+  "exclude": ["dist", "src", "libultrahdr-wasm", "tests", "examples"]
 }
