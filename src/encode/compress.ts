@@ -16,7 +16,7 @@ const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, mimeTyp
   return new Promise<Blob>((resolve, reject) => {
     canvas.toBlob((res) => {
       if (res) resolve(res)
-      else reject('Failed to convert canvas to blob')
+      else reject(new Error('Failed to convert canvas to blob'))
     }, mimeType, quality || 0.9)
   })
 }

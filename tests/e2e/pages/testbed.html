@@ -20,22 +20,30 @@
     }
   </script>
   <script type="module">
-    import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js/encode';
-    import { encodeJPEGMetadata, decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr';
+    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    /* eslint-disable @typescript-eslint/no-unsafe-return */
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-argument */
+    import { encodeAndCompress, findTextureMinMax } from '@monogrid/gainmap-js/encode'
+    import { decodeJPEGMetadata, encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
     import { ACESFilmicToneMapping } from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
     import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
+    /**
+     * @param {File} file
+     */
     const getArrayBuffer = (file) => {
       return new Promise((resolve, reject) => {
-        var fr = new FileReader();
-        fr.onload = () => {
-          resolve(fr.result);
-        }
-        fr.readAsArrayBuffer(file);
+        const fr = new FileReader()
+        fr.onload = () => { resolve(fr.result) }
+        fr.readAsArrayBuffer(file)
       })
     }
-
+    /**
+     * @param {string} url
+     */
     window.encodeAndCompress = async (url, mimeType = 'image/jpeg', quality = 0.9, toneMapping = ACESFilmicToneMapping) => {
       let loader
       if (url.indexOf('.exr') !== -1) loader = new EXRLoader()
@@ -103,7 +111,7 @@
       let loader
       if (file.name.indexOf('.exr') !== -1) loader = new EXRLoader()
       if (file.name.indexOf('.hdr') !== -1) loader = new RGBELoader()
-      const image = await loader.parse(buf.buffer)
+      const image = loader.parse(buf.buffer)
       const textureMax = findTextureMinMax(image)
       const result = await encodeAndCompress({
         image,
@@ -122,7 +130,6 @@
 
       console.log(result)
     }
-
   </script>
   <div>
     HDR: <input type="file" id="hdr" />
