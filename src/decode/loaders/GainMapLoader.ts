@@ -78,7 +78,9 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
         await this.render(quadRenderer, gainMap, sdr, metadata)
 
         if (typeof onLoad === 'function') onLoad(quadRenderer)
-
+        this.manager.itemEnd(sdrUrl)
+        this.manager.itemEnd(gainMapUrl)
+        this.manager.itemEnd(metadataUrl)
         quadRenderer.dispose()
       }
     }
@@ -104,7 +106,11 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       }
     }
 
-    const sdrLoader = new FileLoader(this.manager)
+    this.manager.itemStart(sdrUrl)
+    this.manager.itemStart(gainMapUrl)
+    this.manager.itemStart(metadataUrl)
+
+    const sdrLoader = new FileLoader(this._internalLoadingManager)
     sdrLoader.setResponseType('arraybuffer')
     sdrLoader.setRequestHeader(this.requestHeader)
     sdrLoader.setPath(this.path)
@@ -118,9 +124,12 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       sdrLoaded = e.loaded
       sdrTotal = e.total
       progressHandler()
-    }, onError)
+    }, (error: unknown) => {
+      this.manager.itemError(sdrUrl)
+      if (typeof onError === 'function') onError(error)
+    })
 
-    const gainMapLoader = new FileLoader(this.manager)
+    const gainMapLoader = new FileLoader(this._internalLoadingManager)
     gainMapLoader.setResponseType('arraybuffer')
     gainMapLoader.setRequestHeader(this.requestHeader)
     gainMapLoader.setPath(this.path)
@@ -134,9 +143,12 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       gainMapLoaded = e.loaded
       gainMapTotal = e.total
       progressHandler()
-    }, onError)
+    }, (error: unknown) => {
+      this.manager.itemError(gainMapUrl)
+      if (typeof onError === 'function') onError(error)
+    })
 
-    const metadataLoader = new FileLoader(this.manager)
+    const metadataLoader = new FileLoader(this._internalLoadingManager)
     // metadataLoader.setResponseType('json')
     metadataLoader.setRequestHeader(this.requestHeader)
     metadataLoader.setPath(this.path)
@@ -152,7 +164,10 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
       metadataLoaded = e.loaded
       metadataTotal = e.total
       progressHandler()
-    }, onError)
+    }, (error: unknown) => {
+      this.manager.itemError(metadataUrl)
+      if (typeof onError === 'function') onError(error)
+    })
 
     return quadRenderer
   }

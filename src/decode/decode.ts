@@ -1,6 +1,6 @@
 import {
   HalfFloatType,
-  NoColorSpace,
+  LinearSRGBColorSpace,
   SRGBColorSpace
 } from 'three'
 
@@ -69,9 +69,9 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
   }
   sdr.needsUpdate = true
 
-  if (gainMap.colorSpace !== NoColorSpace) {
-    console.warn('Gainmap Colorspace needs to be *NoColorSpace*')
-    gainMap.colorSpace = NoColorSpace
+  if (gainMap.colorSpace !== LinearSRGBColorSpace) {
+    console.warn('Gainmap Colorspace needs to be *LinearSRGBColorSpace*')
+    gainMap.colorSpace = LinearSRGBColorSpace
   }
   gainMap.needsUpdate = true
 
@@ -82,7 +82,7 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
   })
   // TODO: three types are generic, eslint complains here, see how we can solve
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-  const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, NoColorSpace, material, renderer)
+  const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, LinearSRGBColorSpace, material, renderer)
   try {
     quadRenderer.render()
   } catch (e) {

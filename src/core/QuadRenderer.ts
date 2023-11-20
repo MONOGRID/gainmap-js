@@ -7,10 +7,10 @@ import {
   IntType,
   LinearFilter,
   LinearMipMapLinearFilter,
+  LinearSRGBColorSpace,
   Material,
   Mesh,
   MeshBasicMaterial,
-  NoColorSpace,
   OrthographicCamera,
   PlaneGeometry,
   RepeatWrapping,
@@ -87,7 +87,7 @@ const canReadPixels = (type: TextureDataType, renderer: WebGLRenderer, camera: O
 
   const testRT = new WebGLRenderTarget(1, 1, {
     type,
-    colorSpace: NoColorSpace,
+    colorSpace: LinearSRGBColorSpace,
     format: RGBAFormat,
     magFilter: LinearFilter,
     minFilter: LinearFilter,
@@ -249,7 +249,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
       LinearFilter,
       LinearMipMapLinearFilter,
       1,
-      NoColorSpace
+      LinearSRGBColorSpace
     )
   }
 

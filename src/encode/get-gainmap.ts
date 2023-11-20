@@ -1,5 +1,5 @@
 import {
-  NoColorSpace,
+  LinearSRGBColorSpace,
   UnsignedByteType
 } from 'three'
 
@@ -25,7 +25,7 @@ export const getGainMap = (params: { sdr: InstanceType<typeof QuadRenderer> } & 
     hdr: dataTexture
   })
 
-  const quadRenderer = new QuadRenderer(dataTexture.image.width, dataTexture.image.height, UnsignedByteType, NoColorSpace, material, renderer)
+  const quadRenderer = new QuadRenderer(dataTexture.image.width, dataTexture.image.height, UnsignedByteType, LinearSRGBColorSpace, material, renderer)
   try {
     quadRenderer.render()
   } catch (e) {

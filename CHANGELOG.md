@@ -1,3 +1,11 @@
+## [2.0.6](https://github.com/MONOGRID/gainmap-js/compare/v2.0.5...v2.0.6) (2023-11-20)
+
+
+### Bug Fixes
+
+* **decode:** changes usage of `NoColorSpace` to `LinearSRGBColorSpace` ([587dc03](https://github.com/MONOGRID/gainmap-js/commit/587dc0377876533b18b506516d8757e04e830c62))
+* **loaders:** fixes LoadingManager `onLoad` actually waiting for gainmaps to be generated ([77170f5](https://github.com/MONOGRID/gainmap-js/commit/77170f57c5ad277d3e97d1236ab93a29106c4a99))
+
 ## [2.0.5](https://github.com/MONOGRID/gainmap-js/compare/v2.0.4...v2.0.5) (2023-11-16)
 
 

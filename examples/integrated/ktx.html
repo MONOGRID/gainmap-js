@@ -146,7 +146,7 @@
 					new THREE.FileLoader().setResponseType( 'json' ).loadAsync( './textures/gainmap/qwantani_puresky_8k.json' )
 				] );
 
-				gainMap.colorSpace = THREE.NoColorSpace;
+				gainMap.colorSpace = THREE.LinearSRGBColorSpace;
 
 				const result = await decode( {
 					sdr,
