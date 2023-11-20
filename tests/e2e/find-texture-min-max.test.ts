@@ -35,5 +35,7 @@ describe('find-texture-min-max', () => {
     )
 
     expect(result).toMatchSnapshot('min & max')
+
+    await page.close()
   }, 900000 /* 15 minutes */)
 })

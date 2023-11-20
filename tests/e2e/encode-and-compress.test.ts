@@ -132,5 +132,7 @@ describe('encode-and-compress', () => {
       failureThreshold: 0.015, // 1.5% difference
       failureThresholdType: 'percent'
     })
+
+    await page.close()
   }, 900000 /* 15 minutes */)
 })

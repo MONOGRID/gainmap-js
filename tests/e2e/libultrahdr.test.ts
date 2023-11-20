@@ -28,6 +28,8 @@ describe('libultrahdr', () => {
       await mkdir(path.join(__dirname, './results/'))
     }
     await writeFile(path.join(__dirname, './results/result-embedded.jpg'), Buffer.from(jpeg))
+
+    await page.close()
   }, 100000)
 
   it('extracts metadata', async () => {
@@ -53,5 +55,7 @@ describe('libultrahdr', () => {
 
     // const meta = await decodeJPEGMetadata(file)
     // console.log(meta)
+
+    await page.close()
   }, 900000 /* 15 minutes */)
 })

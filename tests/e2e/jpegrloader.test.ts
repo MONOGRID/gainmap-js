@@ -45,5 +45,7 @@ describe('JPEGRLoader', () => {
     expect(result.data).toBeInstanceOf(Uint16Array)
     expect(result.data.length).toBeGreaterThan(4)
     expect(result.max).toMatchSnapshot('max HDR value')
+
+    await page.close()
   }, 900000 /* 15 minutes */)
 })
