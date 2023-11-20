@@ -1,4 +1,4 @@
-import { DataTexture, LinearFilter, NoColorSpace, RepeatWrapping, RGBAFormat, UVMapping } from 'three'
+import { DataTexture, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, RGBAFormat, UVMapping } from 'three'
 import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
@@ -32,7 +32,7 @@ export const getDataTexture = (image: EXR | RGBE | LogLuv | DataTexture) => {
       LinearFilter,
       LinearFilter,
       1,
-      'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : NoColorSpace
+      'colorSpace' in image && image.colorSpace === 'srgb' ? image.colorSpace : LinearSRGBColorSpace
     )
 
     // TODO: This tries to detect a raw RGBE and applies flipY

@@ -3,9 +3,9 @@ import {
   HalfFloatType,
   LinearFilter,
   LinearMipMapLinearFilter,
+  LinearSRGBColorSpace,
   Loader,
   LoadingManager,
-  NoColorSpace,
   RGBAFormat,
   SRGBColorSpace,
   Texture,
@@ -68,7 +68,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       16,
       16,
       HalfFloatType,
-      NoColorSpace,
+      LinearSRGBColorSpace,
       material,
       this.renderer
     )
@@ -121,7 +121,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       RGBAFormat,
       UnsignedByteType,
       1,
-      NoColorSpace
+      LinearSRGBColorSpace
     )
 
     gainMap.flipY = needsFlip
