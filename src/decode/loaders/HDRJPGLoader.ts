@@ -66,11 +66,12 @@ export class HDRJPGLoader extends LoaderBase<string> {
   public override load (url: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
-    const loader = new FileLoader(this.manager)
+    const loader = new FileLoader(this._internalLoadingManager)
     loader.setResponseType('arraybuffer')
     loader.setRequestHeader(this.requestHeader)
     loader.setPath(this.path)
     loader.setWithCredentials(this.withCredentials)
+    this.manager.itemStart(url)
     loader.load(url, async (jpeg) => {
       if (typeof jpeg === 'string') throw new Error('Invalid buffer')
 
@@ -79,9 +80,13 @@ export class HDRJPGLoader extends LoaderBase<string> {
       await this.render(quadRenderer, gainMapJPEG, sdrJPEG, metadata)
 
       if (typeof onLoad === 'function') onLoad(quadRenderer)
-
+      this.manager.itemEnd(url)
       quadRenderer.dispose()
-    }, onProgress, onError)
+    }, onProgress
+    , (error: unknown) => {
+      this.manager.itemError(url)
+      if (typeof onError === 'function') onError(error)
+    })
 
     return quadRenderer
   }
