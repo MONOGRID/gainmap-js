@@ -63,7 +63,8 @@ import { LoaderBase } from './LoaderBase'
  */
 export class HDRJPGLoader extends LoaderBase<string> {
   /**
-   * Loads a JPEG containing gain map metadata,
+   * Loads a JPEG containing gain map metadata
+   * Renders a normal SDR image if gainmap data is not found
    *
    * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
    * @param onLoad Load complete callback, will receive the result
