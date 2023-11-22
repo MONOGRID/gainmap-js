@@ -79,7 +79,7 @@ export class HDRJPGLoader extends LoaderBase<string> {
       if (typeof jpeg === 'string') throw new Error('Invalid buffer, received [string], was expecting [ArrayBuffer]')
       const jpegBuffer = new Uint8Array(jpeg)
       let sdrJPEG: Uint8Array
-      let gainMapJPEG: Uint8Array
+      let gainMapJPEG: Uint8Array | undefined
       let metadata: GainMapMetadata
       try {
         const extractionResult = await extractGainmapFromJPEG(jpegBuffer)
@@ -99,14 +99,12 @@ export class HDRJPGLoader extends LoaderBase<string> {
             offsetHdr: [0, 0, 0],
             offsetSdr: [0, 0, 0]
           }
-          // 1 pixel black
-          gainMapJPEG = new Uint8Array([0, 0, 0, 0])
           sdrJPEG = jpegBuffer
         } else {
           throw e
         }
       }
-      await this.render(quadRenderer, gainMapJPEG, sdrJPEG, metadata)
+      await this.render(quadRenderer, metadata, sdrJPEG, gainMapJPEG)
 
       if (typeof onLoad === 'function') onLoad(quadRenderer)
       this.manager.itemEnd(url)

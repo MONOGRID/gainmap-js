@@ -63,26 +63,26 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
   }
 
   /**
-   *
-   * @private
-   * @param quadRenderer
-   * @param gainMapBuffer
-   * @param sdrBuffer
-   * @param metadata
-   */
-  protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, gainMapBuffer: ArrayBuffer | string, sdrBuffer: ArrayBuffer | string, metadata: GainMapMetadata) {
-    const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
+ * @private
+ * @param quadRenderer
+ * @param metadata
+ * @param sdrBuffer
+ * @param gainMapBuffer
+ */
+  protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, metadata: GainMapMetadata, sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer) {
+    // this is optional, will render a black gain-map if not present
+    const gainMapBlob = gainMapBuffer ? new Blob([gainMapBuffer], { type: 'image/jpeg' }) : undefined
 
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
     let sdrImage: ImageBitmap | HTMLImageElement
-    let gainMapImage: ImageBitmap | HTMLImageElement
+    let gainMapImage: ImageBitmap | HTMLImageElement | undefined
 
     let needsFlip = false
 
     if (typeof createImageBitmap === 'undefined') {
       const res = await Promise.all([
-        getHTMLImageFromBlob(gainMapBlob),
+        gainMapBlob ? getHTMLImageFromBlob(gainMapBlob) : Promise.resolve(undefined),
         getHTMLImageFromBlob(sdrBlob)
       ])
 
@@ -92,7 +92,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       needsFlip = true
     } else {
       const res = await Promise.all([
-        createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
+        gainMapBlob ? createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }) : Promise.resolve(undefined),
         createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
       ])
 
@@ -100,7 +100,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       sdrImage = res[1]
     }
 
-    const gainMap = new Texture(gainMapImage,
+    const gainMap = new Texture(gainMapImage || new ImageData(2, 2),
       UVMapping,
       ClampToEdgeWrapping,
       ClampToEdgeWrapping,
