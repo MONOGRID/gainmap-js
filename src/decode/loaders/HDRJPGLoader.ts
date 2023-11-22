@@ -58,8 +58,6 @@ import { LoaderBase } from './LoaderBase'
  * // when you are done using it
  * result.dispose()
  *
-
- *
  */
 export class HDRJPGLoader extends LoaderBase<string> {
   /**
