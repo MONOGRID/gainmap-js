@@ -275,7 +275,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   /**
    * Will dispose of **all** assets used by this renderer.
    *
-   * @remarks It will not be possible to call {@link render} after this
    *
    * @param disposeRenderTarget will dispose of the renderTarget which will not be usable later
    * set this to true if you passed the `renderTarget.texture` to a `PMREMGenerator`
@@ -285,11 +284,9 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * ```js
    * const loader = new HDRJPGLoader(renderer)
    * const result = await loader.loadAsync('gainmap.jpeg')
-   * const mesh = new Mesh(
-   *   new PlaneGeometry(),
-   *   new MeshBasicMaterial({ map: result.renderTarget.texture })
-   * )
-   * // DO NOT dispose the renderTarget here
+   * const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: result.renderTarget.texture }) )
+   * // DO NOT dispose the renderTarget here,
+   * // it is used directly in the material
    * result.dispose()
    * ```
    *
@@ -299,11 +296,8 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * const pmremGenerator = new PMREMGenerator( renderer );
    * const result = await loader.loadAsync('gainmap.jpeg')
    * const envMap = pmremGenerator.fromEquirectangular(result.renderTarget.texture)
-   * const mesh = new Mesh(
-   *   new PlaneGeometry(),
-   *   new MeshBasicMaterial({ envMap })
-   * )
-   * // renderTarget CAN be disposed here
+   * const mesh = new Mesh(geometry, new MeshStandardMaterial({ envMap }) )
+   * // renderTarget can be disposed here
    * // because it was used to generate a PMREM texture
    * result.dispose(true)
    * ```
