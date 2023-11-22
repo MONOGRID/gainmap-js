@@ -143,6 +143,9 @@
 						hdrJpgEquirectangularMap.generateMipmaps = false;
 
 						hdrJpgEquirectangularMap.needsUpdate = true;
+						// this must be called manually
+						// when the gain map has been used
+						hdrJpg.dispose();
 
 					}, function ( progress ) {
 
@@ -168,6 +171,10 @@
 						gainMapBackground.generateMipmaps = false;
 
 						gainMapBackground.needsUpdate = true;
+
+						// this must be called manually
+						// when the gain map has been used
+						gainMap.dispose();
 
 					}, function ( progress ) {
 

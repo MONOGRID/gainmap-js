@@ -55,6 +55,9 @@ import { DecodeParameters } from './types'
  * scene.add(mesh)
  * renderer.render(scene, new PerspectiveCamera())
  *
+ * // result must be manually disposed
+ * // when you are done using it
+ * result.dispose()
  *
  * @param params
  * @returns
@@ -86,7 +89,7 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
   try {
     quadRenderer.render()
   } catch (e) {
-    quadRenderer.dispose()
+    quadRenderer.disposeOnDemandRenderer()
     throw e
   }
   return quadRenderer

@@ -18,7 +18,7 @@ import { LoaderBase } from './LoaderBase'
  * @group Loaders
  *
  * @example
- * import { JPEGRLoader } from '@monogrid/gainmap-js'
+ * import { HDRJPGLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
  *   LinearFilter,
@@ -32,9 +32,9 @@ import { LoaderBase } from './LoaderBase'
  *
  * const renderer = new WebGLRenderer()
  *
- * const loader = new JPEGRLoader(renderer)
+ * const loader = new HDRJPGLoader(renderer)
  *
- * const result = loader.load('gainmap.jpeg')
+ * const result = await loader.loadAsync('gainmap.jpeg')
  * // `result` can be used to populate a Texture
  *
  * const scene = new Scene()
@@ -53,12 +53,17 @@ import { LoaderBase } from './LoaderBase'
  * scene.background = result.toDataTexture()
  * scene.background.mapping = EquirectangularReflectionMapping
  * scene.background.minFilter = LinearFilter
+ *
+ * // result must be manually disposed
+ * // when you are done using it
+ * result.dispose()
+ *
 
  *
  */
 export class HDRJPGLoader extends LoaderBase<string> {
   /**
-   * Loads a JPEGR Image
+   * Loads a JPEG containing gain map metadata,
    *
    * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
    * @param onLoad Load complete callback, will receive the result
@@ -90,6 +95,7 @@ export class HDRJPGLoader extends LoaderBase<string> {
       } catch (e: unknown) {
         // render the SDR version if this is not a gainmap
         if (e instanceof XMPMetadataNotFoundError || e instanceof GainMapNotFoundError) {
+          console.warn(`Failure to reconstruct an HDR image from ${url}: Gain map metadata not found in the file, HDRJPGLoader will render the SDR jpeg`)
           metadata = {
             gainMapMin: [0, 0, 0],
             gainMapMax: [1, 1, 1],
@@ -108,7 +114,7 @@ export class HDRJPGLoader extends LoaderBase<string> {
 
       if (typeof onLoad === 'function') onLoad(quadRenderer)
       this.manager.itemEnd(url)
-      quadRenderer.dispose()
+      quadRenderer.disposeOnDemandRenderer()
     }, onProgress
     , (error: unknown) => {
       this.manager.itemError(url)

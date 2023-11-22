@@ -23,6 +23,9 @@ encodingResult.sdr.render()
 encodingResult.gainMap.material.gamma = [1.1, 1.1, 1.1]
 encodingResult.gainMap.render()
 
-// must be manually disposed
+// do something with encodingResult.gainMap.toArray()
+// and encodingResult.sdr.toArray()
+
+// renderers be manually disposed
 encodingResult.sdr.dispose()
 encodingResult.gainMap.dispose()

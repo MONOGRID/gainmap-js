@@ -16,7 +16,9 @@ import {
   RepeatWrapping,
   RGBAFormat,
   Scene,
+  ShaderMaterial,
   ShortType,
+  Texture,
   TextureDataType,
   UnsignedByteType,
   UnsignedIntType,
@@ -236,6 +238,12 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     return out as TextureDataTypeToBufferType<TType>
   }
 
+  /**
+   * Performs a readPixel operation in the renderTarget
+   * and returns a DataTexture containing the read data
+   *
+   * @returns
+   */
   public toDataTexture () {
     return new DataTexture(
       this.toArray(),
@@ -256,12 +264,35 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   /**
    * If using a disposable renderer, it will dispose it.
    */
-  public dispose () {
+  public disposeOnDemandRenderer () {
     this._renderer.setRenderTarget(null)
     if (this._rendererIsDisposable) {
       this._renderer.dispose()
       this._renderer.forceContextLoss()
     }
+  }
+
+  /**
+   * Will dispose of **all** assets used by this renderer.
+   *
+   * @remarks It will not be possible to call {@link render} after this
+   */
+  public dispose () {
+    this.disposeOnDemandRenderer()
+    this.renderTarget.dispose()
+    // dispose shader material texture uniforms
+    if (this.material instanceof ShaderMaterial) {
+      Object.values(this.material.uniforms).forEach(v => {
+        if (v.value instanceof Texture) v.value.dispose()
+      })
+    }
+    // dispose other material properties
+    Object.values(this.material).forEach(value => {
+      if (value instanceof Texture) value.dispose()
+    })
+
+    this.material.dispose()
+    this._quad.geometry.dispose()
   }
 
   /**
