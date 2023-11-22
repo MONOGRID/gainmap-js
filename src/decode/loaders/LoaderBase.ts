@@ -17,21 +17,7 @@ import {
 import { QuadRenderer } from '../../core/QuadRenderer'
 import { type GainMapMetadata } from '../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-
-/**
- * private function, async get image from blob
- *
- * @param blob
- * @returns
- */
-const getImage = (blob: Blob) => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = document.createElement('img')
-    img.onload = () => { resolve(img) }
-    img.onerror = (e) => { reject(e) }
-    img.src = URL.createObjectURL(blob)
-  })
-}
+import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private _renderer: WebGLRenderer
@@ -96,8 +82,8 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
 
     if (typeof createImageBitmap === 'undefined') {
       const res = await Promise.all([
-        getImage(gainMapBlob),
-        getImage(sdrBlob)
+        getHTMLImageFromBlob(gainMapBlob),
+        getHTMLImageFromBlob(sdrBlob)
       ])
 
       gainMapImage = res[0]
