@@ -4,7 +4,10 @@ import {
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
+import { GainMapNotFoundError } from '../errors/GainMapNotFoundError'
+import { XMPMetadataNotFoundError } from '../errors/XMPMetadataNotFoundError'
 import { extractGainmapFromJPEG } from '../extract'
+import { GainMapMetadata } from '../index'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBase } from './LoaderBase'
 
@@ -54,15 +57,15 @@ import { LoaderBase } from './LoaderBase'
  *
  */
 export class HDRJPGLoader extends LoaderBase<string> {
-/**
- * Loads a JPEGR Image
- *
- * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
- * @param onLoad Load complete callback, will receive the result
- * @param onProgress Progress callback, will receive a {@link ProgressEvent}
- * @param onError Error callback
- * @returns
- */
+  /**
+   * Loads a JPEGR Image
+   *
+   * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+   * @param onLoad Load complete callback, will receive the result
+   * @param onProgress Progress callback, will receive a {@link ProgressEvent}
+   * @param onError Error callback
+   * @returns
+   */
   public override load (url: string, onLoad?: (data: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>) => void, onProgress?: (event: ProgressEvent) => void, onError?: (err: unknown) => void): QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial> {
     const quadRenderer = this.prepareQuadRenderer()
 
@@ -73,11 +76,35 @@ export class HDRJPGLoader extends LoaderBase<string> {
     loader.setWithCredentials(this.withCredentials)
     this.manager.itemStart(url)
     loader.load(url, async (jpeg) => {
-      if (typeof jpeg === 'string') throw new Error('Invalid buffer')
-
-      const { gainMap: gainMapJPEG, sdr: sdrJPEG, metadata } = await extractGainmapFromJPEG(new Uint8Array(jpeg))
-
-      await this.render(quadRenderer, gainMapJPEG, sdrJPEG, metadata)
+      if (typeof jpeg === 'string') throw new Error('Invalid buffer, received [string], was expecting [ArrayBuffer]')
+      const jpegBuffer = new Uint8Array(jpeg)
+      let sdrJPEG: Uint8Array
+      let gainMapJPEG: Uint8Array | undefined
+      let metadata: GainMapMetadata
+      try {
+        const extractionResult = await extractGainmapFromJPEG(jpegBuffer)
+        // gain map is successfully reconstructed
+        sdrJPEG = extractionResult.sdr
+        gainMapJPEG = extractionResult.gainMap
+        metadata = extractionResult.metadata
+      } catch (e: unknown) {
+        // render the SDR version if this is not a gainmap
+        if (e instanceof XMPMetadataNotFoundError || e instanceof GainMapNotFoundError) {
+          metadata = {
+            gainMapMin: [0, 0, 0],
+            gainMapMax: [1, 1, 1],
+            gamma: [1, 1, 1],
+            hdrCapacityMin: 0,
+            hdrCapacityMax: 1,
+            offsetHdr: [0, 0, 0],
+            offsetSdr: [0, 0, 0]
+          }
+          sdrJPEG = jpegBuffer
+        } else {
+          throw e
+        }
+      }
+      await this.render(quadRenderer, metadata, sdrJPEG, gainMapJPEG)
 
       if (typeof onLoad === 'function') onLoad(quadRenderer)
       this.manager.itemEnd(url)

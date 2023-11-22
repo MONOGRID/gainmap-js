@@ -17,21 +17,7 @@ import {
 import { QuadRenderer } from '../../core/QuadRenderer'
 import { type GainMapMetadata } from '../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-
-/**
- * private function, async get image from blob
- *
- * @param blob
- * @returns
- */
-const getImage = (blob: Blob) => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = document.createElement('img')
-    img.onload = () => { resolve(img) }
-    img.onerror = (e) => { reject(e) }
-    img.src = URL.createObjectURL(blob)
-  })
-}
+import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private _renderer: WebGLRenderer
@@ -77,27 +63,27 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
   }
 
   /**
-   *
-   * @private
-   * @param quadRenderer
-   * @param gainMapBuffer
-   * @param sdrBuffer
-   * @param metadata
-   */
-  protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, gainMapBuffer: ArrayBuffer | string, sdrBuffer: ArrayBuffer | string, metadata: GainMapMetadata) {
-    const gainMapBlob = new Blob([gainMapBuffer], { type: 'image/jpeg' })
+ * @private
+ * @param quadRenderer
+ * @param metadata
+ * @param sdrBuffer
+ * @param gainMapBuffer
+ */
+  protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, metadata: GainMapMetadata, sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer) {
+    // this is optional, will render a black gain-map if not present
+    const gainMapBlob = gainMapBuffer ? new Blob([gainMapBuffer], { type: 'image/jpeg' }) : undefined
 
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
     let sdrImage: ImageBitmap | HTMLImageElement
-    let gainMapImage: ImageBitmap | HTMLImageElement
+    let gainMapImage: ImageBitmap | HTMLImageElement | undefined
 
     let needsFlip = false
 
     if (typeof createImageBitmap === 'undefined') {
       const res = await Promise.all([
-        getImage(gainMapBlob),
-        getImage(sdrBlob)
+        gainMapBlob ? getHTMLImageFromBlob(gainMapBlob) : Promise.resolve(undefined),
+        getHTMLImageFromBlob(sdrBlob)
       ])
 
       gainMapImage = res[0]
@@ -106,7 +92,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       needsFlip = true
     } else {
       const res = await Promise.all([
-        createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }),
+        gainMapBlob ? createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }) : Promise.resolve(undefined),
         createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
       ])
 
@@ -114,7 +100,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       sdrImage = res[1]
     }
 
-    const gainMap = new Texture(gainMapImage,
+    const gainMap = new Texture(gainMapImage || new ImageData(2, 2),
       UVMapping,
       ClampToEdgeWrapping,
       ClampToEdgeWrapping,
