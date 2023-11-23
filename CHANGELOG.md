@@ -1,3 +1,11 @@
+## [2.0.7](https://github.com/MONOGRID/gainmap-js/compare/v2.0.6...v2.0.7) (2023-11-23)
+
+
+### Bug Fixes
+
+* **core:** QuadRenderer dispose method now properly disposes of its internal resources ([#13](https://github.com/MONOGRID/gainmap-js/issues/13)) ([8e4473d](https://github.com/MONOGRID/gainmap-js/commit/8e4473da77732080de24f98dd271fecda06f9e53))
+* **HDRJPGLoader:** renders (and returns) an SDR image when provided with a normal jpeg file ([#12](https://github.com/MONOGRID/gainmap-js/issues/12)) ([5222151](https://github.com/MONOGRID/gainmap-js/commit/5222151e6b5c95df79f1c4085cf36f30bd9c2dc4))
+
 ## [2.0.6](https://github.com/MONOGRID/gainmap-js/compare/v2.0.5...v2.0.6) (2023-11-20)
 
 
