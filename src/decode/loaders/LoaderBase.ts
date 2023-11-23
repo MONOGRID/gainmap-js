@@ -21,6 +21,9 @@ import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private _renderer: WebGLRenderer
+  /**
+   * @private
+   */
   protected _internalLoadingManager: LoadingManager
   /**
    *

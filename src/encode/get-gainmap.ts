@@ -25,11 +25,18 @@ export const getGainMap = (params: { sdr: InstanceType<typeof QuadRenderer> } & 
     hdr: dataTexture
   })
 
-  const quadRenderer = new QuadRenderer(dataTexture.image.width, dataTexture.image.height, UnsignedByteType, LinearSRGBColorSpace, material, renderer)
+  const quadRenderer = new QuadRenderer(
+    dataTexture.image.width,
+    dataTexture.image.height,
+    UnsignedByteType,
+    LinearSRGBColorSpace,
+    material,
+    renderer
+  )
   try {
     quadRenderer.render()
   } catch (e) {
-    quadRenderer.dispose()
+    quadRenderer.disposeOnDemandRenderer()
     throw e
   }
   return quadRenderer

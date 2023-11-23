@@ -30,7 +30,7 @@ import { LoaderBase } from './LoaderBase'
  *
  * const loader = new GainMapLoader(renderer)
  *
- * const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+ * const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
  * // `result` can be used to populate a Texture
  *
  * const scene = new Scene()
@@ -49,6 +49,10 @@ import { LoaderBase } from './LoaderBase'
  * scene.background = result.toDataTexture()
  * scene.background.mapping = EquirectangularReflectionMapping
  * scene.background.minFilter = LinearFilter
+ *
+ * // result must be manually disposed
+ * // when you are done using it
+ * result.dispose()
  *
  */
 export class GainMapLoader extends LoaderBase<[string, string, string]> {
@@ -81,7 +85,7 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
         this.manager.itemEnd(sdrUrl)
         this.manager.itemEnd(gainMapUrl)
         this.manager.itemEnd(metadataUrl)
-        quadRenderer.dispose()
+        quadRenderer.disposeOnDemandRenderer()
       }
     }
 

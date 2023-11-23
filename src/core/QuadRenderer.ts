@@ -16,7 +16,9 @@ import {
   RepeatWrapping,
   RGBAFormat,
   Scene,
+  ShaderMaterial,
   ShortType,
+  Texture,
   TextureDataType,
   UnsignedByteType,
   UnsignedIntType,
@@ -236,6 +238,12 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     return out as TextureDataTypeToBufferType<TType>
   }
 
+  /**
+   * Performs a readPixel operation in the renderTarget
+   * and returns a DataTexture containing the read data
+   *
+   * @returns
+   */
   public toDataTexture () {
     return new DataTexture(
       this.toArray(),
@@ -256,12 +264,64 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   /**
    * If using a disposable renderer, it will dispose it.
    */
-  public dispose () {
+  public disposeOnDemandRenderer () {
     this._renderer.setRenderTarget(null)
     if (this._rendererIsDisposable) {
       this._renderer.dispose()
       this._renderer.forceContextLoss()
     }
+  }
+
+  /**
+   * Will dispose of **all** assets used by this renderer.
+   *
+   *
+   * @param disposeRenderTarget will dispose of the renderTarget which will not be usable later
+   * set this to true if you passed the `renderTarget.texture` to a `PMREMGenerator`
+   * or are otherwise done with it.
+   *
+   * @example
+   * ```js
+   * const loader = new HDRJPGLoader(renderer)
+   * const result = await loader.loadAsync('gainmap.jpeg')
+   * const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: result.renderTarget.texture }) )
+   * // DO NOT dispose the renderTarget here,
+   * // it is used directly in the material
+   * result.dispose()
+   * ```
+   *
+   * @example
+   * ```js
+   * const loader = new HDRJPGLoader(renderer)
+   * const pmremGenerator = new PMREMGenerator( renderer );
+   * const result = await loader.loadAsync('gainmap.jpeg')
+   * const envMap = pmremGenerator.fromEquirectangular(result.renderTarget.texture)
+   * const mesh = new Mesh(geometry, new MeshStandardMaterial({ envMap }) )
+   * // renderTarget can be disposed here
+   * // because it was used to generate a PMREM texture
+   * result.dispose(true)
+   * ```
+   */
+  public dispose (disposeRenderTarget?: boolean) {
+    this.disposeOnDemandRenderer()
+
+    if (disposeRenderTarget) {
+      this.renderTarget.dispose()
+    }
+
+    // dispose shader material texture uniforms
+    if (this.material instanceof ShaderMaterial) {
+      Object.values(this.material.uniforms).forEach(v => {
+        if (v.value instanceof Texture) v.value.dispose()
+      })
+    }
+    // dispose other material properties
+    Object.values(this.material).forEach(value => {
+      if (value instanceof Texture) value.dispose()
+    })
+
+    this.material.dispose()
+    this._quad.geometry.dispose()
   }
 
   /**
