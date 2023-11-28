@@ -15,12 +15,13 @@ import {
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
-import { type GainMapMetadata } from '../../core/types'
+import { type GainMapMetadata, QuadRendererTextureOptions } from '../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
   private _renderer: WebGLRenderer
+  private _renderTargetOptions?: QuadRendererTextureOptions
   /**
    * @private
    */
@@ -34,6 +35,17 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
     super(manager)
     this._renderer = renderer
     this._internalLoadingManager = new LoadingManager()
+  }
+
+  /**
+   * Specify the renderTarget options to use when rendering the gain map
+   *
+   * @param options
+   * @returns
+   */
+  public setRenderTargetOptions (options: QuadRendererTextureOptions) {
+    this._renderTargetOptions = options
+    return this
   }
 
   /**
@@ -55,14 +67,15 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       sdr: new Texture()
     })
 
-    return new QuadRenderer(
-      16,
-      16,
-      HalfFloatType,
-      LinearSRGBColorSpace,
+    return new QuadRenderer({
+      width: 16,
+      height: 16,
+      type: HalfFloatType,
+      colorSpace: LinearSRGBColorSpace,
       material,
-      this._renderer
-    )
+      renderer: this._renderer,
+      renderTargetOptions: this._renderTargetOptions
+    })
   }
 
   /**
