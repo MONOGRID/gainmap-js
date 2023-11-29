@@ -62,7 +62,7 @@ export const encode = (params: EncodingParametersBase) => {
 
   const dataTexture = getDataTexture(image)
 
-  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping)
+  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping, params.renderTargetOptions)
 
   const gainMapRenderer = getGainMap({
     ...params,
