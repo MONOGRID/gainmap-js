@@ -79,7 +79,17 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
 
     const loadCheck = async () => {
       if (sdr && gainMap && metadata) {
-        await this.render(quadRenderer, metadata, sdr, gainMap)
+        // solves #16
+        try {
+          await this.render(quadRenderer, metadata, sdr, gainMap)
+        } catch (error) {
+          this.manager.itemError(sdrUrl)
+          this.manager.itemError(gainMapUrl)
+          this.manager.itemError(metadataUrl)
+          if (typeof onError === 'function') onError(error)
+          quadRenderer.disposeOnDemandRenderer()
+          return
+        }
 
         if (typeof onLoad === 'function') onLoad(quadRenderer)
         this.manager.itemEnd(sdrUrl)

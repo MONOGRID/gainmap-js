@@ -109,7 +109,16 @@ export class HDRJPGLoader extends LoaderBase<string> {
           throw e
         }
       }
-      await this.render(quadRenderer, metadata, sdrJPEG, gainMapJPEG)
+
+      // solves #16
+      try {
+        await this.render(quadRenderer, metadata, sdrJPEG, gainMapJPEG)
+      } catch (error) {
+        this.manager.itemError(url)
+        if (typeof onError === 'function') onError(error)
+        quadRenderer.disposeOnDemandRenderer()
+        return
+      }
 
       if (typeof onLoad === 'function') onLoad(quadRenderer)
       this.manager.itemEnd(url)
