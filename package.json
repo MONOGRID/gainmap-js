@@ -77,8 +77,10 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
+    "start": "rollup -c -w",
     "test": "jest",
     "pretest": "npm run build",
+    "prepack": "npm run build",
     "check": "concurrently -c auto npm:check:*",
     "check:typecheck-src": "tsc -p src",
     "check:eslint-src": "eslint \"src/**/*.ts\"",
