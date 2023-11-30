@@ -91,7 +91,6 @@
     "check:eslint-examples": "eslint \"examples/**/*.{ts,html}\"",
     "check:typecheck-tests": "tsc -p tests",
     "check:eslint-tests": "eslint \"tests/**/*.ts\"",
-    "ci:test:startserver": "rollup -c && sudo npx servez",
     "ci:check": "concurrently npm:ci:check:*",
     "ci:check:typecheck-src": "tsc --pretty false > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",

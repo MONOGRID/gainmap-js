@@ -96,7 +96,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: process.env.CI ? 'npm run ci:test:startserver' : 'npm run test:startserver',
+    command: 'npm run test:startserver',
     url: 'http://127.0.0.1:8080',
     reuseExistingServer: !process.env.CI,
     env: {

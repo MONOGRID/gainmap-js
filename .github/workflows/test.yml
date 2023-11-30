@@ -149,12 +149,12 @@ jobs:
         run: npm ci
 
       - name: 'Install playwright Browsers'
-        run: sudo npx playwright install --with-deps
+        run: npx playwright install --with-deps
 
       - name: 'Run Playwright Tests'
         run: npm test
-        env:
-          HOME: /root
+        # env:
+        #   HOME: /root
 
       - name: 'Generate NYC Report'
         if: always()
