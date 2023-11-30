@@ -149,7 +149,7 @@ jobs:
         run: npm ci
 
       - name: 'Install playwright Browsers'
-        run: npx playwright install --with-deps
+        run: sudo npx playwright install --with-deps
 
       - name: 'Run Playwright Tests'
         run: npm test
