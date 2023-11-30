@@ -3,7 +3,7 @@ name: 'Publish wiki'
 on:
   workflow_run:
     branches: [main]
-    workflows: ["Build And Test"]
+    workflows: ["Test"]
     types:
       - completed
 

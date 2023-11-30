@@ -13,5 +13,5 @@
     "noEmit": true,
     "skipLibCheck": true
   },
-  "exclude": ["dist", "src", "libultrahdr-wasm", "tests", "examples"]
+  "exclude": ["dist", "src", "libultrahdr-wasm", "tests", "examples", "coverage", "playwright-report", ".nyc_output"]
 }

@@ -1,6 +1,6 @@
 import { GainMapNotFoundError } from './errors/GainMapNotFoundError'
 import { XMPMetadataNotFoundError } from './errors/XMPMetadataNotFoundError'
-import { extractXMP } from './utils/extract-metadata-from-jpeg'
+import { extractXMP } from './utils/extractXMP'
 import { MPFExtractor } from './utils/MPFExtractor'
 /**
  * Extracts XMP Metadata and the gain map recovery image

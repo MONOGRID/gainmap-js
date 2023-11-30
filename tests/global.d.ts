@@ -1,16 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-var */
 
-import * as matchers from 'jest-extended'
-import { Browser } from 'puppeteer'
-
-declare global {
-  var browser: Browser
-}
-
-declare module 'expect' {
-    type JestExtendedMatchers = typeof matchers;
-
-    export interface AsymmetricMatchers extends JestExtendedMatchers {}
-
-    export interface Matchers extends JestExtendedMatchers {}
+export declare global {
+  interface Window {
+    collectIstanbulCoverage: (coverageJSON: string) => void
+    __coverage__: Record<string, unknown>
+  }
 }

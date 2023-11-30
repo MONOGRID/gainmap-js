@@ -5,12 +5,10 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: true,
-    tsconfigRootDir: __dirname,
-    extraFileExtensions: ['.html']
+    tsconfigRootDir: __dirname
   },
   env: {
     node: true,
-    jest: true
   },
 
   // Rules order is important, please avoid shuffling them
@@ -25,27 +23,25 @@ module.exports = {
   plugins: [
     // required to apply rules which need type information
     '@typescript-eslint',
-    'jest-extended',
-    'html',
     'simple-import-sort', // https://github.com/lydell/eslint-plugin-simple-import-sort/
     'unused-imports' // https://github.com/sweepline/eslint-plugin-unused-imports
   ],
 
   // add your custom rules here
   rules: {
-    "@typescript-eslint/no-misused-promises": [
-      "error",
+    '@typescript-eslint/no-misused-promises': [
+      'error',
       {
-        "checksVoidReturn": false
+        checksVoidReturn: false
       }
     ],
-    "@typescript-eslint/no-duplicate-type-constituents": "off",
+    '@typescript-eslint/no-duplicate-type-constituents': 'off',
     // https://github.com/lydell/eslint-plugin-simple-import-sort/#usage
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     // https://github.com/sweepline/eslint-plugin-unused-imports
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'error',
-    'unused-imports/no-unused-vars': ['error', { vars: 'all', args: 'none' }],
+    'unused-imports/no-unused-vars': ['error', { vars: 'all', args: 'none' }]
   }
 }
