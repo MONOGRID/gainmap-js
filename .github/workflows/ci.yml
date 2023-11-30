@@ -255,6 +255,10 @@ jobs:
             comment_template_file: "tests/coverage-comment-template.md"
             comment_mode: "replace"
 
+        - uses: daun/playwright-report-summary@v2
+          with:
+            report-file: playwright-report.json
+
         - name: 'Upload Test artifacts'
           if: always()
           uses: actions/upload-artifact@v3
