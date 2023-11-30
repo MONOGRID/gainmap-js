@@ -90,15 +90,15 @@
     "check:typecheck-examples": "tsc -p examples",
     "check:eslint-examples": "eslint \"examples/**/*.{ts,html}\"",
     "check:typecheck-tests": "tsc -p tests",
-    "check:eslint-tests": "eslint \"tests/**/*.{ts,html}\"",
-    "ci:test": "JEST_JUNIT_OUTPUT_DIR=reports jest --ci --reporters=default --reporters=jest-junit",
+    "check:eslint-tests": "eslint \"tests/**/*.ts\"",
+    "ci:test": "playwright test",
     "ci:check": "concurrently npm:ci:check:*",
     "ci:check:typecheck-src": "tsc --pretty false > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
     "ci:check:typecheck-examples": "tsc --pretty false -p examples > reports/typecheck-examples.log",
     "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.{ts,html}\"",
     "ci:check:typecheck-tests": "tsc --pretty false -p tests > reports/typecheck-tests.log",
-    "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.{ts,html}\""
+    "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
   },
   "peerDependencies": {
     "three": ">= 0.157.0 < 0.159.0"

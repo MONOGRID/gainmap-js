@@ -8,6 +8,9 @@ on:
     types:
       - completed
 
+permissions:
+  actions: read
+
 jobs:
   Check:
     name: 'Check'
