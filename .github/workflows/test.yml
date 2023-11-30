@@ -172,3 +172,15 @@ jobs:
             coverage/
             playwright-report/
             tests/__snapshots__/
+
+      - name: 'Upload Build artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifact
+          if-no-files-found: error
+          path: |
+            libultrahdr-wasm/build/*.ts
+            libultrahdr-wasm/build/*.js
+            libultrahdr-wasm/build/*.map
+            libultrahdr-wasm/build/*.wasm
+            dist/
