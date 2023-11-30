@@ -23,3 +23,7 @@ reports/*.json
 reports/*.xml
 reports/*.txt
 reports/*.log
+test-results
+playwright-report
+.nyc_output
+coverage

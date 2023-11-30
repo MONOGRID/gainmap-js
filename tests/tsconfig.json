@@ -9,8 +9,14 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "allowJs": true,
-    "checkJs": true,
-    "noEmit": true
+    "noEmit": true,
+    "lib": ["DOM", "ES2019"],
+    "paths": {
+      "three": [ "../node_modules/three/build/three.module" ],
+      "three/examples/": [ "../node_modules/three/examples/" ],
+      "@monogrid/gainmap-js": [ "../dist/decode" ],
+      "@monogrid/gainmap-js/encode": [ "../dist/encode" ]
+    },
+    "types": ["@playwright/test", "@types/node"]
   }
 }
