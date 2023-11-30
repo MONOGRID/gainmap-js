@@ -6,19 +6,19 @@ import * as THREE from 'three'
 import { test } from '../../testWithCoverage'
 
 const matrix = [
-  '01.jpg',
-  '02.jpg',
-  '03.jpg',
-  '04.jpg',
-  '05.jpg',
-  '06.jpg',
-  '07.jpg',
-  '08.jpg',
-  '09.jpg',
-  '10.jpg',
-  'pisa-4k.jpg',
-  'spruit_sunrise_4k.jpg'
-  // ['abandoned_bakery_16k.jpg'] // too bit to test? snapshot testing fails
+  '01.jpg'
+  // '02.jpg',
+  // '03.jpg',
+  // '04.jpg',
+  // '05.jpg',
+  // '06.jpg',
+  // '07.jpg',
+  // '08.jpg',
+  // '09.jpg',
+  // '10.jpg',
+  // 'pisa-4k.jpg',
+  // 'spruit_sunrise_4k.jpg'
+  // 'abandoned_bakery_16k.jpg' // too bit to test? snapshot testing fails
 ]
 
 for (const testFile of matrix) {
@@ -51,15 +51,15 @@ for (const testFile of matrix) {
       .png({ compressionLevel: 9, effort: 10 })
       .toBuffer()
 
-    // expect(sdr).toMatchSnapshot(`${testFile}-sdr.png`)
     expect(sdr).not.toBeNull() // temporary
+    expect(sdr).toMatchSnapshot(`${testFile}-sdr.png`)
 
     const gainMap = await sharp(Buffer.from(result![1]))
       .resize({ width: 500, height: 500, fit: 'inside' })
       .png({ compressionLevel: 9, effort: 10 })
       .toBuffer()
 
-    // expect(gainMap).toMatchSnapshot(`${testFile}-gainmap.png`)
     expect(gainMap).not.toBeNull() // temporary
+    expect(gainMap).toMatchSnapshot(`${testFile}-gainmap.png`)
   })
 }

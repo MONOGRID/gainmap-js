@@ -28,6 +28,8 @@
     import * as worker from '@monogrid/gainmap-js/worker'
     import * as workerInterface from '@monogrid/gainmap-js/worker-interface'
     import * as THREE from 'three'
+    import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+    import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 
     window.decode = decode
     window.encode = encode
@@ -35,6 +37,8 @@
     window.worker = worker
     window.workerInterface = workerInterface
     window.THREE = THREE
+    window.EXRLoader = EXRLoader
+    window.RGBELoader = RGBELoader
   </script>
 </body
 
