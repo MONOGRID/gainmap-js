@@ -8,10 +8,6 @@ on:
     types:
       - completed
 
-permissions:
-  actions: read
-  checks: write
-
 concurrency:
   group: test
   cancel-in-progress: true
