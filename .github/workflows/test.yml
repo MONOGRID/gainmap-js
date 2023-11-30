@@ -10,6 +10,7 @@ on:
 
 permissions:
   actions: read
+  checks: write
 
 concurrency:
   group: test
@@ -125,6 +126,12 @@ jobs:
     container:
       image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
+      - name: 'Initialize Git LFS'
+        run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
+
+      - name: 'Install Git LFS'
+        run: apt-get install -y git-lfs
+
       - name: 'Checkout'
         uses: nschloe/action-cached-lfs-checkout@v1
         with:
