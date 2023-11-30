@@ -91,6 +91,7 @@ jobs:
               libultrahdr-wasm/build/*.map
               libultrahdr-wasm/build/*.wasm
               dist/
+
     ################################
     ##
     ## CHECKS
@@ -107,7 +108,7 @@ jobs:
             submodules: recursive
 
         - name: 'Download build artifacts'
-          uses: dawidd6/action-download-artifact@v2
+          uses: actions/download-artifact@v3
           with:
             name: build-artifact
 
@@ -198,7 +199,7 @@ jobs:
             path: |
               reports/
 
-              ################################
+    ################################
     ##
     ## TEST
     ##
@@ -222,7 +223,7 @@ jobs:
             submodules: recursive
 
         - name: 'Download build artifacts'
-          uses: dawidd6/action-download-artifact@v2
+          uses: actions/download-artifact@v3
           with:
             name: build-artifact
 
