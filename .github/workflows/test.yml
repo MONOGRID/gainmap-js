@@ -180,6 +180,9 @@ jobs:
             playwright-report/
             tests/__snapshots__/
 
+      - name: 'Rebuild with no Coverage'
+        run: npm run build
+
       - name: 'Upload Build artifacts'
         uses: actions/upload-artifact@v3
         with:
