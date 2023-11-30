@@ -35,6 +35,11 @@ export const test = baseTest.extend({
           style.innerHTML = `
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
+            body, html {
+              margin: 0;
+              padding: 0;
+            }
+
             .VPNav {
               display: none !important;
             }

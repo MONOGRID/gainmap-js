@@ -13,9 +13,9 @@
     "lib": ["DOM", "ES2019"],
     "paths": {
       "three": [ "../node_modules/three/build/three.module" ],
-      "three/examples/": [ "../node_modules/three/examples/" ],
       "@monogrid/gainmap-js": [ "../dist/decode" ],
-      "@monogrid/gainmap-js/encode": [ "../dist/encode" ]
+      "@monogrid/gainmap-js/encode": [ "../dist/encode" ],
+      "@monogrid/gainmap-js/libultrahdr": [ "../dist/libultrahdr" ]
     },
     "types": ["@playwright/test", "@types/node"]
   }
