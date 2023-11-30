@@ -55,6 +55,9 @@ import { DecodeParameters } from './types'
  * scene.add(mesh)
  * renderer.render(scene, new PerspectiveCamera())
  *
+ * // result must be manually disposed
+ * // when you are done using it
+ * result.dispose()
  *
  * @param params
  * @returns
@@ -80,13 +83,23 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
     sdr,
     gainMap
   })
-  // TODO: three types are generic, eslint complains here, see how we can solve
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-  const quadRenderer = new QuadRenderer(sdr.image.width, sdr.image.height, HalfFloatType, LinearSRGBColorSpace, material, renderer)
+  const quadRenderer = new QuadRenderer({
+    // TODO: three types are generic, eslint complains here, see how we can solve
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    width: sdr.image.width,
+    // TODO: three types are generic, eslint complains here, see how we can solve
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    height: sdr.image.height,
+    type: HalfFloatType,
+    colorSpace: LinearSRGBColorSpace,
+    material,
+    renderer,
+    renderTargetOptions: params.renderTargetOptions
+  })
   try {
     quadRenderer.render()
   } catch (e) {
-    quadRenderer.dispose()
+    quadRenderer.disposeOnDemandRenderer()
     throw e
   }
   return quadRenderer

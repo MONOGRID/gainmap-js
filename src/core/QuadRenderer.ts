@@ -1,22 +1,24 @@
 import {
   ByteType,
+  ClampToEdgeWrapping,
   ColorSpace,
   DataTexture,
   FloatType,
   HalfFloatType,
   IntType,
   LinearFilter,
-  LinearMipMapLinearFilter,
   LinearSRGBColorSpace,
   Material,
   Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
   PlaneGeometry,
-  RepeatWrapping,
+  RenderTargetOptions,
   RGBAFormat,
   Scene,
+  ShaderMaterial,
   ShortType,
+  Texture,
   TextureDataType,
   UnsignedByteType,
   UnsignedIntType,
@@ -24,6 +26,8 @@ import {
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
+
+import { QuadRendererTextureOptions } from './types'
 /**
  * Utility Type that translates `three` texture types to their TypedArray counterparts.
  *
@@ -39,6 +43,37 @@ export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   TType extends typeof IntType ? Int32Array :
   TType extends typeof FloatType ? Float32Array :
   never
+
+export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends Material> = {
+  /**
+   * Width of the render target
+   */
+  width: number
+  /**
+   * height of the renderTarget
+   */
+  height: number
+  /**
+   * TextureDataType of the renderTarget
+   */
+  type: TType
+  /**
+   * ColorSpace of the renderTarget
+   */
+  colorSpace: ColorSpace
+  /**
+   * material to use for rendering
+   */
+  material: TMaterial
+  /**
+   * Renderer instance to use
+   */
+  renderer?: WebGLRenderer
+  /**
+   * Additional renderTarget options
+   */
+  renderTargetOptions?: QuadRendererTextureOptions
+}
 
 const getBufferForType = (type: TextureDataType, width: number, height: number) => {
   let out: ArrayLike<number>
@@ -80,23 +115,13 @@ let _canReadPixelsResult: boolean | undefined
  * @param type
  * @param renderer
  * @param camera
+ * @param renderTargetOptions
  * @returns
  */
-const canReadPixels = (type: TextureDataType, renderer: WebGLRenderer, camera: OrthographicCamera) => {
+const canReadPixels = (type: TextureDataType, renderer: WebGLRenderer, camera: OrthographicCamera, renderTargetOptions: RenderTargetOptions) => {
   if (_canReadPixelsResult !== undefined) return _canReadPixelsResult
 
-  const testRT = new WebGLRenderTarget(1, 1, {
-    type,
-    colorSpace: LinearSRGBColorSpace,
-    format: RGBAFormat,
-    magFilter: LinearFilter,
-    minFilter: LinearFilter,
-    wrapS: RepeatWrapping,
-    wrapT: RepeatWrapping,
-    depthBuffer: false,
-    stencilBuffer: false,
-    generateMipmaps: true
-  })
+  const testRT = new WebGLRenderTarget(1, 1, renderTargetOptions)
 
   renderer.setRenderTarget(testRT)
   const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ color: 0xffffff }))
@@ -136,15 +161,32 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * @param sourceTexture
    * @param renderer
    */
-  constructor (width: number, height: number, type: TType, colorSpace: ColorSpace, material: TMaterial, renderer?:WebGLRenderer) {
-    this._width = width
-    this._height = height
-    this._type = type
-    this._colorSpace = colorSpace
+  constructor (options: QuadRendererOptions<TType, TMaterial>) {
+    this._width = options.width
+    this._height = options.height
+    this._type = options.type
+    this._colorSpace = options.colorSpace
 
-    this._material = material
-    if (renderer) {
-      this._renderer = renderer
+    const rtOptions: RenderTargetOptions = {
+      // fixed options
+      format: RGBAFormat,
+      depthBuffer: false,
+      stencilBuffer: false,
+      // user options
+      type: this._type, // set in class property
+      colorSpace: this._colorSpace, // set in class property
+      anisotropy: options.renderTargetOptions?.anisotropy !== undefined ? options.renderTargetOptions?.anisotropy : 1,
+      generateMipmaps: options.renderTargetOptions?.generateMipmaps !== undefined ? options.renderTargetOptions?.generateMipmaps : false,
+      magFilter: options.renderTargetOptions?.magFilter !== undefined ? options.renderTargetOptions?.magFilter : LinearFilter,
+      minFilter: options.renderTargetOptions?.minFilter !== undefined ? options.renderTargetOptions?.minFilter : LinearFilter,
+      samples: options.renderTargetOptions?.samples !== undefined ? options.renderTargetOptions?.samples : undefined,
+      wrapS: options.renderTargetOptions?.wrapS !== undefined ? options.renderTargetOptions?.wrapS : ClampToEdgeWrapping,
+      wrapT: options.renderTargetOptions?.wrapT !== undefined ? options.renderTargetOptions?.wrapT : ClampToEdgeWrapping
+    }
+
+    this._material = options.material
+    if (options.renderer) {
+      this._renderer = options.renderer
     } else {
       this._renderer = QuadRenderer.instantiateRenderer()
       this._rendererIsDisposable = true
@@ -159,7 +201,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._camera.bottom = -0.5
     this._camera.updateProjectionMatrix()
 
-    if (!canReadPixels(this._type, this._renderer, this._camera)) {
+    if (!canReadPixels(this._type, this._renderer, this._camera, rtOptions)) {
       let alternativeType: TextureDataType | undefined
       switch (this._type) {
         case HalfFloatType:
@@ -180,18 +222,8 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._quad.geometry.computeBoundingBox()
     this._scene.add(this._quad)
 
-    this._renderTarget = new WebGLRenderTarget(width, height, {
-      type: this._type,
-      colorSpace,
-      format: RGBAFormat,
-      magFilter: LinearFilter,
-      minFilter: LinearMipMapLinearFilter,
-      wrapS: RepeatWrapping,
-      wrapT: RepeatWrapping,
-      depthBuffer: false,
-      stencilBuffer: false,
-      generateMipmaps: true
-    })
+    this._renderTarget = new WebGLRenderTarget(this.width, this.height, rtOptions)
+    this._renderTarget.texture.mapping = options.renderTargetOptions?.mapping !== undefined ? options.renderTargetOptions?.mapping : UVMapping
   }
 
   /**
@@ -236,32 +268,98 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     return out as TextureDataTypeToBufferType<TType>
   }
 
-  public toDataTexture () {
-    return new DataTexture(
+  /**
+   * Performs a readPixel operation in the renderTarget
+   * and returns a DataTexture containing the read data
+   *
+   * @params options
+   * @returns
+   */
+  public toDataTexture (options?: QuadRendererTextureOptions) {
+    const returnValue = new DataTexture(
+      // fixed values
       this.toArray(),
       this.width,
       this.height,
       RGBAFormat,
       this._type,
-      UVMapping,
-      RepeatWrapping,
-      RepeatWrapping,
-      LinearFilter,
-      LinearMipMapLinearFilter,
-      1,
+      // user values
+      options?.mapping || UVMapping,
+      options?.wrapS || ClampToEdgeWrapping,
+      options?.wrapT || ClampToEdgeWrapping,
+      options?.magFilter || LinearFilter,
+      options?.minFilter || LinearFilter,
+      options?.anisotropy || 1,
+      // fixed value
       LinearSRGBColorSpace
     )
+    // set this afterwards, we can't set it in constructor
+    returnValue.generateMipmaps = options?.generateMipmaps !== undefined ? options?.generateMipmaps : false
+
+    return returnValue
   }
 
   /**
    * If using a disposable renderer, it will dispose it.
    */
-  public dispose () {
+  public disposeOnDemandRenderer () {
     this._renderer.setRenderTarget(null)
     if (this._rendererIsDisposable) {
       this._renderer.dispose()
       this._renderer.forceContextLoss()
     }
+  }
+
+  /**
+   * Will dispose of **all** assets used by this renderer.
+   *
+   *
+   * @param disposeRenderTarget will dispose of the renderTarget which will not be usable later
+   * set this to true if you passed the `renderTarget.texture` to a `PMREMGenerator`
+   * or are otherwise done with it.
+   *
+   * @example
+   * ```js
+   * const loader = new HDRJPGLoader(renderer)
+   * const result = await loader.loadAsync('gainmap.jpeg')
+   * const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: result.renderTarget.texture }) )
+   * // DO NOT dispose the renderTarget here,
+   * // it is used directly in the material
+   * result.dispose()
+   * ```
+   *
+   * @example
+   * ```js
+   * const loader = new HDRJPGLoader(renderer)
+   * const pmremGenerator = new PMREMGenerator( renderer );
+   * const result = await loader.loadAsync('gainmap.jpeg')
+   * const envMap = pmremGenerator.fromEquirectangular(result.renderTarget.texture)
+   * const mesh = new Mesh(geometry, new MeshStandardMaterial({ envMap }) )
+   * // renderTarget can be disposed here
+   * // because it was used to generate a PMREM texture
+   * result.dispose(true)
+   * ```
+   */
+  public dispose (disposeRenderTarget?: boolean) {
+    this.disposeOnDemandRenderer()
+
+    if (disposeRenderTarget) {
+      this.renderTarget.dispose()
+    }
+
+    // dispose shader material texture uniforms
+    if (this.material instanceof ShaderMaterial) {
+      Object.values(this.material.uniforms).forEach(v => {
+        if (v.value instanceof Texture) v.value.dispose()
+      })
+    }
+    // dispose other material properties
+    Object.values(this.material).forEach(value => {
+      if (value instanceof Texture) value.dispose()
+    })
+
+    this.material.dispose()
+    this._quad.geometry.dispose()
   }
 
   /**

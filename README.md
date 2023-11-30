@@ -79,7 +79,7 @@ const renderer = new WebGLRenderer()
 
 const loader = new HDRJPGLoader(renderer)
 
-const result = loader.load('gainmap.jpeg')
+const result = await loader.loadAsync('gainmap.jpeg')
 // `result` can be used to populate a Texture
 
 const scene = new Scene()
@@ -98,6 +98,11 @@ renderer.render(scene, new PerspectiveCamera())
 scene.background = result.toDataTexture()
 scene.background.mapping = EquirectangularReflectionMapping
 scene.background.minFilter = LinearFilter
+
+
+// result must be manually disposed
+// when you are done using it
+result.dispose()
 
 ```
 
@@ -127,7 +132,7 @@ const renderer = new WebGLRenderer()
 
 const loader = new GainMapLoader(renderer)
 
-const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
 // `result` can be used to populate a Texture
 
 const scene = new Scene()
@@ -147,6 +152,9 @@ scene.background = result.toDataTexture()
 scene.background.mapping = EquirectangularReflectionMapping
 scene.background.minFilter = LinearFilter
 
+// result must be manually disposed
+// when you are done using it
+result.dispose()
 ```
 
 ### Encoding

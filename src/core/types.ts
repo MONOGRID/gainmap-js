@@ -1,3 +1,5 @@
+import { Mapping, RenderTargetOptions } from 'three'
+
 /**
  * This is the Metadata stored in an encoded Gainmap which is used
  * to decode it and return an HDR image
@@ -61,4 +63,18 @@ export type GainMapMetadata = {
    * (divided by) that of the SDR image, at a given pixel.
    */
   gainMapMax: [number, number, number]
+}
+
+/**
+ *
+ */
+export type QuadRendererTextureOptions = Omit<RenderTargetOptions, 'type' | 'format'| 'colorSpace' | 'encoding' | 'depthTexture' | 'stencilBuffer' | 'depthBuffer' | 'internalFormat'> & {
+  /**
+   * @defaultValue {@link UVMapping}
+   */
+  mapping?: Mapping,
+  /**
+   * @defaultValue 1
+   */
+  anisotropy?: number
 }

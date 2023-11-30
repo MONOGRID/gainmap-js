@@ -41,3 +41,7 @@ const [sdr, gainMap] = await Promise.all([
 
 // `sdr` will contain a JPEG which can be saved somewhere
 // `gainMap` will contain a JPEG which can be saved somewhere
+
+// renderers be manually disposed
+encodingResult.sdr.dispose()
+encodingResult.gainMap.dispose()

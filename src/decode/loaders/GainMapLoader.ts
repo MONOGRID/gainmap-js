@@ -30,7 +30,7 @@ import { LoaderBase } from './LoaderBase'
  *
  * const loader = new GainMapLoader(renderer)
  *
- * const result = loader.load(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+ * const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
  * // `result` can be used to populate a Texture
  *
  * const scene = new Scene()
@@ -49,6 +49,10 @@ import { LoaderBase } from './LoaderBase'
  * scene.background = result.toDataTexture()
  * scene.background.mapping = EquirectangularReflectionMapping
  * scene.background.minFilter = LinearFilter
+ *
+ * // result must be manually disposed
+ * // when you are done using it
+ * result.dispose()
  *
  */
 export class GainMapLoader extends LoaderBase<[string, string, string]> {
@@ -75,13 +79,23 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
 
     const loadCheck = async () => {
       if (sdr && gainMap && metadata) {
-        await this.render(quadRenderer, gainMap, sdr, metadata)
+        // solves #16
+        try {
+          await this.render(quadRenderer, metadata, sdr, gainMap)
+        } catch (error) {
+          this.manager.itemError(sdrUrl)
+          this.manager.itemError(gainMapUrl)
+          this.manager.itemError(metadataUrl)
+          if (typeof onError === 'function') onError(error)
+          quadRenderer.disposeOnDemandRenderer()
+          return
+        }
 
         if (typeof onLoad === 'function') onLoad(quadRenderer)
         this.manager.itemEnd(sdrUrl)
         this.manager.itemEnd(gainMapUrl)
         this.manager.itemEnd(metadataUrl)
-        quadRenderer.dispose()
+        quadRenderer.disposeOnDemandRenderer()
       }
     }
 

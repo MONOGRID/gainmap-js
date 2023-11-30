@@ -91,14 +91,14 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
   let w = srcTex.image.width
   let h = srcTex.image.height
 
-  const quadRenderer = new QuadRenderer(
-    w,
-    h,
-    srcTex.type,
-    srcTex.colorSpace,
-    mat,
+  const quadRenderer = new QuadRenderer({
+    width: w,
+    height: h,
+    type: srcTex.type,
+    colorSpace: srcTex.colorSpace,
+    material: mat,
     renderer
-  )
+  })
 
   const frameBuffers: WebGLRenderTarget[] = []
 

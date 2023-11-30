@@ -143,6 +143,12 @@
 						hdrJpgEquirectangularMap.generateMipmaps = false;
 
 						hdrJpgEquirectangularMap.needsUpdate = true;
+						// this must be called manually
+						// when the gain map has been used
+						// in this case we also pass `true`
+						// to the disposeRenderTarget param
+						// because we don't need the renderTarget anymore
+						hdrJpg.dispose( true );
 
 					}, function ( progress ) {
 
@@ -168,6 +174,12 @@
 						gainMapBackground.generateMipmaps = false;
 
 						gainMapBackground.needsUpdate = true;
+						// this must be called manually
+						// when the gain map has been used
+						// in this case we also pass `true`
+						// to the disposeRenderTarget param
+						// because we don't need the renderTarget anymore
+						gainMap.dispose( true );
 
 					}, function ( progress ) {
 

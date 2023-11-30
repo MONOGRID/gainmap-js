@@ -42,3 +42,7 @@ const mesh = new Mesh(
 )
 scene.add(mesh)
 renderer.render(scene, new PerspectiveCamera())
+
+// result must be manually disposed
+// when you are done using it
+result.dispose()

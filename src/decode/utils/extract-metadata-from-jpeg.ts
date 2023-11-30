@@ -30,7 +30,7 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  */
 export const extractXMP = (input: Uint8Array): GainMapMetadata | undefined => {
   let str: string
-  // support node test evnvironment
+  // support node test environment
   if (typeof TextDecoder !== 'undefined') str = new TextDecoder().decode(input)
   else str = input.toString()
 

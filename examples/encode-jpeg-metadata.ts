@@ -55,3 +55,8 @@ const jpeg = await encodeJPEGMetadata({
 })
 
 // `jpeg` will be an `Uint8Array` which can be saved somewhere
+
+// encoder must be manually disposed
+// when no longer needed
+encodingResult.gainMap.dispose()
+encodingResult.sdr.dispose()

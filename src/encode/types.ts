@@ -3,6 +3,7 @@ import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
 import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
+import { QuadRendererTextureOptions } from '../decode'
 import { WorkerInterfaceImplementation } from '../worker-types'
 
 /**
@@ -85,6 +86,10 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
    * @defaultValue `ACESFilmicToneMapping`
    */
   toneMapping?: ToneMapping
+  /**
+   * Options to use when creating the output renderTarget
+   */
+  renderTargetOptions?: QuadRendererTextureOptions
 }
 
 /**

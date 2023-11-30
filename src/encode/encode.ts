@@ -47,7 +47,10 @@ import { EncodingParametersBase } from './types'
  * encodingResult.gainMap.material.gamma = [1.1, 1.1, 1.1]
  * encodingResult.gainMap.render()
  *
- * // must be manually disposed
+ * // do something with encodingResult.gainMap.toArray()
+ * // and encodingResult.sdr.toArray()
+ *
+ * // renderers must be manually disposed
  * encodingResult.sdr.dispose()
  * encodingResult.gainMap.dispose()
  *
@@ -59,7 +62,7 @@ export const encode = (params: EncodingParametersBase) => {
 
   const dataTexture = getDataTexture(image)
 
-  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping)
+  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping, params.renderTargetOptions)
 
   const gainMapRenderer = getGainMap({
     ...params,

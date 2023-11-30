@@ -1,3 +1,28 @@
+# [3.0.0](https://github.com/MONOGRID/gainmap-js/compare/v2.0.7...v3.0.0) (2023-11-29)
+
+
+### Bug Fixes
+
+* **loaders:** properly catches render errors and calls onError callback ([b9bcdd1](https://github.com/MONOGRID/gainmap-js/commit/b9bcdd127576fa61c6ee92c876f4845cd80b4d34)), closes [#16](https://github.com/MONOGRID/gainmap-js/issues/16)
+
+
+### Features
+
+* **core:** disables default mipmap generation, enables user to specify renderTarget (and toDataTexture) options ([147d278](https://github.com/MONOGRID/gainmap-js/commit/147d2783224cb0a2039d762abf4e4b972b0e86da)), closes [#14](https://github.com/MONOGRID/gainmap-js/issues/14) [#15](https://github.com/MONOGRID/gainmap-js/issues/15)
+
+
+### BREAKING CHANGES
+
+* **core:** `generateMipmaps` is no longer `true` by default, both `minFilter` is  no longer `LinearMipMapLinearFilter` by default but `LinearFilter`, `wrapS` and `warpT` are no longer `RepeatWrapping` by default but `ClampToEdgeWrapping`
+
+## [2.0.7](https://github.com/MONOGRID/gainmap-js/compare/v2.0.6...v2.0.7) (2023-11-23)
+
+
+### Bug Fixes
+
+* **core:** QuadRenderer dispose method now properly disposes of its internal resources ([#13](https://github.com/MONOGRID/gainmap-js/issues/13)) ([8e4473d](https://github.com/MONOGRID/gainmap-js/commit/8e4473da77732080de24f98dd271fecda06f9e53))
+* **HDRJPGLoader:** renders (and returns) an SDR image when provided with a normal jpeg file ([#12](https://github.com/MONOGRID/gainmap-js/issues/12)) ([5222151](https://github.com/MONOGRID/gainmap-js/commit/5222151e6b5c95df79f1c4085cf36f30bd9c2dc4))
+
 ## [2.0.6](https://github.com/MONOGRID/gainmap-js/compare/v2.0.5...v2.0.6) (2023-11-20)
 
 
