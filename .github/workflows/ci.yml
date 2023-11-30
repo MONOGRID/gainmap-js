@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-concurrency:
-  group: build
-  cancel-in-progress: true
-
 jobs:
     ################################
     ##
