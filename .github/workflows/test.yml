@@ -1,13 +1,16 @@
 name: Test
 on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # run when build has done
   workflow_run:
     workflows: ['Build']
     types:
       - completed
 
 jobs:
-  check:
-    name: 'check'
+  Check:
+    name: 'Check'
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout'
@@ -109,8 +112,8 @@ jobs:
           path: |
             reports/
 
-  playwright:
-    name: 'Playwright Tests'
+  Test:
+    name: 'Test'
     runs-on: ubuntu-latest
     container:
       image: mcr.microsoft.com/playwright:v1.40.0-jammy
