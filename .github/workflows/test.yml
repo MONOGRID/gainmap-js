@@ -149,7 +149,7 @@ jobs:
         run: npm ci
 
       - name: 'Run Playwright Tests'
-        run: npm test
+        run: sudo npm test # for some reason servez needs sudo in ci?
         env:
           HOME: /root
 
