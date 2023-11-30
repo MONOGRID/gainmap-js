@@ -6,10 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-concurrency:
-  group: build
-  cancel-in-progress: true
-
 jobs:
     ################################
     ##
@@ -171,27 +167,27 @@ jobs:
 
         - name: 'Report Src Code Linting Results'
           if: always()
-          uses: ldiego73/eslint-report-action@v1.1
+          uses: ataylorme/eslint-annotate-action@v2
           with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            report: "reports/eslint-src.json"
-            title: 'Eslint Src'
+            report-json: "reports/eslint-src.json"
+            check-name: 'Eslint Src'
+            markdown-report-on-step-summary: true
 
         - name: 'Report Examples Code Linting Results'
           if: always()
-          uses: ldiego73/eslint-report-action@v1.1
+          uses: ataylorme/eslint-annotate-action@v2
           with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            report: "reports/eslint-examples.json"
-            title: 'Eslint Examples'
+            report-json: "reports/eslint-examples.json"
+            check-name: 'Eslint Examples'
+            markdown-report-on-step-summary: true
 
         - name: 'Report Tests Code Linting Results'
           if: always()
-          uses: ldiego73/eslint-report-action@v1.1
+          uses: ataylorme/eslint-annotate-action@v2
           with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            report: "reports/eslint-tests.json"
-            title: 'Eslint Tests'
+            report-json: "reports/eslint-tests.json"
+            check-name: 'Eslint Tests'
+            markdown-report-on-step-summary: true
 
         - name: 'Upload Check artifacts'
           if: always()
@@ -258,6 +254,10 @@ jobs:
             coverage_file: "coverage/coverage-summary.json"
             comment_template_file: "tests/coverage-comment-template.md"
             comment_mode: "replace"
+
+        - uses: daun/playwright-report-summary@v2
+          with:
+            report-file: playwright-report.json
 
         - name: 'Upload Test artifacts'
           if: always()

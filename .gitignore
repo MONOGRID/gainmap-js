@@ -27,3 +27,4 @@ test-results
 playwright-report
 .nyc_output
 coverage
+playwright-report.json
