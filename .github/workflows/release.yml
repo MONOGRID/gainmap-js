@@ -6,7 +6,7 @@ on:
   # run when tests have passed
   workflow_run:
     branches: [main]
-    workflows: [Test]
+    workflows: [CI]
     types:
       - completed
 
