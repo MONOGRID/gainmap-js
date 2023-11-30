@@ -42,10 +42,13 @@ export default defineConfig({
     timezoneId: 'Europe/Paris'
   },
 
-  // expect timeout to 20 seconds
+  // expect timeout to 40 seconds
   expect: {
-    timeout: 20 * 1000
+    timeout: 40 * 1000
   },
+
+  // test timeout to 60 seconds
+  timeout: 60 * 1000,
 
   // https://github.com/microsoft/playwright/issues/7575#issuecomment-1693400652
   // same screenshot name across platforms

@@ -1,0 +1,1 @@
+{"gainMapMin":[0,0,0],"gainMapMax":[3.13443,3.13443,3.13443],"gamma":[1,1,1],"offsetSdr":[0.015625,0.015625,0.015625],"offsetHdr":[0.015625,0.015625,0.015625],"hdrCapacityMin":0,"hdrCapacityMax":3.13443}
