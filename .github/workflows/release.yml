@@ -1,9 +1,12 @@
-name: 'Release'
+name: Release
 
 on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  # run when tests have passed
   workflow_run:
     branches: [main]
-    workflows: ["Test"]
+    workflows: [Test]
     types:
       - completed
 
@@ -19,7 +22,7 @@ permissions:
 
 jobs:
   release:
-    name: 'Release'
+    name: Release
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
