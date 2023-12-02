@@ -1,8 +1,7 @@
-import * as decode from '@monogrid/gainmap-js'
 import { expect } from '@playwright/test'
-import * as THREE from 'three'
 
 import { test } from '../../testWithCoverage'
+import { testGainMapLoaderInBrowser } from './gainmap-loader'
 
 // const matrix = [
 //   '01.jpg',
@@ -30,42 +29,10 @@ test('loads from webp', async ({ page }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(async () => {
-    const renderer = new THREE.WebGLRenderer()
-    document.body.append(renderer.domElement)
-    renderer.setSize(window.innerWidth, window.innerHeight)
-    const loader = new decode.GainMapLoader(renderer)
-
-    const result = await loader.loadAsync([
-      'files/spruit_sunrise_4k.webp',
-      'files/spruit_sunrise_4k-gainmap.webp',
-      'files/spruit_sunrise_4k.json'
-    ])
-
-    const scene = new THREE.Scene()
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(),
-      new THREE.MeshBasicMaterial({ map: result.renderTarget.texture })
-    )
-    const ratio = result.width / result.height
-    plane.scale.y = Math.min(1, 1 / ratio)
-    plane.scale.x = Math.min(1, ratio)
-    scene.add(plane)
-
-    scene.background = result.toDataTexture({
-      mapping: THREE.EquirectangularReflectionMapping,
-      minFilter: THREE.LinearFilter,
-      generateMipmaps: false
-    })
-    scene.background.needsUpdate = true
-
-    // result must be manually disposed
-    // when you are done using it
-    result.dispose()
-
-    const camera = new THREE.PerspectiveCamera()
-    camera.position.z = 3
-    renderer.render(scene, camera)
+  await page.evaluate(testGainMapLoaderInBrowser, {
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json'
   })
 
   await expect(page).toHaveScreenshot('render.png')
@@ -78,13 +45,10 @@ test('throws with an invalid sdr', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(async () => {
-      const loader = new decode.GainMapLoader(new THREE.WebGLRenderer())
-      await loader.loadAsync([
-        'files/invalid_image.png',
-        'files/spruit_sunrise_4k-gainmap.webp',
-        'files/spruit_sunrise_4k.json'
-      ])
+    await page.evaluate(testGainMapLoaderInBrowser, {
+      sdr: 'files/invalid_image.png',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'files/spruit_sunrise_4k.json'
     })
   }
 
@@ -98,13 +62,10 @@ test('throws with an invalid gainmap', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(async () => {
-      const loader = new decode.GainMapLoader(new THREE.WebGLRenderer())
-      await loader.loadAsync([
-        'files/spruit_sunrise_4k.webp',
-        'files/invalid_image.png',
-        'files/spruit_sunrise_4k.json'
-      ])
+    await page.evaluate(testGainMapLoaderInBrowser, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'files/invalid_image.png',
+      metadata: 'files/spruit_sunrise_4k.json'
     })
   }
 
@@ -118,13 +79,10 @@ test('throws with it doesn\'t find the sdr', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(async () => {
-      const loader = new decode.GainMapLoader(new THREE.WebGLRenderer())
-      await loader.loadAsync([
-        'nope',
-        'files/spruit_sunrise_4k-gainmap.webp',
-        'files/spruit_sunrise_4k.json'
-      ])
+    await page.evaluate(testGainMapLoaderInBrowser, {
+      sdr: 'nope',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'files/spruit_sunrise_4k.json'
     })
   }
 
@@ -138,13 +96,10 @@ test('throws with it doesn\'t find the gainmap', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(async () => {
-      const loader = new decode.GainMapLoader(new THREE.WebGLRenderer())
-      await loader.loadAsync([
-        'files/spruit_sunrise_4k.webp',
-        'nope',
-        'files/spruit_sunrise_4k.json'
-      ])
+    await page.evaluate(testGainMapLoaderInBrowser, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'nope',
+      metadata: 'files/spruit_sunrise_4k.json'
     })
   }
 
@@ -158,13 +113,10 @@ test('throws with it doesn\'t find the metadata', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(async () => {
-      const loader = new decode.GainMapLoader(new THREE.WebGLRenderer())
-      await loader.loadAsync([
-        'files/spruit_sunrise_4k.webp',
-        'files/spruit_sunrise_4k-gainmap.webp',
-        'nope'
-      ])
+    await page.evaluate(testGainMapLoaderInBrowser, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'nope'
     })
   }
 

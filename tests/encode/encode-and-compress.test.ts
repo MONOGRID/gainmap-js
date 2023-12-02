@@ -1,11 +1,8 @@
-import * as encode from '@monogrid/gainmap-js/encode'
-import * as libultrahdr from '@monogrid/gainmap-js/libultrahdr'
 import { expect } from '@playwright/test'
 import sharp from 'sharp'
-import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
 import { test } from '../testWithCoverage'
-
+import { encodeAndCompressInBrowser } from './encode-and-compress'
 // const matrix = [
 //   '01.jpg',
 //   '02.jpg',
@@ -32,33 +29,23 @@ test('encodes and compresses from exr', async ({ page }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  const result = await page.evaluate(async (file) => {
-    // load an HDR file
-    const loader = new EXRLoader()
-    const image = await loader.loadAsync(file)
+  const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
 
-    // find RAW RGB Max value of a texture
-    const textureMax = encode.findTextureMinMax(image)
+  const resized = await sharp(Buffer.from(result))
+    .resize({ width: 500, height: 500, fit: 'inside' })
+    .png({ compressionLevel: 9, effort: 10 })
+    .toBuffer()
 
-    // Encode the gainmap
-    const encodingResult = await encode.encodeAndCompress({
-      image,
-      // this will encode the full HDR range
-      maxContentBoost: Math.max.apply(this, textureMax),
-      mimeType: 'image/jpeg',
-      flipY: true
-    })
+  expect(resized).toMatchSnapshot('memorial.exr-encode-result.png')
+})
 
-    // embed the compressed images + metadata into a single
-    // JPEG file
-    const jpeg = await libultrahdr.encodeJPEGMetadata({
-      ...encodingResult,
-      sdr: encodingResult.sdr,
-      gainMap: encodingResult.gainMap
-    })
+test('encodes and compresses from exr using worker', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
 
-    return Array.from(jpeg)
-  }, 'files/memorial.exr')
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr', withWorker: true })
 
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
