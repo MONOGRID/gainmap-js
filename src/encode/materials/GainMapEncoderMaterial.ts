@@ -159,5 +159,5 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
    * @see {@link GainMapMetadata.hdrCapacityMax}
    * @remarks Logarithmic space
    */
-  get hdrCapacityMax (): number { return Math.min(Math.max(0, this.gainMapMax[0]), Math.max(0, this.gainMapMax[1]), Math.max(0, this.gainMapMax[2])) }
+  get hdrCapacityMax (): number { return Math.max(Math.max(0, this.gainMapMax[0]), Math.max(0, this.gainMapMax[1]), Math.max(0, this.gainMapMax[2])) }
 }

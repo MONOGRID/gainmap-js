@@ -1,9 +1,8 @@
-import * as decode from '@monogrid/gainmap-js'
 import { expect } from '@playwright/test'
 import sharp from 'sharp'
-import * as THREE from 'three'
 
 import { test } from '../../testWithCoverage'
+import { testMPFExtractorInBrowser } from './MPFExtractor'
 
 const matrix = [
   '01.jpg'
@@ -28,25 +27,12 @@ for (const testFile of matrix) {
     const script = page.getByTestId('script')
     await expect(script).toBeAttached()
 
-    const result = await page.evaluate(async (testFile) => {
-      const file = await new THREE.FileLoader()
-        .setResponseType('arraybuffer')
-        .loadAsync(`files/${testFile}`)
-
-      if (typeof file !== 'string') {
-        const extractor = new decode.MPFExtractor({ extractFII: true, extractNonFII: true })
-        const result = await extractor.extract(new Uint8Array(file))
-        const buffers = await Promise.all(result.map(blob => blob.arrayBuffer()))
-        console.log(buffers)
-        return buffers.map(buff => Array.from(new Uint8Array(buff)))
-      }
-      return null
-    }, testFile)
+    const result = await page.evaluate(testMPFExtractorInBrowser, `files/${testFile}`)
 
     expect(result).not.toBeNull()
-    expect(result!.length).toBe(2)
+    expect(result.length).toBe(2)
 
-    const sdr = await sharp(Buffer.from(result![0]))
+    const sdr = await sharp(Buffer.from(result[0]))
       .resize({ width: 500, height: 500, fit: 'inside' })
       .png({ compressionLevel: 9, effort: 10 })
       .toBuffer()
@@ -54,7 +40,7 @@ for (const testFile of matrix) {
     expect(sdr).not.toBeNull() // temporary
     expect(sdr).toMatchSnapshot(`${testFile}-sdr.png`)
 
-    const gainMap = await sharp(Buffer.from(result![1]))
+    const gainMap = await sharp(Buffer.from(result[1]))
       .resize({ width: 500, height: 500, fit: 'inside' })
       .png({ compressionLevel: 9, effort: 10 })
       .toBuffer()
@@ -63,3 +49,29 @@ for (const testFile of matrix) {
     expect(gainMap).toMatchSnapshot(`${testFile}-gainmap.png`)
   })
 }
+
+test('throw when given a plain jpeg', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testMPFExtractorInBrowser, 'files/plain-jpeg.jpg')
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/Not a valid marker at offset/)
+})
+
+test('throw when given an invalid jpeg', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testMPFExtractorInBrowser, 'files/invalid_image.png')
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/Not a valid jpeg/)
+})

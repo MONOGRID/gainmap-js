@@ -13,7 +13,6 @@
         "@monogrid/gainmap-js": "../dist/decode.js",
         "@monogrid/gainmap-js/encode": "../dist/encode.js",
         "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js",
-        "@monogrid/gainmap-js/worker": "../dist/worker.js",
         "@monogrid/gainmap-js/worker-interface": "../dist/worker-interface.js"
       }
     }
@@ -25,7 +24,6 @@
     import * as decode from '@monogrid/gainmap-js'
     import * as encode from '@monogrid/gainmap-js/encode'
     import * as libultrahdr from '@monogrid/gainmap-js/libultrahdr'
-    import * as worker from '@monogrid/gainmap-js/worker'
     import * as workerInterface from '@monogrid/gainmap-js/worker-interface'
     import * as THREE from 'three'
     import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
@@ -34,7 +32,6 @@
     window.decode = decode
     window.encode = encode
     window.libultrahdr = libultrahdr
-    window.worker = worker
     window.workerInterface = workerInterface
     window.THREE = THREE
     window.EXRLoader = EXRLoader

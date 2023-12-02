@@ -40,10 +40,6 @@ export const test = baseTest.extend({
               padding: 0;
             }
 
-            .VPNav {
-              display: none !important;
-            }
-
             *, *:before, *:after {
               font-family: 'Noto Sans' !important;
               font-size: 16px !important;
