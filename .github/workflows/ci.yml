@@ -120,6 +120,10 @@ jobs:
           if: always()
           run: npm run ci:check
 
+        - name: 'Logscan ensure logscan is executable'
+          if: always()
+          run: 'chmod +x .github/logscan.sh'
+
         - name: 'Logscan TypeCheck Src'
           if: always()
           id: logscan_src
