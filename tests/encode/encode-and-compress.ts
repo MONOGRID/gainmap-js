@@ -9,7 +9,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  * @param args
  * @returns
  */
-export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParametersWithCompression, 'image' | 'mimeType' | 'quality' | 'withWorker'> & { file: string, maxContentBoost?: number, mimeType?: encode.CompressionMimeType, quality?: number, withWorker?: boolean }) => {
+export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParametersWithCompression, 'image' | 'maxContentBoost' | 'mimeType' | 'quality' | 'withWorker'> & { file: string, maxContentBoost?: number, mimeType?: encode.CompressionMimeType, quality?: number, withWorker?: boolean }) => {
   let withWorker
   if (args.withWorker) {
     withWorker = workerInterface.getWorkerInterface(
