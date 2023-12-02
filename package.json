@@ -100,7 +100,7 @@
     "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
   },
   "peerDependencies": {
-    "three": ">= 0.157.0 < 0.160.0"
+    "three": ">= 0.159.0"
   },
   "dependencies": {
     "promise-worker-transferable": "^1.0.4"
