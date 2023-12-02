@@ -100,7 +100,7 @@
     "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
   },
   "peerDependencies": {
-    "three": ">= 0.157.0 < 0.159.0"
+    "three": ">= 0.157.0 < 0.160.0"
   },
   "dependencies": {
     "promise-worker-transferable": "^1.0.4"
@@ -115,13 +115,13 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^11.1.0",
     "@semantic-release/git": "github:semantic-release/git",
-    "@semantic-release/github": "^9.2.3",
+    "@semantic-release/github": "^9.2.4",
     "@semantic-release/npm": "^11.0.1",
     "@semantic-release/release-notes-generator": "^12.1.0",
     "@types/node": "^20.9.0",
     "@types/three": "^0.158.2",
-    "@typescript-eslint/eslint-plugin": "^6.11.0",
-    "@typescript-eslint/parser": "^6.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
     "concurrently": "^8.2.2",
     "conventional-changelog-conventionalcommits": "^7.0.2",
     "cz-conventional-changelog": "^3.3.0",
@@ -137,7 +137,7 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "eslint-plugin-unused-imports": "^3.0.0",
     "nyc": "^15.1.0",
-    "rollup": "^4.5.0",
+    "rollup": "^4.6.1",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-istanbul": "^5.0.0",
@@ -145,11 +145,11 @@
     "semantic-release": "^22.0.8",
     "servez": "^2.1.2",
     "sharp": "^0.33.0",
-    "three": "^0.158.0",
-    "typedoc": "^0.25.3",
+    "three": "^0.159.0",
+    "typedoc": "^0.25.4",
     "typedoc-github-wiki-theme": "^1.1.0",
     "typedoc-plugin-markdown": "^3.17.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.3.2"
   },
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
