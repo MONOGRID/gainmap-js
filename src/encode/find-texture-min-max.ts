@@ -34,6 +34,10 @@ precision mediump float;
   #define COMPARE_FUNCTION max
 #endif
 
+#ifndef INITIAL_VALUE
+  #define INITIAL_VALUE 0
+#endif
+
 uniform sampler2D map;
 uniform vec2 u_srcResolution;
 
@@ -49,7 +53,8 @@ void main() {
   // uv for first pixel in cell. +0.5 for center of pixel
   vec2 uv = (srcPixel + 0.5) * onePixel;
 
-  vec4 resultColor = vec4(0);
+  vec4 resultColor = vec4(INITIAL_VALUE);
+
   for (int y = 0; y < CELL_SIZE; ++y) {
     for (int x = 0; x < CELL_SIZE; ++x) {
       resultColor = COMPARE_FUNCTION(resultColor, texture2D(map, uv + vec2(x, y) * onePixel));
@@ -82,7 +87,8 @@ export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode
     },
     defines: {
       CELL_SIZE: cellSize,
-      COMPARE_FUNCTION: mode
+      COMPARE_FUNCTION: mode,
+      INITIAL_VALUE: mode === 'max' ? 0 : 65504 // max half float value
     }
   })
   srcTex.needsUpdate = true
