@@ -19,7 +19,7 @@ const settings = {
   globals: {
     three: 'three'
   },
-  sourcemap: !!process.env.INSTRUMENT_COVERAGE
+  sourcemap: !!process.env.PLAYWRIGHT_TESTING
 }
 
 const configBase = defineConfig({
@@ -32,7 +32,7 @@ const plugins = [
   typescript({
     tsconfig: 'src/tsconfig.json',
     declaration: true,
-    sourceMap: !!process.env.INSTRUMENT_COVERAGE,
+    sourceMap: !!process.env.PLAYWRIGHT_TESTING,
     declarationDir: 'dist',
     include: ['src/**/*.ts']
   }),
@@ -41,7 +41,7 @@ const plugins = [
     include: 'node_modules/**',
     extensions: ['.js'],
     ignoreGlobal: false,
-    sourceMap: !!process.env.INSTRUMENT_COVERAGE
+    sourceMap: !!process.env.PLAYWRIGHT_TESTING
   }),
   license({
     banner: `
@@ -51,7 +51,7 @@ const plugins = [
   })
 ]
 
-if (process.env.INSTRUMENT_COVERAGE) {
+if (process.env.PLAYWRIGHT_TESTING) {
   plugins.push(
     istanbul({
       include: ['src/**/*.ts']
@@ -60,7 +60,8 @@ if (process.env.INSTRUMENT_COVERAGE) {
   )
 }
 
-export default [
+/** @type {import('rollup').RollupOptions[]} */
+let configs = [
   defineConfig({
     input: {
       encode: './src/encode.ts',
@@ -87,45 +88,6 @@ export default [
     ...configBase
   }),
 
-  // decode UMD
-  defineConfig({
-    input: './src/decode.ts',
-    output: {
-      format: 'umd',
-      name,
-      file: 'dist/decode.umd.js',
-      ...settings
-    },
-    plugins,
-    ...configBase
-  }),
-
-  // encode UMD
-  defineConfig({
-    input: './src/encode.ts',
-    output: {
-      format: 'umd',
-      name: 'encode',
-      file: 'dist/encode.umd.js',
-      ...settings
-    },
-    plugins,
-    ...configBase
-  }),
-
-  // libultrahdr UMD
-  defineConfig({
-    input: './src/libultrahdr.ts',
-    output: {
-      format: 'umd',
-      name: 'libultrahdr',
-      file: 'dist/libultrahdr.umd.js',
-      ...settings
-    },
-    plugins,
-    ...configBase
-  }),
-
   // worker UMD
   defineConfig({
     input: './src/worker.ts',
@@ -137,16 +99,66 @@ export default [
     },
     plugins,
     ...configBase
-  }),
-  defineConfig({
-    input: './src/worker-interface.ts',
-    output: {
-      format: 'umd',
-      name: 'worker-interface',
-      file: 'dist/worker-interface.umd.js',
-      ...settings
-    },
-    plugins,
-    ...configBase
   })
 ]
+
+// configs to produce when not testing
+// with playwright
+if (!process.env.PLAYWRIGHT_TESTING) {
+  configs = configs.concat([
+
+    // decode UMD
+    defineConfig({
+      input: './src/decode.ts',
+      output: {
+        format: 'umd',
+        name,
+        file: 'dist/decode.umd.js',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    }),
+
+    // encode UMD
+    defineConfig({
+      input: './src/encode.ts',
+      output: {
+        format: 'umd',
+        name: 'encode',
+        file: 'dist/encode.umd.js',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    }),
+
+    // libultrahdr UMD
+    defineConfig({
+      input: './src/libultrahdr.ts',
+      output: {
+        format: 'umd',
+        name: 'libultrahdr',
+        file: 'dist/libultrahdr.umd.js',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    }),
+
+    // worker interface umd
+    defineConfig({
+      input: './src/worker-interface.ts',
+      output: {
+        format: 'umd',
+        name: 'worker-interface',
+        file: 'dist/worker-interface.umd.js',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    })
+  ])
+}
+
+export default configs

@@ -1,8 +1,7 @@
-import * as decode from '@monogrid/gainmap-js'
 import { expect } from '@playwright/test'
-import * as THREE from 'three'
 
 import { test } from '../../testWithCoverage'
+import { extractXMPInBrowser } from './extractXMP'
 
 const matrix = [
   '01.jpg',
@@ -27,16 +26,7 @@ for (const testFile of matrix) {
     const script = page.getByTestId('script')
     await expect(script).toBeAttached()
 
-    const result = await page.evaluate(async (testFile) => {
-      const file = await new THREE.FileLoader()
-        .setResponseType('arraybuffer')
-        .loadAsync(`files/${testFile}`)
-
-      if (typeof file !== 'string') {
-        return decode.extractXMP(new Uint8Array(file))
-      }
-      return undefined
-    }, testFile)
+    const result = await page.evaluate(extractXMPInBrowser, `files/${testFile}`)
 
     expect(result).not.toBeUndefined()
     expect(JSON.stringify(result)).toMatchSnapshot()
