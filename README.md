@@ -1,4 +1,6 @@
 # gainmap-js
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMONOGRID%2Fgainmap-js.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FMONOGRID%2Fgainmap-js?ref=badge_shield)
+
 A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Technology for storing HDR Images using an SDR Image + a "Gain map"
 
 > :warning: This library **is primarily intended** for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
@@ -252,3 +254,7 @@ module.exports = defineConfig({
 
 * [Adobe Gainmap Specification](https://helpx.adobe.com/camera-raw/using/gain-map.html)
 * [Ultra HDR Image Format v1.0](https://developer.android.com/guide/topics/media/platform/hdr-image-format)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FMONOGRID%2Fgainmap-js.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FMONOGRID%2Fgainmap-js?ref=badge_large)
