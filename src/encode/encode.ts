@@ -75,8 +75,8 @@ export const encode = (params: EncodingParametersBase) => {
     sdr,
     gainMap: gainMapRenderer,
     hdr: dataTexture,
-    getMetadata: () => {
-      const meta: GainMapMetadata = {
+    getMetadata: (): GainMapMetadata => {
+      return {
         gainMapMax: gainMapRenderer.material.gainMapMax,
         gainMapMin: gainMapRenderer.material.gainMapMin,
         gamma: gainMapRenderer.material.gamma,
@@ -85,7 +85,6 @@ export const encode = (params: EncodingParametersBase) => {
         offsetHdr: gainMapRenderer.material.offsetHdr,
         offsetSdr: gainMapRenderer.material.offsetSdr
       }
-      return meta
     }
   }
 }
