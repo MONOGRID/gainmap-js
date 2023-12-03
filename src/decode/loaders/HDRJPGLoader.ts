@@ -45,14 +45,14 @@ import { LoaderBase } from './LoaderBase'
  * scene.add(mesh)
  * renderer.render(scene, new PerspectiveCamera())
  *
- * // `result.renderTarget.texture` must be
- * // converted to `DataTexture` in order
- * // to use it as Equirectangular scene background
- * // if needed
- *
- * scene.background = result.toDataTexture()
+ * // Starting from three.js r159
+ * // `result.renderTarget.texture` can
+ * // also be used as Equirectangular scene background
+ * //
+ * // it was previously needed to convert it
+ * // to a DataTexture with `result.toDataTexture()`
+ * scene.background = result.renderTarget.texture
  * scene.background.mapping = EquirectangularReflectionMapping
- * scene.background.minFilter = LinearFilter
  *
  * // result must be manually disposed
  * // when you are done using it
