@@ -9,7 +9,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  * @param args
  * @returns
  */
-export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParametersWithCompression, 'image' | 'maxContentBoost' | 'mimeType' | 'quality' | 'withWorker'> & { file: string, maxContentBoost?: number, mimeType?: encode.CompressionMimeType, quality?: number, withWorker?: boolean, noOffscreenCanvas?: boolean, noCreateImageBitmap?: boolean }) => {
+export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParametersWithCompression, 'image' | 'maxContentBoost' | 'mimeType' | 'quality' | 'withWorker'> & { file: string, maxContentBoost?: number, mimeType?: encode.CompressionMimeType, quality?: number, withWorker?: boolean }) => {
   let withWorker
   if (args.withWorker) {
     withWorker = workerInterface.getWorkerInterface(
@@ -17,15 +17,6 @@ export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParam
         new Worker('../dist/worker.umd.js')
       )
     )
-  }
-  if (args.noCreateImageBitmap === true) {
-    // @ts-expect-error forcing our hand here
-    window.createImageBitmap = undefined
-  }
-
-  if (args.noOffscreenCanvas) {
-    // @ts-expect-error forcing our hand here
-    window.OffscreenCanvas = undefined
   }
 
   // load an HDR file

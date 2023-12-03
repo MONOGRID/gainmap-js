@@ -73,7 +73,7 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
   sdr.needsUpdate = true
 
   if (gainMap.colorSpace !== LinearSRGBColorSpace) {
-    console.warn('Gainmap Colorspace needs to be *LinearSRGBColorSpace*')
+    console.warn('Gainmap Colorspace needs to be *LinearSRGBColorSpace*, setting it automatically')
     gainMap.colorSpace = LinearSRGBColorSpace
   }
   gainMap.needsUpdate = true

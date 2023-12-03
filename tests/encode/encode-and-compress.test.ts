@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test'
 import sharp from 'sharp'
 
+import { disableCreateImageBitmap, disableOffscreenCanvas, returnNullOnCanvasToBlob } from '../disableBrowserFeatures'
 import { test } from '../testWithCoverage'
 import { encodeAndCompressInBrowser } from './encode-and-compress'
 // const matrix = [
@@ -61,7 +62,9 @@ test('encodes and compresses from exr with no OffscreenCanvas', async ({ page })
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr', noOffscreenCanvas: true })
+  await page.evaluate(disableOffscreenCanvas)
+
+  const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
 
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
@@ -69,4 +72,35 @@ test('encodes and compresses from exr with no OffscreenCanvas', async ({ page })
     .toBuffer()
 
   expect(resized).toMatchSnapshot('memorial.exr-encode-result.png')
+})
+
+test('fails when canvas.toBlob return null (as in TS types possibilities)', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(disableOffscreenCanvas)
+  await page.evaluate(returnNullOnCanvasToBlob)
+
+  const shouldThrow = async () => {
+    await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/Failed to convert canvas to blob/)
+})
+
+test('fails when createImageBitmap is not supported', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(disableCreateImageBitmap)
+
+  const shouldThrow = async () => {
+    await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/createImageBitmap.*not supported/gi)
 })

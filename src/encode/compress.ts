@@ -20,6 +20,10 @@ const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, mimeTyp
       }, mimeType, quality || 0.9)
     })
   }
+  /* istanbul ignore next
+    as long as this function is not exported this is only here
+    to satisfy TS strict mode internally
+  */
   throw new Error('Unsupported canvas element')
 }
 

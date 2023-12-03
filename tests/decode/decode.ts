@@ -29,34 +29,10 @@ export const decodeInBrowser = async (args: { file: string }) => {
     createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
   ])
 
-  // create textures
-  const gainMap = new THREE.Texture(gainMapImageBitmap,
-    THREE.UVMapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.LinearFilter,
-    THREE.LinearMipMapLinearFilter,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-    1,
-    THREE.LinearSRGBColorSpace
-  )
-
+  const gainMap = new THREE.Texture(gainMapImageBitmap)
   gainMap.needsUpdate = true
 
-  // create textures
-  const sdr = new THREE.Texture(sdrImageBitmap,
-    THREE.UVMapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.LinearFilter,
-    THREE.LinearMipMapLinearFilter,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-    1,
-    THREE.SRGBColorSpace
-  )
-
+  const sdr = new THREE.Texture(sdrImageBitmap)
   sdr.needsUpdate = true
 
   // restore the HDR texture
