@@ -3,7 +3,8 @@ name: CI
 on:
   push:
     branches: [ main ]
-  pull_request:
+  pull_request_target:
+    types: [labeled] # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
     branches: [ main ]
 
 jobs:
@@ -15,11 +16,27 @@ jobs:
     Build:
       name: Build
       runs-on: ubuntu-latest
+      # inspired by
+      # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
+      # checks if
+      # - event is a push = allow
+      # - event is a pr
+      #   - pr is internal in the repo = allow
+      #   - pr is a fork & has the appropriate label = allow
+      if: github.event_name == 'push' || (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe to test')))
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
+        - name: 'Checkout PR'
+          if: github.event_name == 'pull_request'
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
+            submodules: recursive
+
         - name: 'Checkout'
-          uses: nschloe/action-cached-lfs-checkout@v1
+          if: github.event_name == 'push'
+          uses: actions/checkout@v4
           with:
             submodules: recursive
 
@@ -97,14 +114,25 @@ jobs:
       name: Check
       needs: Build
       runs-on: ubuntu-latest
-      # https://github.com/actions/first-interaction/issues/10#issuecomment-1232740076
-      # otherwise PR opened by bots can't write
-      permissions:
-        pull-requests: write
-        checks: write
+      # inspired by
+      # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
+      # checks if
+      # - event is a push = allow
+      # - event is a pr
+      #   - pr is internal in the repo = allow
+      #   - pr is a fork & has the appropriate label = allow
+      if: github.event_name == 'push' || (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe to test')))
       steps:
+        - name: 'Checkout PR'
+          if: github.event_name == 'pull_request'
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
+            submodules: recursive
+
         - name: 'Checkout'
-          uses: nschloe/action-cached-lfs-checkout@v1
+          if: github.event_name == 'push'
+          uses: actions/checkout@v4
           with:
             submodules: recursive
 
@@ -216,6 +244,14 @@ jobs:
       name: Test
       needs: Build
       runs-on: ubuntu-latest
+      # inspired by
+      # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
+      # checks if
+      # - event is a push = allow
+      # - event is a pr
+      #   - pr is internal in the repo = allow
+      #   - pr is a fork & has the appropriate label = allow
+      if: github.event_name == 'push' || (github.event_name == 'pull_request' && (github.event.pull_request.head.repo.full_name == github.repository || contains(github.event.pull_request.labels.*.name, 'safe to test')))
       # container:
       #   image: mcr.microsoft.com/playwright:v1.40.0-jammy
       steps:
@@ -225,8 +261,16 @@ jobs:
         # - name: 'Install Git LFS'
         #   run: apt-get install -y git-lfs
 
+        - name: 'Checkout PR'
+          if: github.event_name == 'pull_request'
+          uses: actions/checkout@v4
+          with:
+            ref: ${{ github.event.pull_request.head.sha }}
+            submodules: recursive
+
         - name: 'Checkout'
-          uses: nschloe/action-cached-lfs-checkout@v1
+          if: github.event_name == 'push'
+          uses: actions/checkout@v4
           with:
             submodules: recursive
 
