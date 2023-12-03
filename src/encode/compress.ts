@@ -10,15 +10,17 @@ import { CompressedImage, CompressParameters } from './types'
  * @returns
  */
 const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, mimeType: CompressParameters['mimeType'], quality: CompressParameters['quality']) => {
-  if (canvas instanceof OffscreenCanvas) {
+  if (typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas) {
     return canvas.convertToBlob({ type: mimeType, quality: quality || 0.9 })
+  } else if (canvas instanceof HTMLCanvasElement) {
+    return new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((res) => {
+        if (res) resolve(res)
+        else reject(new Error('Failed to convert canvas to blob'))
+      }, mimeType, quality || 0.9)
+    })
   }
-  return new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob((res) => {
-      if (res) resolve(res)
-      else reject(new Error('Failed to convert canvas to blob'))
-    }, mimeType, quality || 0.9)
-  })
+  throw new Error('Unsupported canvas element')
 }
 
 /**
@@ -52,6 +54,8 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
     canvas = new OffscreenCanvas(width, height)
   } else {
     canvas = document.createElement('canvas')
+    canvas.width = width
+    canvas.height = height
   }
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Failed to create canvas Context')
