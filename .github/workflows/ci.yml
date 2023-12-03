@@ -97,6 +97,11 @@ jobs:
       name: Check
       needs: Build
       runs-on: ubuntu-latest
+      # https://github.com/actions/first-interaction/issues/10#issuecomment-1232740076
+      # otherwise PR opened by bots can't write
+      permissions:
+        pull-requests: write
+        checks: write
       steps:
         - name: 'Checkout'
           uses: nschloe/action-cached-lfs-checkout@v1
@@ -246,9 +251,9 @@ jobs:
           # env:
           #   HOME: /root
 
-        - name: 'Generate NYC Report'
-          if: always()
-          run: npm run test:report-coverage
+        # - name: 'Generate NYC Report'
+        #   if: always()
+        #   run: npm run test:report-coverage
 
         # - name: 'Report NYC coverage'
         #   if: always()
