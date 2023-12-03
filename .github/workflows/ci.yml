@@ -246,9 +246,9 @@ jobs:
           # env:
           #   HOME: /root
 
-        - name: 'Generate NYC Report'
-          if: always()
-          run: npm run test:report-coverage
+        # - name: 'Generate NYC Report'
+        #   if: always()
+        #   run: npm run test:report-coverage
 
         # - name: 'Report NYC coverage'
         #   if: always()
