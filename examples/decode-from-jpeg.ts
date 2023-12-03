@@ -4,9 +4,9 @@ import {
   ClampToEdgeWrapping,
   LinearFilter,
   LinearMipMapLinearFilter,
+  LinearSRGBColorSpace,
   Mesh,
   MeshBasicMaterial,
-  NoColorSpace,
   PerspectiveCamera,
   PlaneGeometry,
   RGBAFormat,
@@ -46,7 +46,7 @@ const gainMap = new Texture(gainMapImageBitmap,
   RGBAFormat,
   UnsignedByteType,
   1,
-  NoColorSpace
+  LinearSRGBColorSpace
 )
 
 gainMap.needsUpdate = true
