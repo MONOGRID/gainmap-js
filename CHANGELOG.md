@@ -1,3 +1,11 @@
+## [3.0.1](https://github.com/MONOGRID/gainmap-js/compare/v3.0.0...v3.0.1) (2023-12-03)
+
+
+### Bug Fixes
+
+* **encode:**  hdrCapacityMax correctly computed in output metadata ([f5f2215](https://github.com/MONOGRID/gainmap-js/commit/f5f22152eb236831cb9f23646445e6459be18285))
+* **encode:** findTextureMinMax correctly finds min values in textures ([fd94680](https://github.com/MONOGRID/gainmap-js/commit/fd94680a76fdb04b5aa85b4210f3aec21b45a727))
+
 # [3.0.0](https://github.com/MONOGRID/gainmap-js/compare/v2.0.7...v3.0.0) (2023-11-29)
 
 
