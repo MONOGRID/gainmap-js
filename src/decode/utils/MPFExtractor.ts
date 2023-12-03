@@ -1,4 +1,4 @@
-type MPFExtractorOptions = {
+export type MPFExtractorOptions = {
   debug: boolean
   extractFII: boolean
   extractNonFII: boolean
