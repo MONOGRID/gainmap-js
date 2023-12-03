@@ -4,7 +4,6 @@ on:
   push:
     branches: [ main ]
   pull_request_target:
-    types: [labeled] # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
     branches: [ main ]
 
 jobs:
