@@ -85,4 +85,20 @@ export const decodeInBrowser = async (args: { file: string }) => {
   renderer.render(scene, camera)
 
   result.dispose()
+
+  return {
+    jpeg: Array.from(jpeg),
+    materialValues: {
+      sdr: result.material.sdr.toJSON(),
+      gainMap: result.material.gainMap.toJSON(),
+      offsetHdr: result.material.offsetHdr,
+      offsetSdr: result.material.offsetSdr,
+      gainMapMin: result.material.gainMapMin,
+      gainMapMax: result.material.gainMapMax,
+      gamma: result.material.gamma,
+      hdrCapacityMin: result.material.hdrCapacityMin,
+      hdrCapacityMax: result.material.hdrCapacityMax,
+      maxDisplayBoost: result.material.maxDisplayBoost
+    }
+  }
 }

@@ -29,7 +29,9 @@ test('decodes from jpeg', async ({ page }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(decodeInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
+  const result = await page.evaluate(decodeInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
+
+  expect(JSON.stringify(result.materialValues)).toMatchSnapshot({ name: 'material-values.json' })
 
   await expect(page).toHaveScreenshot('render.png')
 })

@@ -54,3 +54,19 @@ test('encodes and compresses from exr using worker', async ({ page }) => {
 
   expect(resized).toMatchSnapshot('memorial.exr-encode-result.png')
 })
+
+test('encodes and compresses from exr with no OffscreenCanvas', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr', noOffscreenCanvas: true })
+
+  const resized = await sharp(Buffer.from(result))
+    .resize({ width: 500, height: 500, fit: 'inside' })
+    .png({ compressionLevel: 9, effort: 10 })
+    .toBuffer()
+
+  expect(resized).toMatchSnapshot('memorial.exr-encode-result.png')
+})
