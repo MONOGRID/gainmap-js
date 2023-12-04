@@ -94,38 +94,60 @@ jobs:
           output: |
             {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
 
-      - name: 'Report Src Code Linting Results'
+      - name: 'Analyze Src Code Linting Results'
         if: always()
+        id: eslint_src
         uses: ataylorme/eslint-annotate-action@v2
         with:
           report-json: "reports/eslint-src.json"
-          check-name: 'Eslint Src'
-          markdown-report-on-step-summary: true
-        env:
-          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
-          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
-      - name: 'Report Examples Code Linting Results'
+      - name: 'Analyze Examples Code Linting Results'
         if: always()
+        id: eslint_examples
         uses: ataylorme/eslint-annotate-action@v2
         with:
           report-json: "reports/eslint-examples.json"
-          check-name: 'Eslint Examples'
-          markdown-report-on-step-summary: true
-        env:
-          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
-          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
-      - name: 'Report Tests Code Linting Results'
+      - name: 'Analyze Tests Code Linting Results'
         if: always()
+        id: eslint_tests
         uses: ataylorme/eslint-annotate-action@v2
         with:
           report-json: "reports/eslint-tests.json"
-          check-name: 'Eslint Tests'
-          markdown-report-on-step-summary: true
-        env:
-          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
-          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
+
+      - name: 'Report Eslint Src'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: 'Eslint Src'
+          conclusion: ${{steps.eslint_src.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.eslint_src.outputs.summary }}"}
+
+      - name: 'Report Eslint Examples'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: 'Eslint Examples'
+          conclusion: ${{steps.eslint_examples.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.eslint_examples.outputs.summary }}"}
+
+      - name: 'Report Eslint Tests'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: 'Eslint Tests'
+          conclusion: ${{steps.eslint_tests.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.eslint_tests.outputs.summary }}"}
+
 
       - name: 'Upload coverage reports to Codecov'
         if: always()
