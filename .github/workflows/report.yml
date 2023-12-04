@@ -1,0 +1,126 @@
+name: Report on pull requests
+
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types:
+      - completed
+
+jobs:
+  report:
+    name: Report
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: 'Download build artifacts'
+        if: always()
+        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        with:
+          name: build-artifact
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: 'Download check artifacts'
+        if: always()
+        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        with:
+          name: check-artifact
+          run_id: ${{ github.event.workflow_run.id }}
+
+      - name: 'Download test artifacts'
+        if: always()
+        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        with:
+          name: test-artifact
+          run_id: ${{ github.event.workflow_run.id }}
+
+
+      - name: 'Logscan ensure logscan is executable'
+        if: always()
+        run: 'chmod +x .github/logscan.sh'
+
+      - name: 'Logscan TypeCheck Src'
+        if: always()
+        id: logscan_src
+        run: '.github/logscan.sh reports/typecheck.log'
+
+      - name: 'Logscan TypeCheck Examples'
+        if: always()
+        id: logscan_examples
+        run: '.github/logscan.sh reports/typecheck-examples.log'
+
+      - name: 'Logscan TypeCheck Tests'
+        if: always()
+        id: logscan_tests
+        run: '.github/logscan.sh reports/typecheck-tests.log'
+
+      - name: 'TypeCheck Src'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Typecheck Src
+          conclusion: ${{steps.logscan_src.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.logscan_src.outputs.summary }}"}
+
+      - name: 'TypeCheck Examples'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Typecheck Examples
+          conclusion: ${{steps.logscan_examples.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
+
+      - name: 'TypeCheck Tests'
+        if: always()
+        uses: LouisBrunner/checks-action@v1.6.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          name: Typecheck Tests
+          conclusion: ${{steps.logscan_tests.conclusion}}
+          sha: ${{ github.event.workflow_run.head_sha }}
+          output: |
+            {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
+
+      - name: 'Report Src Code Linting Results'
+        if: always()
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          report-json: "reports/eslint-src.json"
+          check-name: 'Eslint Src'
+          markdown-report-on-step-summary: true
+
+      - name: 'Report Examples Code Linting Results'
+        if: always()
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          report-json: "reports/eslint-examples.json"
+          check-name: 'Eslint Examples'
+          markdown-report-on-step-summary: true
+
+      - name: 'Report Tests Code Linting Results'
+        if: always()
+        uses: ataylorme/eslint-annotate-action@v2
+        with:
+          report-json: "reports/eslint-tests.json"
+          check-name: 'Eslint Tests'
+          markdown-report-on-step-summary: true
+
+      - name: 'Upload coverage reports to Codecov'
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: 'Report playwright test results'
+        uses: daun/playwright-report-summary@v2
+        with:
+          report-file: playwright-report.json
+
