@@ -133,7 +133,8 @@ jobs:
         with:
           directory: ./coverage/
           override_pr: ${{ github.event.workflow_run.pull_requests[0].number }}
-          override_build: ${{ github.event.workflow_run.head_sha }}
+          override_commit: ${{ github.event.workflow_run.head_sha }}
+
 
       # - name: 'Report playwright test results'
       #   uses: daun/playwright-report-summary@v2
