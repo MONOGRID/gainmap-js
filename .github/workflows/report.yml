@@ -101,6 +101,9 @@ jobs:
           report-json: "reports/eslint-src.json"
           check-name: 'Eslint Src'
           markdown-report-on-step-summary: true
+        env:
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
       - name: 'Report Examples Code Linting Results'
         if: always()
@@ -109,6 +112,9 @@ jobs:
           report-json: "reports/eslint-examples.json"
           check-name: 'Eslint Examples'
           markdown-report-on-step-summary: true
+        env:
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
       - name: 'Report Tests Code Linting Results'
         if: always()
@@ -117,18 +123,23 @@ jobs:
           report-json: "reports/eslint-tests.json"
           check-name: 'Eslint Tests'
           markdown-report-on-step-summary: true
+        env:
+          GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+          # GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
       - name: 'Upload coverage reports to Codecov'
+        if: always()
         uses: codecov/codecov-action@v3
         with:
           directory: ./coverage/
           override_pr: ${{ github.event.workflow_run.pull_requests[0].number }}
           override_build: ${{ github.event.workflow_run.head_sha }}
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: 'Report playwright test results'
-        uses: daun/playwright-report-summary@v2
-        with:
-          report-file: playwright-report.json
+      # - name: 'Report playwright test results'
+      #   uses: daun/playwright-report-summary@v2
+      #   with:
+      #     report-file: playwright-report.json
+      #   env:
+      #     GITHUB_SHA: ${{ github.event.workflow_run.head_sha }}
+      #     GITHUB_EVENT_NAME: ${{ github.event.workflow_run.event }}
 
