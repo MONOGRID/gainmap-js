@@ -3,9 +3,8 @@ name: CI
 on:
   push:
     branches: [ main ]
-  pull_request_target:
+  pull_request:
     branches: [ main ]
-    types: [opened, labeled, synchronize]
 
 jobs:
     ################################
@@ -16,25 +15,10 @@ jobs:
     Build:
       name: Build
       runs-on: ubuntu-latest
-      # inspired by
-      # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
-      # checks if
-      # - event is a push = allow
-      # - event is a pr & pr is internal in the repo = allow
-      # - event is a pr & pr is a fork & has the appropriate label = allow
-      if: github.event_name == 'push' || (github.event_name == 'pull_request_target' && !github.event.pull_request.head.repo.fork) || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork && contains(github.event.pull_request.labels.*.name, 'safe to test'))
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -114,15 +98,7 @@ jobs:
       needs: Build
       runs-on: ubuntu-latest
       steps:
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -244,15 +220,7 @@ jobs:
         # - name: 'Install Git LFS'
         #   run: apt-get install -y git-lfs
 
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -314,4 +282,3 @@ jobs:
               coverage/
               playwright-report/
               tests/__snapshots__/
-
