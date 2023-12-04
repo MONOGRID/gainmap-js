@@ -3,9 +3,8 @@ name: CI
 on:
   push:
     branches: [ main ]
-  pull_request_target:
+  pull_request:
     branches: [ main ]
-    types: [opened, labeled, synchronize]
 
 jobs:
     ################################
@@ -16,25 +15,10 @@ jobs:
     Build:
       name: Build
       runs-on: ubuntu-latest
-      # inspired by
-      # https://docs.boostsecurity.io/rules/cicd-gha-risky-pull-request-target-usage.html
-      # checks if
-      # - event is a push = allow
-      # - event is a pr & pr is internal in the repo = allow
-      # - event is a pr & pr is a fork & has the appropriate label = allow
-      if: github.event_name == 'push' || (github.event_name == 'pull_request_target' && !github.event.pull_request.head.repo.fork) || (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.fork && contains(github.event.pull_request.labels.*.name, 'safe to test'))
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -114,15 +98,7 @@ jobs:
       needs: Build
       runs-on: ubuntu-latest
       steps:
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -143,79 +119,6 @@ jobs:
         - name: 'Produce Reports & Logs'
           if: always()
           run: npm run ci:check
-
-        - name: 'Logscan ensure logscan is executable'
-          if: always()
-          run: 'chmod +x .github/logscan.sh'
-
-        - name: 'Logscan TypeCheck Src'
-          if: always()
-          id: logscan_src
-          run: '.github/logscan.sh reports/typecheck.log'
-
-        - name: 'TypeCheck Src'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            name: Typecheck Src
-            conclusion: ${{steps.logscan_src.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_src.outputs.summary }}"}
-
-        - name: 'Logscan TypeCheck Examples'
-          if: always()
-          id: logscan_examples
-          run: '.github/logscan.sh reports/typecheck-examples.log'
-
-        - name: 'TypeCheck Examples'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            name: Typecheck Examples
-            conclusion: ${{steps.logscan_examples.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
-
-        - name: 'Logscan TypeCheck Tests'
-          if: always()
-          id: logscan_tests
-          run: '.github/logscan.sh reports/typecheck-tests.log'
-
-        - name: 'TypeCheck Tests'
-          if: always()
-          uses: LouisBrunner/checks-action@v1.6.1
-          with:
-            token: ${{ secrets.GITHUB_TOKEN }}
-            name: Typecheck Tests
-            conclusion: ${{steps.logscan_tests.conclusion}}
-            output: |
-              {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
-
-        - name: 'Report Src Code Linting Results'
-          if: always()
-          uses: ataylorme/eslint-annotate-action@v2
-          with:
-            report-json: "reports/eslint-src.json"
-            check-name: 'Eslint Src'
-            markdown-report-on-step-summary: true
-
-        - name: 'Report Examples Code Linting Results'
-          if: always()
-          uses: ataylorme/eslint-annotate-action@v2
-          with:
-            report-json: "reports/eslint-examples.json"
-            check-name: 'Eslint Examples'
-            markdown-report-on-step-summary: true
-
-        - name: 'Report Tests Code Linting Results'
-          if: always()
-          uses: ataylorme/eslint-annotate-action@v2
-          with:
-            report-json: "reports/eslint-tests.json"
-            check-name: 'Eslint Tests'
-            markdown-report-on-step-summary: true
 
         - name: 'Upload Check artifacts'
           if: always()
@@ -244,15 +147,7 @@ jobs:
         # - name: 'Install Git LFS'
         #   run: apt-get install -y git-lfs
 
-        - name: 'Checkout PR'
-          if: github.event_name == 'pull_request_target'
-          uses: actions/checkout@v4
-          with:
-            ref: ${{ github.event.pull_request.head.sha }}
-            submodules: recursive
-
         - name: 'Checkout'
-          if: github.event_name == 'push'
           uses: actions/checkout@v4
           with:
             submodules: recursive
@@ -278,31 +173,6 @@ jobs:
           # env:
           #   HOME: /root
 
-        # - name: 'Generate NYC Report'
-        #   if: always()
-        #   run: npm run test:report-coverage
-
-        # - name: 'Report NYC coverage'
-        #   if: always()
-        #   uses: sidx1024/report-nyc-coverage-github-action@v1.2.7
-        #   with:
-        #     # Path to coverage file generated by "nyc report".
-        #     coverage_file: "coverage/coverage-summary.json"
-        #     comment_template_file: "tests/coverage-comment-template.md"
-        #     comment_mode: "replace"
-
-        - name: 'Upload coverage reports to Codecov'
-          uses: codecov/codecov-action@v3
-          with:
-            directory: ./coverage/
-          env:
-            CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-        - name: 'Report playwright test results'
-          uses: daun/playwright-report-summary@v2
-          with:
-            report-file: playwright-report.json
-
         - name: 'Upload Test artifacts'
           if: always()
           uses: actions/upload-artifact@v3
@@ -310,8 +180,8 @@ jobs:
             name: test-artifact
             if-no-files-found: error
             path: |
+              .nyc_output/
               test-results/
               coverage/
               playwright-report/
               tests/__snapshots__/
-
