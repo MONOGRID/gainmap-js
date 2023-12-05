@@ -33,21 +33,21 @@ test('renders the example correctly', async ({ page, context }) => {
 
   await expect(page).toHaveScreenshot('initial.png')
 
-  await page.mouse.move(250, 250, { steps: 100 })
+  await page.mouse.move(250, 250, { steps: 20 })
   await page.mouse.down({ button: 'middle' })
-  await page.mouse.move(250, 0, { steps: 500 })
+  await page.mouse.move(250, 0, { steps: 20 })
   await page.mouse.up({ button: 'middle' })
 
   await expect(page).toHaveScreenshot('zoomed-in.png')
 
-  await page.mouse.move(250, 250, { steps: 100 })
+  await page.mouse.move(250, 250, { steps: 20 })
   await page.mouse.down({ button: 'middle' })
-  await page.mouse.move(250, 500, { steps: 500 })
+  await page.mouse.move(250, 500, { steps: 50 })
   await page.mouse.up({ button: 'middle' })
 
-  await page.mouse.move(250, 250, { steps: 100 })
+  await page.mouse.move(250, 250, { steps: 20 })
   await page.mouse.down({ button: 'left' })
-  await page.mouse.move(250, 500, { steps: 100 })
+  await page.mouse.move(250, 500, { steps: 20 })
   await page.mouse.up({ button: 'left' })
 
   await expect(page).toHaveScreenshot('zoomed-out-from-above.png')
