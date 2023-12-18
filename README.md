@@ -16,7 +16,7 @@ Compares loading:
  2. a `webp` sdr file + a `webp` gain map + metadata JSON
  3. a comparable size `.hdr` file for comparison
 
-## [Free online encoder](https://gainmap-creator.mono-grid.com)
+## [Free online encoder](https://gainmap-creator.monogrid.com)
 
 Use it to convert `.hdr` and `.exr` files into gain maps. It's free and the whole process happens in your browser.
 
