@@ -2,12 +2,13 @@ import { GainMapMetadata } from '../core/types'
 import { getLibrary } from './library'
 
 /**
- *
+ * @deprecated
  * @param description
  * @param name
  * @param defaultValue
  * @returns
  */
+/* istanbul ignore next */
 const getAttribute = (description: Element, name: string, defaultValue?: string) => {
   let returnValue: string | [string, string, string]
   const parsedValue = description.attributes.getNamedItem(name)?.nodeValue
@@ -35,7 +36,7 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  *
  * @category Decoding
  * @group Decoding
- *
+ * @deprecated
  * @example
  * import { decodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
  *
@@ -49,6 +50,7 @@ const getAttribute = (description: Element, name: string, defaultValue?: string)
  * @returns The decoded data
  * @throws {Error} if the provided file cannot be parsed or does not contain a valid Gainmap
  */
+/* istanbul ignore next */
 export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const lib = await getLibrary()
   const result = lib.extractJpegR(file, file.length)

@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 
+import { disableCreateImageBitmap } from '../../disableBrowserFeatures'
 import { test } from '../../testWithCoverage'
 import { testHDRJpegLoaderInBrowser } from './hdr-jpg-loader'
 
@@ -40,7 +41,8 @@ test('loads from jpeg in browsers where createImageBitmap is not available', asy
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/spruit_sunrise_4k.jpg', noCreateImageBitmap: true })
+  await page.evaluate(disableCreateImageBitmap)
+  await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
 
   await expect(page).toHaveScreenshot('render-no-create-image-bitmap.png')
 })

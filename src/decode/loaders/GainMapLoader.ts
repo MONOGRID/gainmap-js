@@ -130,6 +130,9 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     sdrLoader.setPath(this.path)
     sdrLoader.setWithCredentials(this.withCredentials)
     sdrLoader.load(sdrUrl, async (buffer) => {
+      /* istanbul ignore if
+       this condition exists only because of three.js types + strict mode
+      */
       if (typeof buffer === 'string') throw new Error('Invalid sdr buffer')
       sdr = buffer
       await loadCheck()
@@ -149,6 +152,9 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     gainMapLoader.setPath(this.path)
     gainMapLoader.setWithCredentials(this.withCredentials)
     gainMapLoader.load(gainMapUrl, async (buffer) => {
+      /* istanbul ignore if
+       this condition exists only because of three.js types + strict mode
+      */
       if (typeof buffer === 'string') throw new Error('Invalid gainmap buffer')
       gainMap = buffer
       await loadCheck()
@@ -168,6 +174,9 @@ export class GainMapLoader extends LoaderBase<[string, string, string]> {
     metadataLoader.setPath(this.path)
     metadataLoader.setWithCredentials(this.withCredentials)
     metadataLoader.load(metadataUrl, async (json) => {
+      /* istanbul ignore if
+       this condition exists only because of three.js types + strict mode
+      */
       if (typeof json !== 'string') throw new Error('Invalid metadata string')
       // TODO: implement check on JSON file and remove this eslint disable
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

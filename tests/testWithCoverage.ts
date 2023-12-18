@@ -26,6 +26,9 @@ export const test = baseTest.extend({
         window.collectIstanbulCoverage(JSON.stringify(window.__coverage__))
       )
 
+      // @ts-expect-error injecting variables
+      window.TESTING = true
+
       /* Deterministic Font Rendering across platforms */
       let styleInjected = false
       document.addEventListener('readystatechange', (e) => {
@@ -34,6 +37,10 @@ export const test = baseTest.extend({
           const style = document.createElement('style')
           style.innerHTML = `
             @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+
+            #info, .lbl, .lil-gui, canvas[width="80"] {
+              display: none !important;
+            }
 
             body, html {
               margin: 0;

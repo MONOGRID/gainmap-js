@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { ConsoleMessage, expect } from '@playwright/test'
 
 import { test } from '../../testWithCoverage'
 import { testGainMapLoaderInBrowser } from './gainmap-loader'
@@ -34,6 +34,30 @@ test('loads from webp', async ({ page }) => {
     gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
     metadata: 'files/spruit_sunrise_4k.json'
   })
+
+  await expect(page).toHaveScreenshot('render.png')
+})
+
+test('loads from webp sync', async ({ page }) => {
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const logs: string[] = []
+  page.on('console', (m: ConsoleMessage) => {
+    logs.push(m.text())
+  })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(testGainMapLoaderInBrowser, {
+    sync: true,
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json'
+  })
+
+  // test loading progress happens
+  expect(logs.find(mess => mess.match(/loading/gi))).toBeTruthy()
 
   await expect(page).toHaveScreenshot('render.png')
 })

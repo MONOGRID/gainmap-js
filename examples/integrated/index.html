@@ -301,7 +301,8 @@
 
 				}
 
-				torusMesh.rotation.y += 0.005;
+				if ( ! window.TESTING ) torusMesh.rotation.y += 0.005;
+
 				planeMesh.visible = params.debug;
 
 				scene.environment = equirectangularMap;

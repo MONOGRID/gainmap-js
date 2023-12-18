@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { ConsoleMessage, expect } from '@playwright/test'
 import sharp from 'sharp'
 import { ACESFilmicToneMapping, CineonToneMapping, LinearToneMapping, ReinhardToneMapping, ToneMapping } from 'three'
 
@@ -16,7 +16,7 @@ test('encodes from exr', async ({ page }) => {
   const result = await page.evaluate(encodeInBrowser, { file: 'files/memorial.exr' })
 
   // test written metadata
-  const meta = await page.evaluate(extractXMPInBrowser, result)
+  const meta = await page.evaluate(extractXMPInBrowser, result.jpeg)
 
   expect(meta, 'metadata was not written').toBeDefined()
   expect(meta!.hdrCapacityMin, 'hdrCapacityMin is not default value').toEqual(Math.log2(1)) // default value
@@ -25,7 +25,7 @@ test('encodes from exr', async ({ page }) => {
   expect(meta!.offsetSdr, 'offsetSdr is not default value').toEqual([1 / 64, 1 / 64, 1 / 64]) // default value
   expect(meta!.gainMapMin, 'gainMapMin is not default value').toEqual([0, 0, 0]) // default value
 
-  const extracted = await page.evaluate(testMPFExtractorInBrowser, result)
+  const extracted = await page.evaluate(testMPFExtractorInBrowser, result.jpeg)
 
   const resized = await sharp(Buffer.from(extracted[0]))
     .resize({ width: 500, height: 500, fit: 'inside' })
@@ -64,7 +64,7 @@ test('renders the gainmap with custom parameters', async ({ page }) => {
     offsetSdr
   })
 
-  const meta = await page.evaluate(extractXMPInBrowser, result)
+  const meta = await page.evaluate(extractXMPInBrowser, result.jpeg)
 
   const expectedGainMapMin = [Math.log2(minContentBoost), Math.log2(minContentBoost), Math.log2(minContentBoost)]
   const expectedGainMapMax = [Math.log2(maxContentBoost), Math.log2(maxContentBoost), Math.log2(maxContentBoost)]
@@ -94,7 +94,7 @@ test('renders the gainmap with custom parameters', async ({ page }) => {
   expect.soft(meta!.hdrCapacityMin, 'written hdrCapacityMin does not match input').toBeCloseTo(Math.min.apply(this, expectedGainMapMin), 4)
   expect.soft(meta!.hdrCapacityMax, 'written hdrCapacityMax does not match input').toBeCloseTo(Math.max.apply(this, expectedGainMapMax), 4)
 
-  const extracted = await page.evaluate(testMPFExtractorInBrowser, result)
+  const extracted = await page.evaluate(testMPFExtractorInBrowser, result.jpeg)
 
   const resizedGainmap = await sharp(Buffer.from(extracted[1]))
     .resize({ width: 500, height: 500, fit: 'inside' })
@@ -128,7 +128,7 @@ test('re-renders the gainmap on demand with custom parameters', async ({ page })
     }
   })
 
-  const meta = await page.evaluate(extractXMPInBrowser, result)
+  const meta = await page.evaluate(extractXMPInBrowser, result.jpeg)
 
   const expectedGainMapMin = [Math.log2(minContentBoost), Math.log2(minContentBoost), Math.log2(minContentBoost)]
   const expectedGainMapMax = [Math.log2(maxContentBoost), Math.log2(maxContentBoost), Math.log2(maxContentBoost)]
@@ -158,7 +158,7 @@ test('re-renders the gainmap on demand with custom parameters', async ({ page })
   expect.soft(meta!.hdrCapacityMin, 'written hdrCapacityMin does not match input').toBeCloseTo(Math.min.apply(this, expectedGainMapMin), 4)
   expect.soft(meta!.hdrCapacityMax, 'written hdrCapacityMax does not match input').toBeCloseTo(Math.max.apply(this, expectedGainMapMax), 4)
 
-  const extracted = await page.evaluate(testMPFExtractorInBrowser, result)
+  const extracted = await page.evaluate(testMPFExtractorInBrowser, result.jpeg)
 
   const resizedGainmap = await sharp(Buffer.from(extracted[1]))
     .resize({ width: 500, height: 500, fit: 'inside' })
@@ -172,22 +172,33 @@ const toneMappings: [ToneMapping, string][] = [
   [LinearToneMapping, 'LinearToneMapping'],
   [ACESFilmicToneMapping, 'ACESFilmicToneMapping'],
   [CineonToneMapping, 'CineonToneMapping'],
-  [ReinhardToneMapping, 'ReinhardToneMapping']
+  [ReinhardToneMapping, 'ReinhardToneMapping'],
+  // @ts-expect-error this is purposely invalid
+  [-1, 'INVALID']
 ]
 
 for (const toneMapping of toneMappings) {
   test(`encodes from exr using tone mapping ${toneMapping[1]}`, async ({ page }) => {
     await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
 
+    const logs: string[] = []
+    page.on('console', (m: ConsoleMessage) => {
+      logs.push(m.text())
+    })
+
     const script = page.getByTestId('script')
     await expect(script).toBeAttached()
 
     const result = await page.evaluate(encodeInBrowser, { file: 'files/memorial.exr', toneMapping: toneMapping[0] })
 
-    const resized = await sharp(Buffer.from(result))
+    const resized = await sharp(Buffer.from(result.jpeg))
       .resize({ width: 500, height: 500, fit: 'inside' })
       .png({ compressionLevel: 9, effort: 10 })
       .toBuffer()
+
+    if (toneMapping[1] === 'INVALID') {
+      expect(logs.find(m => m.match(/Unsupported toneMapping/gi))).toBeTruthy()
+    }
 
     expect(resized).toMatchSnapshot(`memorial.exr-encode-result-with-tone-mapping-${toneMapping[1]}.png`)
   })
@@ -211,7 +222,7 @@ test('encodes from exr with custom sdr parameters', async ({ page }) => {
     }
   })
 
-  const resized = await sharp(Buffer.from(result))
+  const resized = await sharp(Buffer.from(result.jpeg))
     .resize({ width: 500, height: 500, fit: 'inside' })
     .png({ compressionLevel: 9, effort: 10 })
     .toBuffer()

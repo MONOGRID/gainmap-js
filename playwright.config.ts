@@ -31,7 +31,7 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:8080',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: process.env.CI ? 'on-first-retry' : 'retain-on-failure',
 
     // Emulates the user locale.
     locale: 'en-GB',

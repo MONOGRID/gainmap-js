@@ -161,24 +161,32 @@ export class SDRMaterial extends ShaderMaterial {
 
   get toneMapping () { return this._toneMapping }
   set toneMapping (value: ToneMapping) {
+    let valid = false
     switch (value) {
       case ACESFilmicToneMapping:
         this.defines.TONEMAPPING_FUNCTION = 'ACESFilmicToneMapping'
+        valid = true
         break
       case ReinhardToneMapping:
         this.defines.TONEMAPPING_FUNCTION = 'ReinhardToneMapping'
+        valid = true
         break
       case CineonToneMapping:
         this.defines.TONEMAPPING_FUNCTION = 'CineonToneMapping'
+        valid = true
         break
       case LinearToneMapping:
         this.defines.TONEMAPPING_FUNCTION = 'LinearToneMapping'
+        valid = true
         break
       default:
-        console.error('Unsupported toneMapping')
-        return
+        console.error(`Unsupported toneMapping: ${value}. Using LinearToneMapping.`)
+        this.defines.TONEMAPPING_FUNCTION = 'LinearToneMapping'
+        this._toneMapping = LinearToneMapping
     }
-    this._toneMapping = value
+    if (valid) {
+      this._toneMapping = value
+    }
     this.needsUpdate = true
   }
 

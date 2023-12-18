@@ -75,3 +75,15 @@ test('throw when given an invalid jpeg', async ({ page }) => {
 
   await expect(shouldThrow).rejects.toThrow(/Not a valid jpeg/)
 })
+
+// test('extracts an unrelated mpf image', async ({ page }) => {
+//   await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+//   const script = page.getByTestId('script')
+//   await expect(script).toBeAttached()
+
+//   const result = await page.evaluate(testMPFExtractorInBrowser, 'files/340_AppleiPhoneXSMax_IMG_E7156.jpg')
+
+//   expect(result).not.toBeNull()
+//   expect(result.length).toBe(2)
+// })
