@@ -1,3 +1,10 @@
+## [3.0.2](https://github.com/MONOGRID/gainmap-js/compare/v3.0.1...v3.0.2) (2024-01-31)
+
+
+### Bug Fixes
+
+* **encode:** encodes a valid image when an invalid tonemapping value was provided as input ([94cec23](https://github.com/MONOGRID/gainmap-js/commit/94cec2363aa0dcb3cc46fca048c68ed7e555ebd0))
+
 ## [3.0.1](https://github.com/MONOGRID/gainmap-js/compare/v3.0.0...v3.0.1) (2023-12-03)
 
 
