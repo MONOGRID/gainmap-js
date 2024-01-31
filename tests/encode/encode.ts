@@ -87,5 +87,24 @@ export const encodeInBrowser = async (args: Omit<encode.EncodingParametersWithCo
   encodingResult.gainMap.dispose(true)
   encodingResult.sdr.dispose(true)
 
-  return Array.from(jpeg)
+  return {
+    jpeg: Array.from(jpeg),
+    sdrMaterialValues: {
+      toneMapping: encodingResult.sdr.material.toneMapping,
+      brightness: encodingResult.sdr.material.brightness,
+      contrast: encodingResult.sdr.material.contrast,
+      saturation: encodingResult.sdr.material.saturation
+    },
+    gainMapMaterialValues: {
+      maxContentBoost: encodingResult.gainMap.material.maxContentBoost,
+      minContentBoost: encodingResult.gainMap.material.minContentBoost,
+      gainMapMax: encodingResult.gainMap.material.gainMapMax,
+      gainMapMin: encodingResult.gainMap.material.gainMapMin,
+      hdrCapacityMin: encodingResult.gainMap.material.hdrCapacityMin,
+      hdrCapacityMax: encodingResult.gainMap.material.hdrCapacityMax,
+      offsetHdr: encodingResult.gainMap.material.offsetHdr,
+      offsetSdr: encodingResult.gainMap.material.offsetSdr,
+      gamma: encodingResult.gainMap.material.gamma
+    }
+  }
 }

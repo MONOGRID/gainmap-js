@@ -29,34 +29,10 @@ export const decodeInBrowser = async (args: { file: string }) => {
     createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
   ])
 
-  // create textures
-  const gainMap = new THREE.Texture(gainMapImageBitmap,
-    THREE.UVMapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.LinearFilter,
-    THREE.LinearMipMapLinearFilter,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-    1,
-    THREE.LinearSRGBColorSpace
-  )
-
+  const gainMap = new THREE.Texture(gainMapImageBitmap)
   gainMap.needsUpdate = true
 
-  // create textures
-  const sdr = new THREE.Texture(sdrImageBitmap,
-    THREE.UVMapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.ClampToEdgeWrapping,
-    THREE.LinearFilter,
-    THREE.LinearMipMapLinearFilter,
-    THREE.RGBAFormat,
-    THREE.UnsignedByteType,
-    1,
-    THREE.SRGBColorSpace
-  )
-
+  const sdr = new THREE.Texture(sdrImageBitmap)
   sdr.needsUpdate = true
 
   // restore the HDR texture
@@ -85,4 +61,20 @@ export const decodeInBrowser = async (args: { file: string }) => {
   renderer.render(scene, camera)
 
   result.dispose()
+
+  return {
+    jpeg: Array.from(jpeg),
+    materialValues: {
+      sdr: result.material.sdr.toJSON(),
+      gainMap: result.material.gainMap.toJSON(),
+      offsetHdr: result.material.offsetHdr,
+      offsetSdr: result.material.offsetSdr,
+      gainMapMin: result.material.gainMapMin,
+      gainMapMax: result.material.gainMapMax,
+      gamma: result.material.gamma,
+      hdrCapacityMin: result.material.hdrCapacityMin,
+      hdrCapacityMax: result.material.hdrCapacityMax,
+      maxDisplayBoost: result.material.maxDisplayBoost
+    }
+  }
 }

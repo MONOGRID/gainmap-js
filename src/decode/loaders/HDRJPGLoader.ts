@@ -80,6 +80,9 @@ export class HDRJPGLoader extends LoaderBase<string> {
     loader.setWithCredentials(this.withCredentials)
     this.manager.itemStart(url)
     loader.load(url, async (jpeg) => {
+      /* istanbul ignore if
+       this condition exists only because of three.js types + strict mode
+      */
       if (typeof jpeg === 'string') throw new Error('Invalid buffer, received [string], was expecting [ArrayBuffer]')
       const jpegBuffer = new Uint8Array(jpeg)
       let sdrJPEG: Uint8Array
