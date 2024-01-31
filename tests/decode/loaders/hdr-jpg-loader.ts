@@ -1,11 +1,7 @@
 import * as decode from '@monogrid/gainmap-js'
 import * as THREE from 'three'
 
-export const testHDRJpegLoaderInBrowser = async (args: { file: string, noCreateImageBitmap?: boolean, exposure?:number } & Partial<decode.GainmapDecodingParameters>) => {
-  if (args.noCreateImageBitmap === true) {
-    // @ts-expect-error forcing our hand here
-    window.createImageBitmap = undefined
-  }
+export const testHDRJpegLoaderInBrowser = async (args: { file: string, exposure?:number } & Partial<decode.GainmapDecodingParameters>) => {
   const renderer = new THREE.WebGLRenderer()
   renderer.toneMapping = THREE.LinearToneMapping
   renderer.toneMappingExposure = args.exposure || 1
