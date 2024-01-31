@@ -118,7 +118,7 @@
     "@semantic-release/npm": "^11.0.1",
     "@semantic-release/release-notes-generator": "^12.1.0",
     "@types/node": "^20.9.0",
-    "@types/three": "^0.159.0",
+    "@types/three": "^0.160.0",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
     "concurrently": "^8.2.2",
