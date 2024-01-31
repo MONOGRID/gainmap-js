@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test'
+import { ConsoleMessage, expect } from '@playwright/test'
 
 import { test } from '../testWithCoverage'
 import { decodeInBrowser } from './decode'
@@ -26,10 +26,21 @@ import { decodeInBrowser } from './decode'
 test('decodes from jpeg', async ({ page }) => {
   await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
 
+  const logs: string[] = []
+  page.on('console', (m: ConsoleMessage) => {
+    logs.push(m.text())
+  })
+
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(decodeInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
+  const result = await page.evaluate(decodeInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
+
+  expect(JSON.stringify(result.materialValues)).toMatchSnapshot({ name: 'material-values.json' })
+
+  // test conversion to appropriate colorspace happens
+  expect(logs.find(m => m.match(/Gainmap Colorspace needs to be/gi))).toBeTruthy()
+  expect(logs.find(m => m.match(/SDR Colorspace needs to be/gi))).toBeTruthy()
 
   await expect(page).toHaveScreenshot('render.png')
 })
