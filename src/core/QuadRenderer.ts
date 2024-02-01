@@ -157,9 +157,9 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   private _colorSpace: ColorSpace
   private _supportsReadPixels: boolean = true
   /**
+   * Constructs a new QuadRenderer
    *
-   * @param sourceTexture
-   * @param renderer
+   * @param options Parameters for this QuadRenderer
    */
   constructor (options: QuadRendererOptions<TType, TMaterial>) {
     this._width = options.width

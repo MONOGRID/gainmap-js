@@ -117,7 +117,7 @@
     "@semantic-release/github": "^9.2.6",
     "@semantic-release/npm": "^11.0.2",
     "@semantic-release/release-notes-generator": "^12.1.0",
-    "@types/node": "^20.9.0",
+    "@types/node": "^20.11.15",
     "@types/three": "^0.160.0",
     "@typescript-eslint/eslint-plugin": "^6.20.0",
     "@typescript-eslint/parser": "^6.20.0",

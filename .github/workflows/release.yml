@@ -46,7 +46,7 @@ jobs:
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
           with:
-            node-version: 18
+            node-version: 20
 
         - name: 'Install Packages'
           run: npm ci
