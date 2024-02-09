@@ -1,3 +1,10 @@
+## [3.0.3](https://github.com/MONOGRID/gainmap-js/compare/v3.0.2...v3.0.3) (2024-02-09)
+
+
+### Bug Fixes
+
+* **libultrahdr-wasm:** encoding of odd sized images ([#31](https://github.com/MONOGRID/gainmap-js/issues/31)) ([efd52c3](https://github.com/MONOGRID/gainmap-js/commit/efd52c385387d2575c161e243b07369100e8e349))
+
 ## [3.0.2](https://github.com/MONOGRID/gainmap-js/compare/v3.0.1...v3.0.2) (2024-01-31)
 
 
