@@ -252,6 +252,70 @@ module.exports = defineConfig({
 })
 ```
 
+
+Hi, thanks for reporting this.
+I'm afraid this is a documentation issue on my side, I'm going to update the README after resolving this
+Here's a rough draft, let me know if it works for you (I already pushed the `rollup.config.decodeonly.mjs`)
+
+## Building with full encoding support (libultrahdr-wasm)
+
+Clone the repository with git submodules recursively:
+```bash
+$ git clone --recurse-submodules git@github.com:MONOGRID/gainmap-js.git
+```
+
+Proceed to build the libultrahdr-wasm module following the [documentation found here](https://github.com/MONOGRID/libultrahdr-wasm#building), here's a quick summary
+
+```bash
+$ cd gainmap-js/libultrahdr-wasm/
+```
+Create a meson "cross compile config" named em.txt and place the following content inside:
+```ini
+[binaries]
+c = 'emcc'
+cpp = 'em++'
+ar = 'emar'
+nm = 'emnm'
+
+[host_machine]
+system = 'emscripten'
+cpu_family = 'wasm32'
+cpu = 'wasm32'
+endian = 'little'
+```
+Then execute
+
+```bash
+$ meson setup build --cross-file=em.txt
+$ meson compile -C build
+```
+
+After compiling the WASM, head back to the main repository
+
+```bash
+$ cd ..
+$ npm i
+$ npm run build
+```
+
+## Building with no encoding support (requires no wasm)
+
+> :warning: Building the library with decode only capabilities will not allow to run playwright e2e tests with `npm run test`
+> this method should only be used by people who would like to customize the "decoding" part of the library but are unable to build the WASM module for some reason (emscripten can be tricky sometimes, I've been there)
+
+Clone the repository normally:
+```bash
+$ git clone git@github.com:MONOGRID/gainmap-js.git
+$ cd gainmap-js
+$ npm i
+```
+
+build with
+```bash
+$ npm run build --config rollup.config.decodeonly.mjs
+```
+
+
 ## References
 
 * [Adobe Gainmap Specification](https://helpx.adobe.com/camera-raw/using/gain-map.html)
