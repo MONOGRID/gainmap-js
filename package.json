@@ -91,7 +91,7 @@
     "check:typecheck-tests": "tsc -p tests",
     "check:eslint-tests": "eslint \"tests/**/*.ts\"",
     "ci:check": "concurrently npm:ci:check:*",
-    "ci:check:typecheck-src": "tsc --pretty false > reports/typecheck.log",
+    "ci:check:typecheck-src": "tsc --pretty false -p src > reports/typecheck.log",
     "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
     "ci:check:typecheck-examples": "tsc --pretty false -p examples > reports/typecheck-examples.log",
     "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.{ts,html}\"",
