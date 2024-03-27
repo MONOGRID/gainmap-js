@@ -31,11 +31,22 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
    * @param renderer
    * @param manager
    */
-  constructor (renderer: WebGLRenderer, manager?: LoadingManager) {
+  constructor (renderer?: WebGLRenderer, manager?: LoadingManager) {
     super(manager)
-    this._renderer = renderer
+    if (renderer) this._renderer = renderer
     this._internalLoadingManager = new LoadingManager()
   }
+
+  /**
+   * Specify the renderer to use when rendering the gain map
+   *
+   * @param renderer
+   * @returns
+   */
+    public setRenderer (renderer: WebGLRenderer) {
+      this._renderer = renderer
+      return this
+    }
 
   /**
    * Specify the renderTarget options to use when rendering the gain map
