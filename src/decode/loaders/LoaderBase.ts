@@ -20,7 +20,7 @@ import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
 export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
-  private _renderer: WebGLRenderer
+  private _renderer?: WebGLRenderer
   private _renderTargetOptions?: QuadRendererTextureOptions
   /**
    * @private
@@ -64,6 +64,8 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
    * @returns
    */
   protected prepareQuadRenderer () {
+    if (!this._renderer) console.warn("WARNING: An existing WebGL Renderer was not passed to this Loader constructor or in setRenderer, the result of this Loader will need to be converted to a Data Texture with toDataTexture() before you can use it in your renderer.")
+
     // temporary values
     const material = new GainMapDecoderMaterial({
       gainMapMax: [1, 1, 1],
