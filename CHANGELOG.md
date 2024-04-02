@@ -1,3 +1,10 @@
+## [3.0.4](https://github.com/MONOGRID/gainmap-js/compare/v3.0.3...v3.0.4) (2024-04-02)
+
+
+### Bug Fixes
+
+* adds setRenderer on LoaderBase ([#34](https://github.com/MONOGRID/gainmap-js/issues/34)) ([18ad0ec](https://github.com/MONOGRID/gainmap-js/commit/18ad0eca49d95685b7f78fc4137f4aaf1338e782))
+
 ## [3.0.3](https://github.com/MONOGRID/gainmap-js/compare/v3.0.2...v3.0.3) (2024-02-09)
 
 
