@@ -43,10 +43,10 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
    * @param renderer
    * @returns
    */
-    public setRenderer (renderer: WebGLRenderer) {
-      this._renderer = renderer
-      return this
-    }
+  public setRenderer (renderer: WebGLRenderer) {
+    this._renderer = renderer
+    return this
+  }
 
   /**
    * Specify the renderTarget options to use when rendering the gain map
@@ -64,7 +64,7 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
    * @returns
    */
   protected prepareQuadRenderer () {
-    if (!this._renderer) console.warn("WARNING: An existing WebGL Renderer was not passed to this Loader constructor or in setRenderer, the result of this Loader will need to be converted to a Data Texture with toDataTexture() before you can use it in your renderer.")
+    if (!this._renderer) console.warn('WARNING: An existing WebGL Renderer was not passed to this Loader constructor or in setRenderer, the result of this Loader will need to be converted to a Data Texture with toDataTexture() before you can use it in your renderer.')
 
     // temporary values
     const material = new GainMapDecoderMaterial({
