@@ -1,3 +1,10 @@
+## [3.0.5](https://github.com/MONOGRID/gainmap-js/compare/v3.0.4...v3.0.5) (2024-04-03)
+
+
+### Bug Fixes
+
+* **package.json:** publint fixes so that package is correctly imported in next.js ([#36](https://github.com/MONOGRID/gainmap-js/issues/36)) ([490df10](https://github.com/MONOGRID/gainmap-js/commit/490df10f401a82267595dd9e161cc6a0bbce3d94))
+
 ## [3.0.4](https://github.com/MONOGRID/gainmap-js/compare/v3.0.3...v3.0.4) (2024-04-02)
 
 
