@@ -253,10 +253,6 @@ module.exports = defineConfig({
 ```
 
 
-Hi, thanks for reporting this.
-I'm afraid this is a documentation issue on my side, I'm going to update the README after resolving this
-Here's a rough draft, let me know if it works for you (I already pushed the `rollup.config.decodeonly.mjs`)
-
 ## Building with full encoding support (libultrahdr-wasm)
 
 Clone the repository with git submodules recursively:
