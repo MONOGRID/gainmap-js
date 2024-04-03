@@ -94,7 +94,7 @@ let configs = [
     output: {
       format: 'umd',
       name: 'worker',
-      file: 'dist/worker.umd.js',
+      file: 'dist/worker.umd.cjs',
       ...settings
     },
     plugins,
@@ -113,7 +113,7 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       output: {
         format: 'umd',
         name,
-        file: 'dist/decode.umd.js',
+        file: 'dist/decode.umd.cjs',
         ...settings
       },
       plugins,
@@ -126,7 +126,7 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       output: {
         format: 'umd',
         name: 'encode',
-        file: 'dist/encode.umd.js',
+        file: 'dist/encode.umd.cjs',
         ...settings
       },
       plugins,
@@ -139,7 +139,7 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       output: {
         format: 'umd',
         name: 'libultrahdr',
-        file: 'dist/libultrahdr.umd.js',
+        file: 'dist/libultrahdr.umd.cjs',
         ...settings
       },
       plugins,
@@ -152,7 +152,7 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       output: {
         format: 'umd',
         name: 'worker-interface',
-        file: 'dist/worker-interface.umd.js',
+        file: 'dist/worker-interface.umd.cjs',
         ...settings
       },
       plugins,
