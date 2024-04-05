@@ -14,7 +14,7 @@ export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParam
   if (args.withWorker) {
     withWorker = workerInterface.getWorkerInterface(
       workerInterface.getPromiseWorker(
-        new Worker('../dist/worker.umd.js')
+        new Worker('../dist/worker.umd.cjs')
       )
     )
   }
