@@ -68,7 +68,6 @@ The disadvantages are:
 import { HDRJPGLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
-  LinearFilter,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -92,7 +91,6 @@ const mesh = new Mesh(
 scene.add(mesh)
 renderer.render(scene, new PerspectiveCamera())
 
-
 // Starting from three.js r159
 // `result.renderTarget.texture` can
 // also be used as Equirectangular scene background
@@ -102,11 +100,9 @@ renderer.render(scene, new PerspectiveCamera())
 scene.background = result.renderTarget.texture
 scene.background.mapping = EquirectangularReflectionMapping
 
-
 // result must be manually disposed
 // when you are done using it
 result.dispose()
-
 ```
 
 ### Using separate files
@@ -122,7 +118,6 @@ Using separate files will get rid of the limitations of using a single JPEG file
 import { GainMapLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,
-  LinearFilter,
   Mesh,
   MeshBasicMaterial,
   PerspectiveCamera,
@@ -146,7 +141,6 @@ const mesh = new Mesh(
 scene.add(mesh)
 renderer.render(scene, new PerspectiveCamera())
 
-
 // Starting from three.js r159
 // `result.renderTarget.texture` can
 // also be used as Equirectangular scene background
@@ -169,7 +163,7 @@ This is generally not useful in a `three.js` site but this library exposes metho
 that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
 
 ```ts
-import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js'
+import { compress, encode, findTextureMinMax } from '@monogrid/gainmap-js/encode'
 import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
 import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
 
@@ -178,7 +172,7 @@ const loader = new EXRLoader()
 const image = await loader.loadAsync('image.exr')
 
 // find RAW RGB Max value of a texture
-const textureMax = await findTextureMinMax(image)
+const textureMax = findTextureMinMax(image)
 
 // Encode the gainmap
 const encodingResult = encode({
@@ -188,17 +182,9 @@ const encodingResult = encode({
 })
 
 // obtain the RAW RGBA SDR buffer and create an ImageData
-const sdrImageData = new ImageData(
-  encodingResult.sdr.toArray(),
-  encodingResult.sdr.width,
-  encodingResult.sdr.height
-)
+const sdrImageData = new ImageData(encodingResult.sdr.toArray(), encodingResult.sdr.width, encodingResult.sdr.height)
 // obtain the RAW RGBA Gain map buffer and create an ImageData
-const gainMapImageData = new ImageData(
-  encodingResult.gainMap.toArray(),
-  encodingResult.gainMap.width,
-  encodingResult.gainMap.height
-)
+const gainMapImageData = new ImageData(encodingResult.gainMap.toArray(), encodingResult.gainMap.width, encodingResult.gainMap.height)
 
 // parallel compress the RAW buffers into the specified mimeType
 const mimeType = 'image/jpeg'
@@ -233,6 +219,12 @@ const jpeg = await encodeJPEGMetadata({
 })
 
 // `jpeg` will be an `Uint8Array` which can be saved somewhere
+
+// encoder must be manually disposed
+// when no longer needed
+encodingResult.gainMap.dispose()
+encodingResult.sdr.dispose()
+
 ```
 
 ## Libultrahdr in Vite
