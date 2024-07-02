@@ -4,7 +4,9 @@ import { join } from 'path'
 
 import { test } from '../testWithCoverage'
 
+// @ts-expect-error tsc throws "Named capturing groups are only available when targeting 'ES2018' or later." here
 const threeMatch = /https:\/\/unpkg\.com\/three(?<version>@[0-9.]+)?\/(?<path>.*)/
+// @ts-expect-error tsc throws "Named capturing groups are only available when targeting 'ES2018' or later." here
 const gainmapJSMatch = /https:\/\/unpkg\.com\/@monogrid\/gainmap-js(?<version>@[0-9.]+)?\/(?<path>.*)/
 
 test('renders the example correctly', async ({ page, context }) => {

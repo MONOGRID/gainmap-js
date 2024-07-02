@@ -20,6 +20,7 @@ import {
   ShortType,
   Texture,
   TextureDataType,
+  TypedArray,
   UnsignedByteType,
   UnsignedIntType,
   UVMapping,
@@ -76,7 +77,7 @@ export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends
 }
 
 const getBufferForType = (type: TextureDataType, width: number, height: number) => {
-  let out: ArrayLike<number>
+  let out: TypedArray
   switch (type) {
     case UnsignedByteType:
       out = new Uint8ClampedArray(width * height * 4)
@@ -272,7 +273,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * Performs a readPixel operation in the renderTarget
    * and returns a DataTexture containing the read data
    *
-   * @params options
+   * @param options options
    * @returns
    */
   public toDataTexture (options?: QuadRendererTextureOptions) {
