@@ -20,6 +20,7 @@ import {
   ShortType,
   Texture,
   TextureDataType,
+  TypedArray,
   UnsignedByteType,
   UnsignedIntType,
   UVMapping,
@@ -76,7 +77,7 @@ export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends
 }
 
 const getBufferForType = (type: TextureDataType, width: number, height: number) => {
-  let out: ArrayLike<number>
+  let out: TypedArray
   switch (type) {
     case UnsignedByteType:
       out = new Uint8ClampedArray(width * height * 4)
