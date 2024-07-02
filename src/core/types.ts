@@ -70,7 +70,7 @@ export type GainMapMetadata = {
  */
 export type QuadRendererTextureOptions = Omit<RenderTargetOptions, 'type' | 'format'| 'colorSpace' | 'encoding' | 'depthTexture' | 'stencilBuffer' | 'depthBuffer' | 'internalFormat'> & {
   /**
-   * @defaultValue {@link UVMapping}
+   * @defaultValue {@link Mapping}
    */
   mapping?: Mapping,
   /**

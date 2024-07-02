@@ -273,7 +273,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * Performs a readPixel operation in the renderTarget
    * and returns a DataTexture containing the read data
    *
-   * @params options
+   * @param options options
    * @returns
    */
   public toDataTexture (options?: QuadRendererTextureOptions) {

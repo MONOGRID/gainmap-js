@@ -69,7 +69,7 @@ void main() {
  * @category Utility
  * @group Utility
  *
- * @param srcTex
+ * @param image
  * @param mode
  * @param renderer
  * @returns
