@@ -85,7 +85,7 @@
     "start": "concurrently -n rollup,servez -c magenta,green \"rollup -c -w\" \"servez\"",
     "test": "nyc --reporter=text --reporter=lcov playwright test",
     "test:startserver": "rollup -c && servez",
-    "test:docker": "docker run --rm --network host -v $(pwd):/work -w /work -it -u $(id -u ${USER}):$(id -g ${USER}) mcr.microsoft.com/playwright:v1.45.0-jammy /bin/bash",
+    "test:docker": "docker run --rm --network host -v $(pwd):/work -w /work -it -u $(id -u ${USER}):$(id -g ${USER}) mcr.microsoft.com/playwright:v1.46.0-jammy /bin/bash",
     "test:codegen": "playwright codegen http://localhost:8080",
     "prepack": "npm run build",
     "check": "concurrently -c auto npm:check:*",
@@ -110,7 +110,7 @@
     "promise-worker-transferable": "^1.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.45.0",
+    "@playwright/test": "^1.46.0",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -119,7 +119,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "github:semantic-release/git",
-    "@semantic-release/github": "^10.0.7",
+    "@semantic-release/github": "^10.1.3",
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/node": "^20.14.9",
@@ -140,19 +140,19 @@
     "eslint-plugin-simple-import-sort": "^12.0.0",
     "eslint-plugin-unused-imports": "^3.2.0",
     "nyc": "^17.0.0",
-    "rollup": "^4.18.0",
+    "rollup": "^4.20.0",
     "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-istanbul": "^5.0.0",
-    "rollup-plugin-license": "^3.5.1",
+    "rollup-plugin-license": "^3.5.2",
     "semantic-release": "^24.0.0",
-    "servez": "^2.1.6",
+    "servez": "^2.2.3",
     "sharp": "^0.33.4",
     "three": "^0.167.1",
-    "typedoc": "^0.26.3",
+    "typedoc": "^0.26.5",
     "typedoc-github-wiki-theme": "^2.0.0",
-    "typedoc-plugin-markdown": "^4.1.1",
-    "typescript": "^5.5.3"
+    "typedoc-plugin-markdown": "^4.2.3",
+    "typescript": "^5.5.4"
   },
   "browserslist": [
     "> 1%, not dead, not ie 11, not op_mini all"
