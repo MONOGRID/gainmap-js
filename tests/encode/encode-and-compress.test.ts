@@ -32,6 +32,8 @@ test('encodes and compresses from exr', async ({ page }) => {
 
   const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
 
+  expect(result.length).toBeGreaterThan(0)
+
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
     .png({ compressionLevel: 9, effort: 10 })
@@ -48,6 +50,8 @@ test('encodes and compresses odd sized images', async ({ page }) => {
 
   const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/odd-sized.exr' })
 
+  expect(result.length).toBeGreaterThan(0)
+
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
     .png({ compressionLevel: 9, effort: 10 })
@@ -63,6 +67,8 @@ test('encodes and compresses from exr using worker', async ({ page }) => {
   await expect(script).toBeAttached()
 
   const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr', withWorker: true })
+
+  expect(result.length).toBeGreaterThan(0)
 
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
@@ -81,6 +87,8 @@ test('encodes and compresses from exr with no OffscreenCanvas', async ({ page })
   await page.evaluate(disableOffscreenCanvas)
 
   const result = await page.evaluate(encodeAndCompressInBrowser, { file: 'files/memorial.exr' })
+
+  expect(result.length).toBeGreaterThan(0)
 
   const resized = await sharp(Buffer.from(result))
     .resize({ width: 500, height: 500, fit: 'inside' })
