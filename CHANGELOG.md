@@ -1,3 +1,10 @@
+## [3.0.6](https://github.com/MONOGRID/gainmap-js/compare/v3.0.5...v3.0.6) (2024-09-03)
+
+
+### Bug Fixes
+
+* remove LogLuv following threejs removal https://github.com/mrdoob/three.js/pull/29144 ([1df2154](https://github.com/MONOGRID/gainmap-js/commit/1df2154dce59aff39439eb4974c42b55eddc862b))
+
 ## [3.0.5](https://github.com/MONOGRID/gainmap-js/compare/v3.0.4...v3.0.5) (2024-04-03)
 
 
