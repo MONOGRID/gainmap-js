@@ -1,6 +1,5 @@
 import { DataTexture, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, RGBAFormat, UVMapping } from 'three'
 import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 /**
  * Utility function to obtain a `DataTexture` from various input formats
@@ -11,7 +10,7 @@ import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
  * @param image
  * @returns
  */
-export const getDataTexture = (image: EXR | RGBE | LogLuv | DataTexture) => {
+export const getDataTexture = (image: EXR | RGBE | DataTexture) => {
   let dataTexture: DataTexture
 
   if (image instanceof DataTexture) {

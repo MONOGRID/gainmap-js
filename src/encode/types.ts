@@ -1,6 +1,5 @@
 import { type DataTexture, ToneMapping, WebGLRenderer } from 'three'
 import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { type LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
 import { QuadRendererTextureOptions } from '../decode'
@@ -74,7 +73,7 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
   /**
    * Input image for encoding, must be an HDR image
    */
-  image: EXR | RGBE | LogLuv | DataTexture,
+  image: EXR | RGBE | DataTexture,
   /**
    * Optional WebGLRenderer
    * @remarks
@@ -106,7 +105,7 @@ export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
  * @category Utility
  * @group Utility
  */
-export type HDRRawImageBuffer = EXR['data'] | RGBE['data'] | LogLuv['data']
+export type HDRRawImageBuffer = EXR['data'] | RGBE['data']
 
 /**
  * Raw HDR image data

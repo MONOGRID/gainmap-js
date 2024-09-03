@@ -10,7 +10,6 @@ import {
   WebGLRenderTarget
 } from 'three'
 import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { LogLuv } from 'three/examples/jsm/loaders/LogLuvLoader'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
 
 import { getDataTexture } from '../core/get-data-texture'
@@ -74,7 +73,7 @@ void main() {
  * @param renderer
  * @returns
  */
-export const findTextureMinMax = (image: EXR | RGBE | LogLuv | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
+export const findTextureMinMax = (image: EXR | RGBE | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
   const srcTex = getDataTexture(image)
   const cellSize = 2
 
