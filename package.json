@@ -148,7 +148,7 @@
     "semantic-release": "^24.0.0",
     "servez": "^2.2.3",
     "sharp": "^0.33.4",
-    "three": "^0.169.0",
+    "three": "^0.170.0",
     "typedoc": "^0.26.5",
     "typedoc-github-wiki-theme": "^2.0.0",
     "typedoc-plugin-markdown": "^4.2.3",
