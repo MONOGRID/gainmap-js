@@ -22,21 +22,21 @@ jobs:
 
       - name: 'Download build artifacts'
         if: always()
-        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        uses: dawidd6/action-download-artifact@v6 # download artifacts
         with:
           name: build-artifact
           run_id: ${{ github.event.workflow_run.id }}
 
       - name: 'Download check artifacts'
         if: always()
-        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        uses: dawidd6/action-download-artifact@v6 # download artifacts
         with:
           name: check-artifact
           run_id: ${{ github.event.workflow_run.id }}
 
       - name: 'Download test artifacts'
         if: always()
-        uses: dawidd6/action-download-artifact@v2 # download artifacts
+        uses: dawidd6/action-download-artifact@v6 # download artifacts
         with:
           name: test-artifact
           run_id: ${{ github.event.workflow_run.id }}
