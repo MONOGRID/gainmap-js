@@ -1,5 +1,6 @@
 import {
   ClampToEdgeWrapping,
+  ColorSpace,
   DataTexture,
   DataUtils,
   FloatType,
@@ -100,7 +101,7 @@ export const findTextureMinMax = (image: EXR | RGBE | DataTexture, mode: 'min' |
     width: w,
     height: h,
     type: srcTex.type,
-    colorSpace: srcTex.colorSpace,
+    colorSpace: srcTex.colorSpace as ColorSpace,
     material: mat,
     renderer
   })
