@@ -1,33 +1,25 @@
 import { GainMapMetadata } from '../../core/types'
 
-const getAttribute = (description: Element, name: string, defaultValue?: string) => {
-  let returnValue: string | [string, string, string]
-  const parsedValue = description.attributes.getNamedItem(name)?.nodeValue
-  if (!parsedValue) {
-    const node = description.getElementsByTagName(name)[0]
-    if (node) {
-      const values = node.getElementsByTagName('rdf:li')
-      if (values.length === 3) {
-        returnValue = Array.from(values).map(v => v.innerHTML) as [string, string, string]
-      } else {
-        throw new Error(`Gainmap metadata contains an array of items for ${name} but its length is not 3`)
-      }
-    } else {
-      if (defaultValue) return defaultValue
-      else throw new Error(`Can't find ${name} in gainmap metadata`)
+const getXMLValue = (xml: string, tag: string, defaultValue?: string): string | [string, string, string] => {
+  // Check for attribute format first: tag="value"
+  const attributeMatch = new RegExp(`${tag}="([^"]*)"`, 'i').exec(xml)
+  if (attributeMatch) return attributeMatch[1]
+
+  // Check for tag format: <tag>value</tag> or <tag><rdf:li>value</rdf:li>...</tag>
+  const tagMatch = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i').exec(xml)
+  if (tagMatch) {
+    // Check if it contains rdf:li elements
+    const liValues = tagMatch[1].match(/<rdf:li>([^<]*)<\/rdf:li>/g)
+    if (liValues && liValues.length === 3) {
+      return liValues.map(v => v.replace(/<\/?rdf:li>/g, '')) as [string, string, string]
     }
-  } else {
-    returnValue = parsedValue
+    return tagMatch[1].trim()
   }
 
-  return returnValue
+  if (defaultValue !== undefined) return defaultValue
+  throw new Error(`Can't find ${tag} in gainmap metadata`)
 }
 
-/**
- *
- * @param input
- * @returns
- */
 export const extractXMP = (input: Uint8Array): GainMapMetadata | undefined => {
   let str: string
   // support node test environment
@@ -35,29 +27,25 @@ export const extractXMP = (input: Uint8Array): GainMapMetadata | undefined => {
   else str = input.toString()
 
   let start = str.indexOf('<x:xmpmeta')
-  const parser = new DOMParser()
 
   while (start !== -1) {
     const end = str.indexOf('x:xmpmeta>', start)
-    str.slice(start, end + 10)
     const xmpBlock = str.slice(start, end + 10)
+
     try {
-      const xmlDocument = parser.parseFromString(xmpBlock, 'text/xml')
-      const description = xmlDocument.getElementsByTagName('rdf:Description')[0]
+      const gainMapMin = getXMLValue(xmpBlock, 'hdrgm:GainMapMin', '0')
+      const gainMapMax = getXMLValue(xmpBlock, 'hdrgm:GainMapMax')
+      const gamma = getXMLValue(xmpBlock, 'hdrgm:Gamma', '1')
+      const offsetSDR = getXMLValue(xmpBlock, 'hdrgm:OffsetSDR', '0.015625')
+      const offsetHDR = getXMLValue(xmpBlock, 'hdrgm:OffsetHDR', '0.015625')
 
-      const gainMapMin = getAttribute(description, 'hdrgm:GainMapMin', '0')
-      const gainMapMax = getAttribute(description, 'hdrgm:GainMapMax')
+      // These are always attributes, so we can use a simpler regex
+      const hdrCapacityMinMatch = /hdrgm:HDRCapacityMin="([^"]*)"/.exec(xmpBlock)
+      const hdrCapacityMin = hdrCapacityMinMatch ? hdrCapacityMinMatch[1] : '0'
 
-      const gamma = getAttribute(description, 'hdrgm:Gamma', '1')
-
-      const offsetSDR = getAttribute(description, 'hdrgm:OffsetSDR', '0.015625')
-      const offsetHDR = getAttribute(description, 'hdrgm:OffsetHDR', '0.015625')
-
-      let hdrCapacityMin = description.attributes.getNamedItem('hdrgm:HDRCapacityMin')?.nodeValue
-      if (!hdrCapacityMin) hdrCapacityMin = '0'
-
-      const hdrCapacityMax = description.attributes.getNamedItem('hdrgm:HDRCapacityMax')?.nodeValue
-      if (!hdrCapacityMax) throw new Error('Incomplete gainmap metadata')
+      const hdrCapacityMaxMatch = /hdrgm:HDRCapacityMax="([^"]*)"/.exec(xmpBlock)
+      if (!hdrCapacityMaxMatch) throw new Error('Incomplete gainmap metadata')
+      const hdrCapacityMax = hdrCapacityMaxMatch[1]
 
       return {
         gainMapMin: Array.isArray(gainMapMin) ? gainMapMin.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(gainMapMin), parseFloat(gainMapMin), parseFloat(gainMapMin)],
@@ -69,7 +57,7 @@ export const extractXMP = (input: Uint8Array): GainMapMetadata | undefined => {
         hdrCapacityMax: parseFloat(hdrCapacityMax)
       }
     } catch (e) {
-
+      // Continue searching for another xmpmeta block if this one fails
     }
     start = str.indexOf('<x:xmpmeta', end)
   }
