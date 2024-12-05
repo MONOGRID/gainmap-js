@@ -2,36 +2,6 @@ import { GainMapMetadata } from '../core/types'
 import { getLibrary } from './library'
 
 /**
- * @deprecated
- * @param description
- * @param name
- * @param defaultValue
- * @returns
- */
-/* istanbul ignore next */
-const getAttribute = (description: Element, name: string, defaultValue?: string) => {
-  let returnValue: string | [string, string, string]
-  const parsedValue = description.attributes.getNamedItem(name)?.nodeValue
-  if (!parsedValue) {
-    const node = description.getElementsByTagName(name)[0]
-    if (node) {
-      const values = node.getElementsByTagName('rdf:li')
-      if (values.length === 3) {
-        returnValue = Array.from(values).map(v => v.innerHTML) as [string, string, string]
-      } else {
-        throw new Error(`Gainmap metadata contains an array of items for ${name} but its length is not 3`)
-      }
-    } else {
-      if (defaultValue) return defaultValue
-      else throw new Error(`Can't find ${name} in gainmap metadata`)
-    }
-  } else {
-    returnValue = parsedValue
-  }
-
-  return returnValue
-}
-/**
  * Decodes a JPEG file with an embedded Gainmap and XMP Metadata (aka JPEG-R)
  *
  * @category Decoding
@@ -56,23 +26,41 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
   const result = lib.extractJpegR(file, file.length)
   if (!result.success) throw new Error(`${result.errorMessage}`)
 
-  const parser = new DOMParser()
-  const xmlDocument = parser.parseFromString(result.metadata as string, 'text/xml')
-  const description = xmlDocument.getElementsByTagName('rdf:Description')[0]
+  const getXMLValue = (xml: string, tag: string, defaultValue?: string): string | [string, string, string] => {
+    // Check for attribute format first: tag="value"
+    const attributeMatch = new RegExp(`${tag}="([^"]*)"`, 'i').exec(xml)
+    if (attributeMatch) return attributeMatch[1]
 
-  const gainMapMin = getAttribute(description, 'hdrgm:GainMapMin', '0')
-  const gainMapMax = getAttribute(description, 'hdrgm:GainMapMax')
+    // Check for tag format: <tag>value</tag> or <tag><rdf:li>value</rdf:li>...</tag>
+    const tagMatch = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, 'i').exec(xml)
+    if (tagMatch) {
+      // Check if it contains rdf:li elements
+      const liValues = tagMatch[1].match(/<rdf:li>([^<]*)<\/rdf:li>/g)
+      if (liValues && liValues.length === 3) {
+        return liValues.map(v => v.replace(/<\/?rdf:li>/g, '')) as [string, string, string]
+      }
+      return tagMatch[1].trim()
+    }
 
-  const gamma = getAttribute(description, 'hdrgm:Gamma', '1')
+    if (defaultValue !== undefined) return defaultValue
+    throw new Error(`Can't find ${tag} in gainmap metadata`)
+  }
 
-  const offsetSDR = getAttribute(description, 'hdrgm:OffsetSDR', '0.015625')
-  const offsetHDR = getAttribute(description, 'hdrgm:OffsetHDR', '0.015625')
+  const metadata = result.metadata as string
 
-  let hdrCapacityMin = description.attributes.getNamedItem('hdrgm:HDRCapacityMin')?.nodeValue
-  if (!hdrCapacityMin) hdrCapacityMin = '0'
+  const gainMapMin = getXMLValue(metadata, 'hdrgm:GainMapMin', '0')
+  const gainMapMax = getXMLValue(metadata, 'hdrgm:GainMapMax')
+  const gamma = getXMLValue(metadata, 'hdrgm:Gamma', '1')
+  const offsetSDR = getXMLValue(metadata, 'hdrgm:OffsetSDR', '0.015625')
+  const offsetHDR = getXMLValue(metadata, 'hdrgm:OffsetHDR', '0.015625')
 
-  const hdrCapacityMax = description.attributes.getNamedItem('hdrgm:HDRCapacityMax')?.nodeValue
-  if (!hdrCapacityMax) throw new Error('Incomplete gainmap metadata')
+  // These are always attributes, so we can use a simpler regex
+  const hdrCapacityMinMatch = /hdrgm:HDRCapacityMin="([^"]*)"/.exec(metadata)
+  const hdrCapacityMin = hdrCapacityMinMatch ? hdrCapacityMinMatch[1] : '0'
+
+  const hdrCapacityMaxMatch = /hdrgm:HDRCapacityMax="([^"]*)"/.exec(metadata)
+  if (!hdrCapacityMaxMatch) throw new Error('Incomplete gainmap metadata')
+  const hdrCapacityMax = hdrCapacityMaxMatch[1]
 
   const parsedMetadata: GainMapMetadata = {
     gainMapMin: Array.isArray(gainMapMin) ? gainMapMin.map(v => parseFloat(v)) as [number, number, number] : [parseFloat(gainMapMin), parseFloat(gainMapMin), parseFloat(gainMapMin)],
@@ -86,9 +74,6 @@ export const decodeJPEGMetadata = async (file: Uint8Array) => {
 
   return {
     ...result,
-    /**
-     * Parsed metadata
-     */
     parsedMetadata
   }
 }
