@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/MONOGRID/gainmap-js/compare/v3.0.6...v3.1.0) (2024-12-05)
+
+
+### Features
+
+* **decode:** removes `DOMParser`, decode is now compatible with Web Workers ([b6a607d](https://github.com/MONOGRID/gainmap-js/commit/b6a607d1be3e7e86524e059c9eb61c8ee2a9e6f7))
+
 ## [3.0.6](https://github.com/MONOGRID/gainmap-js/compare/v3.0.5...v3.0.6) (2024-09-03)
 
 
