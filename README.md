@@ -52,6 +52,7 @@ Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed do
 The main use case of this library is to decode a JPEG file that contains gain map data
 and use it instead of a traditional `.exr` or `.hdr` image.
 
+> NOTE: Starting from v3.1.0 Decoding also works in a WebWorker, thanks to [Alejandro Romano](https://github.com/Arecsu) for the [contribution](https://github.com/MONOGRID/gainmap-js/pull/59)
 
 ### Using a single JPEG with embedded Gain map Metadata
 
