@@ -18,7 +18,7 @@
     "url": "git+ssh://git@github.com/MONOGRID/gainmap-js.git"
   },
   "license": "MIT",
-  "author": "MONOGRID <rnd@monogrid.com>",
+  "author": "MONOGRID <gainmap@monogrid.com>",
   "sideEffects": false,
   "type": "module",
   "exports": {

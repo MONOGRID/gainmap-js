@@ -7,6 +7,13 @@ A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Tec
 >
 > It can be used for general encode/decode of gain maps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gain maps.
 
+## Share Your Project!
+Have you built something awesome using this library? We’d love to see what you’ve created!
+Whether it’s a small demo or a full-scale application, your project can inspire others and help improve the library. Please share your work in one of these ways:
+* GitHub Issues: [Open a new issue](https://github.com/MONOGRID/gainmap-js/issues/new) in this repository with a brief description, screenshots, and links to your project.
+* Email: Send us an email at gainmap@monogrid.com with your project details.
+Your contributions and creative ideas make our community stronger. We can’t wait to see what you build!
+
 ## Live Demo
 
 https://monogrid.github.io/gainmap-js/
