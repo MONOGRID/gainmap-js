@@ -68,9 +68,9 @@ export type GainMapMetadata = {
 /**
  *
  */
-export type QuadRendererTextureOptions = Omit<RenderTargetOptions, 'type' | 'format'| 'colorSpace' | 'encoding' | 'depthTexture' | 'stencilBuffer' | 'depthBuffer' | 'internalFormat'> & {
+export type QuadRendererTextureOptions = Omit<RenderTargetOptions, 'type' | 'format' | 'colorSpace' | 'encoding' | 'depthTexture' | 'stencilBuffer' | 'depthBuffer' | 'internalFormat'> & {
   /**
-   * @defaultValue {@link Mapping}
+   * @defaultValue 300
    */
   mapping?: Mapping,
   /**

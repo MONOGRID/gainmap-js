@@ -2,11 +2,6 @@
   "name": "@monogrid/gainmap-js",
   "version": "3.1.0",
   "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gain map",
-  "homepage": "https://github.com/MONOGRID/gainmap-js#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/MONOGRID/gainmap-js.git"
-  },
   "keywords": [
     "hdr",
     "gain map",
@@ -14,23 +9,16 @@
     "three",
     "threejs"
   ],
-  "author": "MONOGRID <rnd@monogrid.com>",
-  "license": "MIT",
+  "homepage": "https://github.com/MONOGRID/gainmap-js#readme",
   "bugs": {
     "url": "https://github.com/MONOGRID/gainmap-js/issues"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/MONOGRID/gainmap-js.git"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "main": "dist/decode.umd.cjs",
-  "module": "dist/decode.js",
-  "types": "dist/decode.d.ts",
+  "license": "MIT",
+  "author": "MONOGRID <rnd@monogrid.com>",
   "sideEffects": false,
   "type": "module",
   "exports": {
@@ -60,6 +48,9 @@
       "default": "./dist/worker-interface.umd.cjs"
     }
   },
+  "main": "dist/decode.umd.cjs",
+  "module": "dist/decode.js",
+  "types": "dist/decode.d.ts",
   "typesVersions": {
     "*": {
       ".": [
@@ -81,36 +72,42 @@
   },
   "scripts": {
     "build": "rollup -c",
+    "check": "concurrently -c auto npm:check:*",
+    "check:eslint-examples": "eslint \"examples/**/*.{ts,html}\"",
+    "check:eslint-src": "eslint \"src/**/*.ts\"",
+    "check:eslint-tests": "eslint \"tests/**/*.ts\"",
+    "check:typecheck-examples": "tsc -p examples",
+    "check:typecheck-src": "tsc -p src",
+    "check:typecheck-tests": "tsc -p tests",
+    "ci:check": "concurrently npm:ci:check:*",
+    "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.{ts,html}\"",
+    "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
+    "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\"",
+    "ci:check:typecheck-examples": "tsc --pretty false -p examples > reports/typecheck-examples.log",
+    "ci:check:typecheck-src": "tsc --pretty false -p src > reports/typecheck.log",
+    "ci:check:typecheck-tests": "tsc --pretty false -p tests > reports/typecheck-tests.log",
     "dev": "concurrently -n rollup,servez -c magenta,green \"rollup -c -w\" \"servez\"",
+    "prepack": "npm run build",
     "start": "concurrently -n rollup,servez -c magenta,green \"rollup -c -w\" \"servez\"",
     "test": "nyc --reporter=text --reporter=lcov playwright test",
-    "test:startserver": "rollup -c && servez",
-    "test:docker": "docker run --rm --network host -v $(pwd):/work -w /work -it -u $(id -u ${USER}):$(id -g ${USER}) mcr.microsoft.com/playwright:v1.46.0-jammy /bin/bash",
     "test:codegen": "playwright codegen http://localhost:8080",
-    "prepack": "npm run build",
-    "check": "concurrently -c auto npm:check:*",
-    "check:typecheck-src": "tsc -p src",
-    "check:eslint-src": "eslint \"src/**/*.ts\"",
-    "check:typecheck-examples": "tsc -p examples",
-    "check:eslint-examples": "eslint \"examples/**/*.{ts,html}\"",
-    "check:typecheck-tests": "tsc -p tests",
-    "check:eslint-tests": "eslint \"tests/**/*.ts\"",
-    "ci:check": "concurrently npm:ci:check:*",
-    "ci:check:typecheck-src": "tsc --pretty false -p src > reports/typecheck.log",
-    "ci:check:eslint-src": "eslint --format json --output-file reports/eslint-src.json \"src/**/*.ts\"",
-    "ci:check:typecheck-examples": "tsc --pretty false -p examples > reports/typecheck-examples.log",
-    "ci:check:eslint-examples": "eslint --format json --output-file reports/eslint-examples.json \"examples/**/*.{ts,html}\"",
-    "ci:check:typecheck-tests": "tsc --pretty false -p tests > reports/typecheck-tests.log",
-    "ci:check:eslint-tests": "eslint --format json --output-file reports/eslint-tests.json \"tests/**/*.ts\""
+    "test:docker": "docker run --rm --network host -v $(pwd):/work -w /work -it -u $(id -u ${USER}):$(id -g ${USER}) mcr.microsoft.com/playwright:v1.51.1-jammy /bin/bash",
+    "test:startserver": "rollup -c && servez"
   },
-  "peerDependencies": {
-    "three": ">= 0.159.0"
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
+  "browserslist": [
+    "> 1%, not dead, not ie 11, not op_mini all"
+  ],
   "dependencies": {
     "promise-worker-transferable": "^1.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.46.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.51.1",
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
@@ -123,22 +120,17 @@
     "@semantic-release/npm": "^12.0.1",
     "@semantic-release/release-notes-generator": "^14.0.1",
     "@types/node": "^20.14.9",
-    "@types/three": "^0.172.0",
-    "@typescript-eslint/eslint-plugin": "^7.15.0",
-    "@typescript-eslint/parser": "^7.15.0",
+    "@types/three": "^0.175.0",
     "concurrently": "^8.2.2",
     "conventional-changelog-conventionalcommits": "^8.0.0",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.16.0",
     "eslint-config-mdcs": "^5.0.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-compat": "^4.2.0",
     "eslint-plugin-html": "^8.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.4.0",
-    "eslint-plugin-simple-import-sort": "^12.0.0",
-    "eslint-plugin-unused-imports": "^3.2.0",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^16.0.0",
+    "neostandard": "^0.12.1",
     "nyc": "^17.0.0",
     "rollup": "^4.20.0",
     "rollup-plugin-copy": "^3.5.0",
@@ -148,13 +140,17 @@
     "semantic-release": "^24.0.0",
     "servez": "^2.2.3",
     "sharp": "^0.33.4",
-    "three": "^0.172.0",
-    "typedoc": "^0.26.5",
-    "typedoc-github-wiki-theme": "^2.0.0",
+    "three": "^0.175.0",
+    "typedoc": "^0.28.0",
+    "typedoc-github-wiki-theme": "^2.1.0",
     "typedoc-plugin-markdown": "^4.2.3",
     "typescript": "^5.5.4"
   },
-  "browserslist": [
-    "> 1%, not dead, not ie 11, not op_mini all"
-  ]
+  "peerDependencies": {
+    "three": ">= 0.159.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

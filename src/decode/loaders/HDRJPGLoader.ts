@@ -66,7 +66,7 @@ export class HDRJPGLoader extends LoaderBase<string> {
    *
    * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
    * @param onLoad Load complete callback, will receive the result
-   * @param onProgress Progress callback, will receive a {@link ProgressEvent}
+   * @param onProgress Progress callback, will receive a `ProgressEvent`
    * @param onError Error callback
    * @returns
    */

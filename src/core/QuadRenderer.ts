@@ -37,13 +37,13 @@ import { QuadRendererTextureOptions } from './types'
  */
 export type TextureDataTypeToBufferType<TType extends TextureDataType> =
   TType extends typeof UnsignedByteType ? Uint8ClampedArray :
-  TType extends typeof HalfFloatType ? Uint16Array :
-  TType extends typeof UnsignedIntType ? Uint32Array :
-  TType extends typeof ByteType ? Int8Array :
-  TType extends typeof ShortType ? Int16Array :
-  TType extends typeof IntType ? Int32Array :
-  TType extends typeof FloatType ? Float32Array :
-  never
+    TType extends typeof HalfFloatType ? Uint16Array :
+      TType extends typeof UnsignedIntType ? Uint32Array :
+        TType extends typeof ByteType ? Int8Array :
+          TType extends typeof ShortType ? Int16Array :
+            TType extends typeof IntType ? Int32Array :
+              TType extends typeof FloatType ? Float32Array :
+                never
 
 export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends Material> = {
   /**

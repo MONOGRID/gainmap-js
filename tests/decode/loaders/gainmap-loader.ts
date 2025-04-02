@@ -4,7 +4,7 @@ import * as THREE from 'three'
  *
  * @param args
  */
-export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string, metadata: string, exposure?:number, sync?: boolean } & Partial<decode.GainmapDecodingParameters>) => {
+export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string, metadata: string, exposure?: number, sync?: boolean } & Partial<decode.GainmapDecodingParameters>) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise<void>(async (resolve, reject) => {
     const renderer = new THREE.WebGLRenderer()
@@ -58,6 +58,7 @@ export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string,
           args.metadata
         ])
       } catch (e) {
+        // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
         reject(e)
         return
       }

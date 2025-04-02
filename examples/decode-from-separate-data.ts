@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { decode, GainMapMetadata } from '@monogrid/gainmap-js'
 import {
   Mesh,
