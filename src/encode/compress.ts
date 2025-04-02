@@ -40,7 +40,7 @@ const canvasToBlob = async (canvas: OffscreenCanvas | HTMLCanvasElement, mimeTyp
 export const compress = async (params: CompressParameters): Promise<CompressedImage> => {
   if (typeof createImageBitmap === 'undefined') throw new Error('createImageBitmap() not supported.')
   const { source, mimeType, quality, flipY } = params
-  // eslint-disable-next-line no-undef
+
   let imageBitmapSource: ImageBitmapSource
   if ((source instanceof Uint8Array || source instanceof Uint8ClampedArray) && 'sourceMimeType' in params) {
     imageBitmapSource = new Blob([source], { type: params.sourceMimeType })

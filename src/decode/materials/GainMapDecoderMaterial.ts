@@ -113,12 +113,12 @@ export class GainMapDecoderMaterial extends ShaderMaterial {
    * @see {@link GainMapMetadata.gamma}
    */
   get gamma () {
-    const g = (this.uniforms.gamma.value as Vector3)
+    const g = this.uniforms.gamma.value as Vector3
     return [1 / g.x, 1 / g.y, 1 / g.z] as [number, number, number]
   }
 
   set gamma (value: [number, number, number]) {
-    const g = (this.uniforms.gamma.value as Vector3)
+    const g = this.uniforms.gamma.value as Vector3
     g.x = 1.0 / value[0]
     g.y = 1.0 / value[1]
     g.z = 1.0 / value[2]

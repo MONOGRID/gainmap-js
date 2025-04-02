@@ -5,7 +5,7 @@ import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
  * @param file
  * @returns
  */
-export const findTextureMinMaxInBrowser = async (args: {file: string, mode?: 'min' | 'max'}) => {
+export const findTextureMinMaxInBrowser = async (args: { file: string, mode?: 'min' | 'max' }) => {
   // load an HDR file
   const image = await new EXRLoader().loadAsync(args.file)
 

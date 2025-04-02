@@ -13,6 +13,7 @@ let library: MainModule | undefined
  */
 export const getLibrary = async () => {
   if (!library) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     library = await libultrahdr() as MainModule
   }
   return library

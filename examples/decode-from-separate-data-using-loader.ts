@@ -1,4 +1,3 @@
-/* eslint-disable unused-imports/no-unused-vars */
 import { GainMapLoader } from '@monogrid/gainmap-js'
 import {
   EquirectangularReflectionMapping,

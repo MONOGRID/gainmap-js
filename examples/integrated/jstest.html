@@ -65,7 +65,6 @@
 
 			const imgToRGBA = ( img ) => {
 
-				// eslint-disable-next-line compat/compat
 				const canvas = new OffscreenCanvas( img.width, img.height );
 				const ctx = canvas.getContext( '2d' );
 				ctx.drawImage( img, 0, 0, img.width, img.height );
