@@ -15,10 +15,10 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  actions: read
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+  id-token: write # to enable use of OIDC for trusted publishing and npm provenance
 
 jobs:
   release:
@@ -27,7 +27,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
       GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
         - name: 'Checkout'
           uses: nschloe/action-cached-lfs-checkout@v1
@@ -46,7 +45,7 @@ jobs:
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
           with:
-            node-version: 20
+            node-version: 22
 
         - name: 'Install Packages'
           run: npm ci
