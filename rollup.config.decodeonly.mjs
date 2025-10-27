@@ -9,7 +9,7 @@ import istanbul from 'rollup-plugin-istanbul'
 import license from 'rollup-plugin-license'
 
 // @ts-expect-error tsc + rollup fight each other
-import pkgJSON from './package.json' assert { type: 'json' }
+import pkgJSON from './package.json' with { type: 'json' }
 
 const { author, name, version } = pkgJSON
 

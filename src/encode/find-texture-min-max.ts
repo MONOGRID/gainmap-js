@@ -1,10 +1,21 @@
 import {
+  AlphaFormat,
   ClampToEdgeWrapping,
   ColorSpace,
   DataTexture,
   DataUtils,
+  DepthFormat,
+  DepthStencilFormat,
   FloatType,
   NearestFilter,
+  RedFormat,
+  RedIntegerFormat,
+  RGBAFormat,
+  RGBAIntegerFormat,
+  RGBFormat,
+  RGBIntegerFormat,
+  RGFormat,
+  RGIntegerFormat,
   ShaderMaterial,
   Vector2,
   WebGLRenderer,
@@ -76,6 +87,23 @@ void main() {
  */
 export const findTextureMinMax = (image: EXR | RGBE | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
   const srcTex = getDataTexture(image)
+
+  // check if texture has a valid format
+  if (
+    srcTex.format !== AlphaFormat &&
+    srcTex.format !== RGBFormat &&
+    srcTex.format !== RGBAFormat &&
+    srcTex.format !== DepthFormat &&
+    srcTex.format !== DepthStencilFormat &&
+    srcTex.format !== RedFormat &&
+    srcTex.format !== RedIntegerFormat &&
+    srcTex.format !== RGFormat &&
+    srcTex.format !== RGIntegerFormat &&
+    srcTex.format !== RGBIntegerFormat &&
+    srcTex.format !== RGBAIntegerFormat
+  ) {
+    throw new Error('Unsupported texture format')
+  }
   const cellSize = 2
 
   const mat = new ShaderMaterial({

@@ -69,12 +69,10 @@ for (const neoConfig of neoStandardConfigs) {
 // Add TypeScript type checking configs
 if (Array.isArray(typeCheckingConfigs)) {
   for (const tsConfig of typeCheckingConfigs) {
-    // @ts-expect-error untyped lib
     config.push({
       ...tsConfig,
       files: ['**/*.{ts,mts,cts,tsx}'],
       ignores: [
-        ...(tsConfig.ignores || []),
         integratedExamplesPath
       ]
     })
