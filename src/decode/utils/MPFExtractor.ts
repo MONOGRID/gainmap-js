@@ -36,7 +36,7 @@ export class MPFExtractor {
     }
   }
 
-  extract (imageArrayBuffer: Uint8Array) {
+  extract (imageArrayBuffer: Uint8Array<ArrayBuffer>) {
     return new Promise<Blob[]>((resolve, reject) => {
       const debug = this.options.debug
 

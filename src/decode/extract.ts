@@ -22,7 +22,7 @@ import { MPFExtractor } from './utils/MPFExtractor'
  *
  * const { sdr, gainMap, metadata } = extractGainmapFromJPEG(jpegFile)
  */
-export const extractGainmapFromJPEG = async (jpegFile: Uint8Array) => {
+export const extractGainmapFromJPEG = async (jpegFile: Uint8Array<ArrayBuffer>) => {
   const metadata = extractXMP(jpegFile)
   if (!metadata) throw new XMPMetadataNotFoundError('Gain map XMP metadata not found')
 

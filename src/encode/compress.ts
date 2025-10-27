@@ -43,7 +43,7 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
 
   let imageBitmapSource: ImageBitmapSource
   if ((source instanceof Uint8Array || source instanceof Uint8ClampedArray) && 'sourceMimeType' in params) {
-    imageBitmapSource = new Blob([source], { type: params.sourceMimeType })
+    imageBitmapSource = new Blob([source as (Uint8Array<ArrayBuffer> | Uint8ClampedArray<ArrayBuffer>)], { type: params.sourceMimeType })
   } else if (source instanceof ImageData) {
     imageBitmapSource = source
   } else {
