@@ -7,7 +7,7 @@
     "noImplicitAny": true,
     "noImplicitThis": true,
     "module": "ES2022",
-    "target": "ES2018",
+    "target": "ES2022",
     "moduleResolution": "Bundler",
     "resolvePackageJsonExports": true,
     "resolvePackageJsonImports": true,
