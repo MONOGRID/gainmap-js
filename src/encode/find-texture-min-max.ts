@@ -21,8 +21,8 @@ import {
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
-import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
+import { EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import { getDataTexture } from '../core/get-data-texture'
 import { QuadRenderer } from '../core/QuadRenderer'

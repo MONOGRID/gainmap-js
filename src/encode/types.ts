@@ -1,6 +1,6 @@
 import { type DataTexture, ToneMapping, WebGLRenderer } from 'three'
-import { type EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader'
+import { type EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import { QuadRendererTextureOptions } from '../decode'
 import { WorkerInterfaceImplementation } from '../worker-types'

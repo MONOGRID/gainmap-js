@@ -1,6 +1,6 @@
 import { DataTexture, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, RGBAFormat, UVMapping } from 'three'
-import { EXR } from 'three/examples/jsm/loaders/EXRLoader'
-import { RGBE } from 'three/examples/jsm/loaders/RGBELoader'
+import { EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 /**
  * Utility function to obtain a `DataTexture` from various input formats
  *
