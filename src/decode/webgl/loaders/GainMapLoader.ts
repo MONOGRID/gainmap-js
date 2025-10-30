@@ -17,7 +17,6 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * import { GainMapLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
@@ -29,6 +28,7 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * const renderer = new WebGLRenderer()
  *
  * const loader = new GainMapLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
  * // `result` can be used to populate a Texture
@@ -48,7 +48,6 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it

@@ -1,4 +1,4 @@
-import { GainMapLoader } from '@monogrid/gainmap-js'
+import { HDRJPGLoader } from '@monogrid/gainmap-js/webgpu'
 import {
   EquirectangularReflectionMapping,
   Mesh,
@@ -6,15 +6,16 @@ import {
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
-  WebGLRenderer
-} from 'three'
+  WebGPURenderer
+} from 'three/webgpu'
 
-const renderer = new WebGLRenderer()
+const renderer = new WebGPURenderer()
+await renderer.init()
 
-const loader = new GainMapLoader(renderer)
+const loader = new HDRJPGLoader(renderer)
   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
 
-const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+const result = await loader.loadAsync('gainmap.jpeg')
 // `result` can be used to populate a Texture
 
 const scene = new Scene()
@@ -23,7 +24,7 @@ const mesh = new Mesh(
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
-renderer.render(scene, new PerspectiveCamera())
+await renderer.renderAsync(scene, new PerspectiveCamera())
 
 // Starting from three.js r159
 // `result.renderTarget.texture` can

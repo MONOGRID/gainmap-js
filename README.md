@@ -87,6 +87,7 @@ import {
 const renderer = new WebGLRenderer()
 
 const loader = new HDRJPGLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
 
 const result = await loader.loadAsync('gainmap.jpeg')
 // `result` can be used to populate a Texture
@@ -106,7 +107,6 @@ renderer.render(scene, new PerspectiveCamera())
 // it was previously needed to convert it
 // to a DataTexture with `result.toDataTexture()`
 scene.background = result.renderTarget.texture
-scene.background.mapping = EquirectangularReflectionMapping
 
 // result must be manually disposed
 // when you are done using it
@@ -137,6 +137,7 @@ import {
 const renderer = new WebGLRenderer()
 
 const loader = new GainMapLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
 
 const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
 // `result` can be used to populate a Texture
@@ -156,12 +157,108 @@ renderer.render(scene, new PerspectiveCamera())
 // it was previously needed to convert it
 // to a DataTexture with `result.toDataTexture()`
 scene.background = result.renderTarget.texture
-scene.background.mapping = EquirectangularReflectionMapping
 
 // result must be manually disposed
 // when you are done using it
 result.dispose()
 ```
+
+### Decoding with WebGPU
+
+> NOTE: WebGPU decoding requires three.js r163 or higher and a browser that supports WebGPU
+
+The library provides WebGPU-accelerated decoding through the `@monogrid/gainmap-js/webgpu` entry point. WebGPU decoding uses Three.js Shading Language (TSL) and offers improved performance and modern GPU architecture support.
+
+#### Using a single JPEG with embedded Gain map Metadata (WebGPU)
+
+```ts
+import { HDRJPGLoader } from '@monogrid/gainmap-js/webgpu'
+import {
+  EquirectangularReflectionMapping,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGPURenderer
+} from 'three/webgpu'
+
+const renderer = new WebGPURenderer()
+await renderer.init()
+
+const loader = new HDRJPGLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
+
+const result = await loader.loadAsync('gainmap.jpeg')
+// `result` can be used to populate a Texture
+
+const scene = new Scene()
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+)
+scene.add(mesh)
+await renderer.renderAsync(scene, new PerspectiveCamera())
+
+// Starting from three.js r159
+// `result.renderTarget.texture` can
+// also be used as Equirectangular scene background
+scene.background = result.renderTarget.texture
+
+// result must be manually disposed
+// when you are done using it
+result.dispose()
+```
+
+#### Using separate files (WebGPU)
+
+```ts
+import { GainMapLoader } from '@monogrid/gainmap-js/webgpu'
+import {
+  EquirectangularReflectionMapping,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  PlaneGeometry,
+  Scene,
+  WebGPURenderer
+} from 'three/webgpu'
+
+const renderer = new WebGPURenderer()
+await renderer.init()
+
+const loader = new GainMapLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
+
+const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
+// `result` can be used to populate a Texture
+
+const scene = new Scene()
+const mesh = new Mesh(
+  new PlaneGeometry(),
+  new MeshBasicMaterial({ map: result.renderTarget.texture })
+)
+scene.add(mesh)
+await renderer.renderAsync(scene, new PerspectiveCamera())
+
+// Starting from three.js r159
+// `result.renderTarget.texture` can
+// also be used as Equirectangular scene background
+scene.background = result.renderTarget.texture
+
+// result must be manually disposed
+// when you are done using it
+result.dispose()
+```
+
+#### Key differences between WebGL and WebGPU
+
+1. **Import path**: Use `@monogrid/gainmap-js/webgpu` instead of `@monogrid/gainmap-js`
+2. **Three.js imports**: Use `three/webgpu` instead of `three`
+3. **Renderer**: Use `WebGPURenderer` instead of `WebGLRenderer`
+4. **Renderer initialization**: Call `await renderer.init()` before using WebGPU renderer
+5. **Async decoding**: The `decode()` function and rendering are async in WebGPU
+6. **Rendering**: Use `await renderer.renderAsync()` instead of `renderer.render()`
 
 ### Encoding
 

@@ -58,7 +58,7 @@ const decodeImpl = createDecodeFunction({
  *   new MeshBasicMaterial({ map: result.renderTarget.texture })
  * )
  * scene.add(mesh)
- * renderer.render(scene, new PerspectiveCamera())
+ * await renderer.renderAsync(scene, new PerspectiveCamera())
  *
  * // result must be manually disposed
  * // when you are done using it

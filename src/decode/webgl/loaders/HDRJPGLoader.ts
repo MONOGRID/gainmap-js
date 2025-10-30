@@ -19,7 +19,6 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * import { HDRJPGLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
@@ -31,6 +30,7 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * const renderer = new WebGLRenderer()
  *
  * const loader = new HDRJPGLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync('gainmap.jpeg')
  * // `result` can be used to populate a Texture
@@ -50,7 +50,6 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it
@@ -62,7 +61,7 @@ export class HDRJPGLoader extends LoaderBaseWebGL<string> {
    * Loads a JPEG containing gain map metadata
    * Renders a normal SDR image if gainmap data is not found
    *
-   * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+   * @param url Path to a JPEG file containing embedded gain map metadata
    * @param onLoad Load complete callback, will receive the result
    * @param onProgress Progress callback, will receive a `ProgressEvent`
    * @param onError Error callback
