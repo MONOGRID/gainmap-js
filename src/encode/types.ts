@@ -1,5 +1,6 @@
 import { type DataTexture, ToneMapping, WebGLRenderer } from 'three'
 import { type EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { type HDR } from 'three/examples/jsm/loaders/HDRLoader.js'
 import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import { QuadRendererTextureOptions } from '../decode'
@@ -73,7 +74,7 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
   /**
    * Input image for encoding, must be an HDR image
    */
-  image: EXR | RGBE | DataTexture,
+  image: EXR | RGBE | HDR | DataTexture,
   /**
    * Optional WebGLRenderer
    * @remarks

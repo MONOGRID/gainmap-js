@@ -103,7 +103,13 @@
     "glsl",
     "hdrgm",
     "HDRJPG",
+    "metalness",
     "monogrid",
+    "networkidle",
+    "pmrem",
+    "RGBE",
+    "spruit",
+    "webgpu",
     "xmpmeta"
   ]
 }

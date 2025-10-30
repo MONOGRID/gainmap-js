@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - gainmap hdr</title>
+		<title>three.js webgpu - gainmap hdr</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -129,24 +129,17 @@
 				};
 
 
-
-
-				hdrJpg = new HDRJPGLoader( renderer )
+				hdrJpg = await new HDRJPGLoader( renderer )
+					.setRenderTargetOptions( {
+						mapping: THREE.EquirectangularReflectionMapping
+					 } )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', async function ( ) {
 
 						resolutions[ 'HDR JPG' ] = hdrJpg.width + 'x' + hdrJpg.height;
 						displayStats( 'HDR JPG' );
 
 						hdrJpgEquirectangularMap = hdrJpg.renderTarget.texture;
-						//hdrJpgEquirectangularMap = await hdrJpg.toDataTexture( {
-						//	mapping: THREE.EquirectangularReflectionMapping,
-						//	minFilter: THREE.LinearFilter,
-						//	generateMipmaps: false
-						//} );
 						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrJpgEquirectangularMap );
-
-						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
-						hdrJpgEquirectangularMap.needsUpdate = true;
 
 						hdrJpg.dispose();
 
@@ -157,6 +150,9 @@
 					} );
 
 				gainMap = new GainMapLoader( renderer )
+					.setRenderTargetOptions( {
+						mapping: THREE.EquirectangularReflectionMapping
+					 } )
 					.load( [
 						'textures/gainmap/spruit_sunrise_4k.webp',
 						'textures/gainmap/spruit_sunrise_4k-gainmap.webp',
@@ -167,9 +163,6 @@
 
 						gainMapBackground = gainMap.renderTarget.texture;
 						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( gainMapBackground );
-
-						gainMapBackground.mapping = THREE.EquirectangularReflectionMapping;
-						gainMapBackground.needsUpdate = true;
 
 						gainMap.dispose();
 
