@@ -16,7 +16,9 @@ const { author, name, version } = pkgJSON
 /** @type {import('rollup').OutputOptions} */
 const settings = {
   globals: {
-    three: 'three'
+    three: 'three',
+    'three/webgpu': 'three/webgpu',
+    'three/tsl': 'three/tsl'
   },
   sourcemap: !!process.env.PLAYWRIGHT_TESTING
 }
@@ -65,7 +67,7 @@ let configs = [
     input: {
       encode: './src/encode.ts',
       decode: './src/decode.ts',
-      'decode/webgpu/index': './src/decode/webgpu/index.ts',
+      'decode.webgpu': './src/decode/webgpu/index.ts',
       libultrahdr: './src/libultrahdr.ts',
       worker: './src/worker.ts',
       'worker-interface': './src/worker-interface.ts'
@@ -114,6 +116,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
         format: 'umd',
         name,
         file: 'dist/decode.umd.cjs',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    }),
+
+    // decode webgpu UMD
+    defineConfig({
+      input: './src/decode/webgpu/index.ts',
+      output: {
+        format: 'umd',
+        name,
+        file: 'dist/decode.webgpu.umd.cjs',
         ...settings
       },
       plugins,

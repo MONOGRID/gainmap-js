@@ -1,12 +1,12 @@
 import {
   HalfFloatType,
-  LinearSRGBColorSpace,
-  SRGBColorSpace
+  type WebGLRenderer
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
+import { createDecodeFunction } from '../core/base/decode-base'
+import { DecodeParameters } from '../core/base/types'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
-import { DecodeParameters } from './types'
 
 /**
  * Decodes a gain map using a WebGLRenderTarget
@@ -63,38 +63,24 @@ import { DecodeParameters } from './types'
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
-export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
-  const { sdr, gainMap, renderer } = params
+const decodeImpl = createDecodeFunction<
+  WebGLRenderer,
+  QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>,
+  GainMapDecoderMaterial
+>({
+  createMaterial: (params) => new GainMapDecoderMaterial(params),
+  createQuadRenderer: (params) => new QuadRenderer(params)
+})
 
-  if (sdr.colorSpace !== SRGBColorSpace) {
-    console.warn('SDR Colorspace needs to be *SRGBColorSpace*, setting it automatically')
-    sdr.colorSpace = SRGBColorSpace
+export const decode = (params: DecodeParameters<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
+  // Ensure renderer is defined for the base function
+  if (!params.renderer) {
+    throw new Error('Renderer is required for decode function')
   }
-  sdr.needsUpdate = true
 
-  if (gainMap.colorSpace !== LinearSRGBColorSpace) {
-    console.warn('Gainmap Colorspace needs to be *LinearSRGBColorSpace*, setting it automatically')
-    gainMap.colorSpace = LinearSRGBColorSpace
-  }
-  gainMap.needsUpdate = true
-
-  const material = new GainMapDecoderMaterial({
+  const quadRenderer = decodeImpl({
     ...params,
-    sdr,
-    gainMap
-  })
-  const quadRenderer = new QuadRenderer({
-    // TODO: three types are generic, eslint complains here, see how we can solve
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    width: sdr.image.width,
-    // TODO: three types are generic, eslint complains here, see how we can solve
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    height: sdr.image.height,
-    type: HalfFloatType,
-    colorSpace: LinearSRGBColorSpace,
-    material,
-    renderer,
-    renderTargetOptions: params.renderTargetOptions
+    renderer: params.renderer
   })
   try {
     quadRenderer.render()

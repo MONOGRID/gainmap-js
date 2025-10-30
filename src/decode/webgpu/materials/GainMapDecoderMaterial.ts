@@ -2,7 +2,7 @@ import { add, exp2, float, max, min, mul, pow, sub, texture, uniform, vec3 } fro
 import { MeshBasicNodeMaterial, NoBlending, Texture, Vector3 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
-import { type GainmapDecodingParameters } from '../types'
+import { type GainmapDecodingParameters } from '../../core'
 
 // min half float value
 const HALF_FLOAT_MIN = vec3(-65504, -65504, -65504)

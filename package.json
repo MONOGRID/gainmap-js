@@ -29,7 +29,13 @@
     },
     "./decode/webgpu": {
       "types": "./dist/decode/webgpu/index.d.ts",
-      "import": "./dist/decode/webgpu/index.js"
+      "import": "./dist/decode.webgpu.js",
+      "default": "./dist/decode.webgpu.umd.cjs"
+    },
+    "./decode/webgl": {
+      "types": "./dist/decode/webgl/index.d.ts",
+      "import": "./dist/decode.js",
+      "default": "./dist/decode.umd.cjs"
     },
     "./encode": {
       "types": "./dist/encode.d.ts",
@@ -62,6 +68,9 @@
       ],
       "decode/webgpu": [
         "./dist/decode/webgpu/index.d.ts"
+      ],
+      "decode/webgl": [
+        "./dist/decode/webgl/index.d.ts"
       ],
       "encode": [
         "./dist/encode.d.ts"

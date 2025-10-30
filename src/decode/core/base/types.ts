@@ -1,13 +1,7 @@
-import { type Texture, type WebGLRenderer } from 'three'
+import { Texture } from 'three'
 
-import { type GainMapMetadata, type QuadRendererTextureOptions } from '../../core/types'
+import { GainMapMetadata, QuadRendererTextureOptions } from '../../webgl'
 
-/**
- * Necessary parameters for decoding a Gainmap
- *
- * @category Specs
- * @group Specs
- */
 export type GainmapDecodingParameters = {
   /**
    * The maximum available boost supported by a display, at a given point in time.
@@ -20,26 +14,25 @@ export type GainmapDecodingParameters = {
    */
   maxDisplayBoost: number
 }
+
 /**
- * @category Decoding Functions
- * @group Decoding Functions
+ * Parameters for decode function
  */
-export type DecodeParameters = {
+export type DecodeParameters<TRenderer> = {
   /**
-   * An Texture containing the SDR Rendition
+   * A Texture containing the SDR Rendition
    */
-  sdr: Texture
+  sdr: Omit<Texture, 'image'> & { image: { width: number, height: number } }
   /**
-   * An Texture containing the GainMap recovery image
+   * A Texture containing the GainMap recovery image
    */
-  gainMap: Texture
+  gainMap: Omit<Texture, 'image'> & { image: { width: number, height: number } }
   /**
-   * WebGLRenderer used to decode the GainMap
+   * The renderer used to decode the GainMap
    */
-  renderer?: WebGLRenderer,
+  renderer: TRenderer
   /**
    * Options to use when creating the output renderTarget
    */
   renderTargetOptions?: QuadRendererTextureOptions
-
 } & GainmapDecodingParameters & GainMapMetadata
