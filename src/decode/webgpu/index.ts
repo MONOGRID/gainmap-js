@@ -1,5 +1,5 @@
 export * from '../../core/types'
-export * from '../core/index'
+export * from '../shared'
 export * from './core/QuadRenderer'
 export * from './decode'
 export * from './loaders/GainMapLoader'

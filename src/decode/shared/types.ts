@@ -1,7 +1,10 @@
 import { Texture } from 'three'
 
-import { GainMapMetadata, QuadRendererTextureOptions } from '../../webgl'
+import { GainMapMetadata, QuadRendererTextureOptions } from '../../core'
 
+/**
+ * Parameters related to the display used for decoding
+ */
 export type GainmapDecodingParameters = {
   /**
    * The maximum available boost supported by a display, at a given point in time.

@@ -13,8 +13,8 @@ import {
   UVMapping
 } from 'three'
 
-import { type GainMapMetadata, QuadRendererTextureOptions } from '../../../core/types'
-import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
+import { type GainMapMetadata, QuadRendererTextureOptions } from '../../core/types'
+import { getHTMLImageFromBlob } from './utils/get-html-image-from-blob'
 
 /**
  * Configuration for the loader base class

@@ -4,9 +4,7 @@ import {
 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
-import { GainMapNotFoundError } from '../../core/errors/GainMapNotFoundError'
-import { XMPMetadataNotFoundError } from '../../core/errors/XMPMetadataNotFoundError'
-import { extractGainmapFromJPEG } from '../../core/extract'
+import { extractGainmapFromJPEG, GainMapNotFoundError, XMPMetadataNotFoundError } from '../../shared'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBase } from './LoaderBase'

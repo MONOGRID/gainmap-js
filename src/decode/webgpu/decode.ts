@@ -3,8 +3,7 @@ import {
   WebGPURenderer
 } from 'three/webgpu'
 
-import { createDecodeFunction } from '../core/base/decode-base'
-import { DecodeParameters } from '../core/base/types'
+import { createDecodeFunction, DecodeParameters } from '../shared'
 import { QuadRenderer } from './core/QuadRenderer'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 

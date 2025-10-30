@@ -5,7 +5,7 @@ import {
   Texture
 } from 'three'
 
-import { QuadRendererTextureOptions } from '../../webgl'
+import { QuadRendererTextureOptions } from '../../core'
 import { DecodeParameters } from './types'
 
 /**

@@ -5,7 +5,7 @@ import {
 } from 'three/webgpu'
 
 import { type GainMapMetadata } from '../../../core/types'
-import { LoaderBaseShared } from '../../core/base/LoaderBase'
+import { LoaderBaseShared } from '../../shared'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 

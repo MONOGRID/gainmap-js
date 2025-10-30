@@ -4,8 +4,7 @@ import {
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
-import { createDecodeFunction } from '../core/base/decode-base'
-import { DecodeParameters } from '../core/base/types'
+import { createDecodeFunction, DecodeParameters } from '../shared'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 
 /**

@@ -1,6 +1,6 @@
 export * from '../../core/QuadRenderer'
 export * from '../../core/types'
-export * from '../core/index'
+export * from '../shared'
 export * from './decode'
 export * from './loaders/GainMapLoader'
 export * from './loaders/HDRJPGLoader'

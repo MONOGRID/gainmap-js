@@ -6,7 +6,7 @@ import {
 
 import { QuadRenderer } from '../../../core/QuadRenderer'
 import { type GainMapMetadata } from '../../../core/types'
-import { LoaderBaseShared } from '../../core/base/LoaderBase'
+import { LoaderBaseShared } from '../../shared'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 
 export abstract class LoaderBase<TUrl = string> extends LoaderBaseShared<
