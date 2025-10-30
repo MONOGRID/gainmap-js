@@ -1,5 +1,5 @@
-import { add, exp2, float, max, min, mul, pow, sub, texture, uniform, vec3 } from 'three/tsl'
-import { MeshBasicNodeMaterial, NoBlending, Texture, Vector3 } from 'three/webgpu'
+import { add, exp2, float, max, min, mul, pow, ShaderNodeObject, sub, texture, uniform, vec3 } from 'three/tsl'
+import { MeshBasicNodeMaterial, NoBlending, Texture, TextureNode, Vector3 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
 import { type GainmapDecodingParameters } from '../../shared'
@@ -27,8 +27,8 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
   private _gainMapMinUniform: ReturnType<typeof uniform<Vector3>>
   private _gainMapMaxUniform: ReturnType<typeof uniform<Vector3>>
   private _weightFactorUniform: ReturnType<typeof uniform<number>>
-  private _sdrTexture: Texture
-  private _gainMapTexture: Texture
+  private _sdrTexture: ShaderNodeObject<TextureNode>
+  private _gainMapTexture: ShaderNodeObject<TextureNode>
 
   /**
    *
@@ -42,8 +42,8 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
     this.depthTest = false
     this.depthWrite = false
 
-    this._sdrTexture = sdr
-    this._gainMapTexture = gainMap
+    this._sdrTexture = texture(sdr)
+    this._gainMapTexture = texture(gainMap)
 
     // Create uniform nodes
     this._gammaUniform = uniform(vec3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]))
@@ -60,17 +60,10 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
     this._hdrCapacityMax = hdrCapacityMax
 
     // Build the TSL shader graph
-    this._buildShader()
-  }
-
-  private _buildShader () {
-    // Sample textures
-    const sdrColor = texture(this._sdrTexture)
-    const gainMapColor = texture(this._gainMapTexture)
 
     // Get RGB values
-    const rgb = sdrColor.rgb
-    const recovery = gainMapColor.rgb
+    const rgb = this._sdrTexture.rgb
+    const recovery = this._gainMapTexture.rgb
 
     // Apply gamma correction
     const logRecovery = pow(recovery, this._gammaUniform)
@@ -100,23 +93,17 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
     this.colorNode = clampedHdrColor
   }
 
-  get sdr () { return this._sdrTexture }
-  set sdr (value: Texture) {
-    this._sdrTexture = value
-    this._buildShader()
-  }
+  get sdr () { return this._sdrTexture.value }
+  set sdr (value: Texture) { this._sdrTexture.value = value }
 
-  get gainMap () { return this._gainMapTexture }
-  set gainMap (value: Texture) {
-    this._gainMapTexture = value
-    this._buildShader()
-  }
+  get gainMap () { return this._gainMapTexture.value }
+  set gainMap (value: Texture) { this._gainMapTexture.value = value }
 
   /**
    * @see {@link GainMapMetadata.offsetHdr}
    */
   get offsetHdr (): [number, number, number] {
-    return [(this._offsetHdrUniform.value).x, (this._offsetHdrUniform.value).y, (this._offsetHdrUniform.value).z]
+    return [this._offsetHdrUniform.value.x, this._offsetHdrUniform.value.y, this._offsetHdrUniform.value.z]
   }
 
   set offsetHdr (value: [number, number, number]) {
