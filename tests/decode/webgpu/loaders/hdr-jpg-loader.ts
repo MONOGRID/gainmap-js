@@ -1,7 +1,7 @@
 import * as decode from '@monogrid/gainmap-js/decode/webgpu'
 import * as THREE from 'three/webgpu'
 
-export const testHDRJpegLoaderInBrowserWebGPU = async (args: { file: string, exposure?: number, maxDisplayBoost?: number }) => {
+export const testHDRJpegLoaderInBrowser = async (args: { file: string, exposure?: number, maxDisplayBoost?: number }) => {
   const renderer = new THREE.WebGPURenderer()
   await renderer.init()
   renderer.toneMapping = THREE.LinearToneMapping

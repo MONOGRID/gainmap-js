@@ -2,7 +2,7 @@ import { expect } from '@playwright/test'
 
 import { disableCreateImageBitmap } from '../../../disableBrowserFeatures'
 import { test } from '../../../testWithCoverage'
-import { testHDRJpegLoaderInBrowserWebGPU } from './hdr-jpg-loader'
+import { testHDRJpegLoaderInBrowser } from './hdr-jpg-loader'
 
 // const matrix = [
 //   '01.jpg',
@@ -33,7 +33,7 @@ test('loads from jpeg (WebGPU)', async ({ page, browserName }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(testHDRJpegLoaderInBrowserWebGPU, { file: 'files/spruit_sunrise_4k.jpg' })
+  await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
 
   await expect(page).toHaveScreenshot('render.png')
 })
@@ -48,7 +48,7 @@ test('loads from jpeg in browsers where createImageBitmap is not available (WebG
   await expect(script).toBeAttached()
 
   await page.evaluate(disableCreateImageBitmap)
-  await page.evaluate(testHDRJpegLoaderInBrowserWebGPU, { file: 'files/spruit_sunrise_4k.jpg' })
+  await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
 
   await expect(page).toHaveScreenshot('render-no-create-image-bitmap.png')
 })
@@ -62,7 +62,7 @@ test('loads a plain jpeg anyway (WebGPU)', async ({ page, browserName }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(testHDRJpegLoaderInBrowserWebGPU, { file: 'files/plain-jpeg.jpg' })
+  await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/plain-jpeg.jpg' })
 
   await expect(page).toHaveScreenshot('render-plain.png')
 })
@@ -77,7 +77,7 @@ test('throws with an invalid image (WebGPU)', async ({ page, browserName }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testHDRJpegLoaderInBrowserWebGPU, { file: 'files/invalid_image.png' })
+    await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'files/invalid_image.png' })
   }
 
   await expect(shouldThrow).rejects.toThrow(/The source image could not be decoded/)
@@ -93,7 +93,7 @@ test('throws with a not found image (WebGPU)', async ({ page, browserName }) => 
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testHDRJpegLoaderInBrowserWebGPU, { file: 'nope' })
+    await page.evaluate(testHDRJpegLoaderInBrowser, { file: 'nope' })
   }
 
   await expect(shouldThrow).rejects.toThrow(/404/)

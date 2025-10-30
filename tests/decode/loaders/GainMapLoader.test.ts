@@ -38,6 +38,25 @@ test('loads from webp', async ({ page }) => {
   await expect(page).toHaveScreenshot('render.png')
 })
 
+test('loads from webp with pure RT background', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(testGainMapLoaderInBrowser, {
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json',
+    pureRTBackground: true
+  })
+
+  await expect(page).toHaveScreenshot('render-with-pure-rt-background.png')
+})
+
 test('loads from webp sync', async ({ page }) => {
   await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
 

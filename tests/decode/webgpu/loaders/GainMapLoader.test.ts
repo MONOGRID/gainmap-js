@@ -1,7 +1,7 @@
 import { ConsoleMessage, expect } from '@playwright/test'
 
 import { test } from '../../../testWithCoverage'
-import { testGainMapLoaderInBrowserWebGPU } from './gainmap-loader'
+import { testGainMapLoaderInBrowser } from './gainmap-loader'
 
 // const matrix = [
 //   '01.jpg',
@@ -32,13 +32,32 @@ test('loads from webp (WebGPU)', async ({ page, browserName }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+  await page.evaluate(testGainMapLoaderInBrowser, {
     sdr: 'files/spruit_sunrise_4k.webp',
     gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
     metadata: 'files/spruit_sunrise_4k.json'
   })
 
   await expect(page).toHaveScreenshot('render.png')
+})
+
+test('loads from webp with pure RT background (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(testGainMapLoaderInBrowser, {
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json',
+    pureRTBackground: true
+  })
+
+  await expect(page).toHaveScreenshot('render-with-pure-rt-background.png')
 })
 
 test('loads from webp sync (WebGPU)', async ({ page, browserName }) => {
@@ -55,7 +74,7 @@ test('loads from webp sync (WebGPU)', async ({ page, browserName }) => {
   const script = page.getByTestId('script')
   await expect(script).toBeAttached()
 
-  await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+  await page.evaluate(testGainMapLoaderInBrowser, {
     sync: true,
     sdr: 'files/spruit_sunrise_4k.webp',
     gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
@@ -78,7 +97,7 @@ test('throws with an invalid sdr (WebGPU)', async ({ page, browserName }) => {
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    await page.evaluate(testGainMapLoaderInBrowser, {
       sdr: 'files/invalid_image.png',
       gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
       metadata: 'files/spruit_sunrise_4k.json'
@@ -98,7 +117,7 @@ test('throws with an invalid gainmap (WebGPU)', async ({ page, browserName }) =>
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    await page.evaluate(testGainMapLoaderInBrowser, {
       sdr: 'files/spruit_sunrise_4k.webp',
       gainmap: 'files/invalid_image.png',
       metadata: 'files/spruit_sunrise_4k.json'
@@ -118,7 +137,7 @@ test('throws with it doesn\'t find the sdr (WebGPU)', async ({ page, browserName
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    await page.evaluate(testGainMapLoaderInBrowser, {
       sdr: 'nope',
       gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
       metadata: 'files/spruit_sunrise_4k.json'
@@ -138,7 +157,7 @@ test('throws with it doesn\'t find the gainmap (WebGPU)', async ({ page, browser
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    await page.evaluate(testGainMapLoaderInBrowser, {
       sdr: 'files/spruit_sunrise_4k.webp',
       gainmap: 'nope',
       metadata: 'files/spruit_sunrise_4k.json'
@@ -158,7 +177,7 @@ test('throws with it doesn\'t find the metadata (WebGPU)', async ({ page, browse
   await expect(script).toBeAttached()
 
   const shouldThrow = async () => {
-    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    await page.evaluate(testGainMapLoaderInBrowser, {
       sdr: 'files/spruit_sunrise_4k.webp',
       gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
       metadata: 'nope'

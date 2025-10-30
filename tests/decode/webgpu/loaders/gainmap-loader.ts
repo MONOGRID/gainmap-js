@@ -4,7 +4,7 @@ import * as THREE from 'three/webgpu'
  *
  * @param args
  */
-export const testGainMapLoaderInBrowserWebGPU = (args: { sdr: string, gainmap: string, metadata: string, exposure?: number, sync?: boolean, maxDisplayBoost?: number }) => {
+export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string, metadata: string, exposure?: number, sync?: boolean, maxDisplayBoost?: number, pureRTBackground?: boolean }) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise<void>(async (resolve, reject) => {
     const renderer = new THREE.WebGPURenderer()
@@ -17,7 +17,7 @@ export const testGainMapLoaderInBrowserWebGPU = (args: { sdr: string, gainmap: s
 
     const loader = new decode.GainMapLoader(renderer)
 
-    const onLoadingDone = async (result: decode.QuadRenderer<1016, decode.GainMapDecoderMaterial>) => {
+    const onLoadingDone = async (result: Awaited<ReturnType<typeof loader.loadAsync>>) => {
       if (args.maxDisplayBoost) {
         result.material.maxDisplayBoost = args.maxDisplayBoost
         await result.render()
@@ -33,13 +33,18 @@ export const testGainMapLoaderInBrowserWebGPU = (args: { sdr: string, gainmap: s
       plane.scale.x = Math.min(1, ratio)
       scene.add(plane)
 
-      const bgTexture = await result.toDataTexture({
-        mapping: THREE.EquirectangularReflectionMapping,
-        minFilter: THREE.LinearFilter,
-        generateMipmaps: false
-      })
-      scene.background = bgTexture
-      bgTexture.needsUpdate = true
+      if (!args.pureRTBackground) {
+        const bgTexture = await result.toDataTexture({
+          mapping: THREE.EquirectangularReflectionMapping,
+          minFilter: THREE.LinearFilter,
+          generateMipmaps: false
+        })
+        scene.background = bgTexture
+        bgTexture.needsUpdate = true
+      } else {
+        result.renderTarget.texture.mapping = THREE.EquirectangularReflectionMapping
+        scene.background = result.renderTarget.texture
+      }
 
       // result must be manually disposed
       // when you are done using it
@@ -53,7 +58,7 @@ export const testGainMapLoaderInBrowserWebGPU = (args: { sdr: string, gainmap: s
     }
 
     if (!args.sync) {
-      let result: decode.QuadRenderer<1016, decode.GainMapDecoderMaterial>
+      let result: Awaited<ReturnType<typeof loader.loadAsync>>
       try {
         result = await loader.loadAsync([
           args.sdr,
