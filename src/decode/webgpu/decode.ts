@@ -7,6 +7,12 @@ import { createDecodeFunction, DecodeParameters } from '../shared'
 import { QuadRenderer } from './core/QuadRenderer'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 
+const decodeImpl = createDecodeFunction({
+  renderer: WebGPURenderer,
+  createMaterial: (params) => new GainMapDecoderMaterial(params),
+  createQuadRenderer: (params) => new QuadRenderer(params)
+})
+
 /**
  * Decodes a gain map using WebGPU RenderTarget
  *
@@ -62,11 +68,6 @@ import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
  * @returns
  * @throws {Error} if the WebGPURenderer fails to render the gain map
  */
-const decodeImpl = createDecodeFunction<WebGPURenderer, QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, GainMapDecoderMaterial>({
-  createMaterial: (params) => new GainMapDecoderMaterial(params),
-  createQuadRenderer: (params) => new QuadRenderer(params)
-})
-
 export const decode = async (params: DecodeParameters<WebGPURenderer>): Promise<InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>>> => {
   // Ensure renderer is defined for the base function
   if (!params.renderer) {

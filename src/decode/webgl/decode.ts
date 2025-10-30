@@ -1,14 +1,20 @@
 import {
   HalfFloatType,
-  type WebGLRenderer
+  WebGLRenderer
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
 import { createDecodeFunction, DecodeParameters } from '../shared'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 
+const decodeImpl = createDecodeFunction({
+  renderer: WebGLRenderer,
+  createMaterial: (params) => new GainMapDecoderMaterial(params),
+  createQuadRenderer: (params) => new QuadRenderer(params)
+})
+
 /**
- * Decodes a gain map using a WebGLRenderTarget
+ * Decodes a gain map using a WebGL RenderTarget
  *
  * @category Decoding Functions
  * @group Decoding Functions
@@ -35,7 +41,7 @@ import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
  * // load metadata
  * const metadata = await (await fetch('metadata.json')).json()
  *
- * const result = await decode({
+ * const result = decode({
  *   sdr,
  *   gainMap,
  *   // this allows to use `result.renderTarget.texture` directly
@@ -62,15 +68,6 @@ import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
-const decodeImpl = createDecodeFunction<
-  WebGLRenderer,
-  QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>,
-  GainMapDecoderMaterial
->({
-  createMaterial: (params) => new GainMapDecoderMaterial(params),
-  createQuadRenderer: (params) => new QuadRenderer(params)
-})
-
 export const decode = (params: DecodeParameters<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   // Ensure renderer is defined for the base function
   if (!params.renderer) {

@@ -1,36 +1,25 @@
 import {
   HalfFloatType,
   LinearSRGBColorSpace,
-  SRGBColorSpace,
-  Texture
+  SRGBColorSpace
 } from 'three'
 
-import { QuadRendererTextureOptions } from '../../core'
+import { Constructor, QuadRendererTextureOptions } from '../../core'
 import { DecodeParameters } from './types'
 
 /**
  * Configuration for decode function
  */
-export interface DecodeConfig<TRenderer, TQuadRenderer, TMaterial> {
-  createMaterial: (params: {
-    gainMapMax: [number, number, number]
-    gainMapMin: [number, number, number]
-    gamma: [number, number, number]
-    offsetHdr: [number, number, number]
-    offsetSdr: [number, number, number]
-    hdrCapacityMax: number
-    hdrCapacityMin: number
-    maxDisplayBoost: number
-    gainMap: Texture
-    sdr: Texture
-  }) => TMaterial
+export interface DecodeConfig<TRenderer extends Constructor, TQuadRenderer, TMaterial> {
+  renderer: TRenderer
+  createMaterial: (params: DecodeParameters<InstanceType<TRenderer>>) => TMaterial
   createQuadRenderer: (params: {
     width: number
     height: number
     type: typeof HalfFloatType
     colorSpace: typeof LinearSRGBColorSpace
     material: TMaterial
-    renderer: TRenderer
+    renderer: InstanceType<TRenderer>
     renderTargetOptions?: QuadRendererTextureOptions
   }) => TQuadRenderer
 }
@@ -39,8 +28,8 @@ export interface DecodeConfig<TRenderer, TQuadRenderer, TMaterial> {
  * Shared decode implementation factory
  * Creates a decode function that prepares a QuadRenderer with the given parameters
  */
-export function createDecodeFunction<TRenderer, TQuadRenderer, TMaterial> (config: DecodeConfig<TRenderer, TQuadRenderer, TMaterial>) {
-  return (params: DecodeParameters<TRenderer>): TQuadRenderer => {
+export function createDecodeFunction<TRenderer extends Constructor, TQuadRenderer, TMaterial> (config: DecodeConfig<TRenderer, TQuadRenderer, TMaterial>) {
+  return (params: DecodeParameters<InstanceType<TRenderer>>): TQuadRenderer => {
     const { sdr, gainMap, renderer } = params
 
     if (sdr.colorSpace !== SRGBColorSpace) {
