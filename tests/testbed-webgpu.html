@@ -13,7 +13,7 @@
         "three/examples/": "../node_modules/three/examples/",
 
         "@monogrid/gainmap-js": "../dist/decode.js",
-        "@monogrid/gainmap-js/decode/webgpu": "../dist/decode/webgpu/index.js",
+        "@monogrid/gainmap-js/webgpu": "../dist/decode.webgpu.js",
         "@monogrid/gainmap-js/encode": "../dist/encode.js",
         "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js",
         "@monogrid/gainmap-js/worker-interface": "../dist/worker-interface.js"
@@ -24,7 +24,7 @@
 
 <body>
   <script type="module" data-testid="script">
-    import * as decode from '@monogrid/gainmap-js/decode/webgpu'
+    import * as decode from '@monogrid/gainmap-js/webgpu'
     import * as encode from '@monogrid/gainmap-js/encode'
     import * as libultrahdr from '@monogrid/gainmap-js/libultrahdr'
     import * as workerInterface from '@monogrid/gainmap-js/worker-interface'

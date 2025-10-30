@@ -15,7 +15,7 @@
     "lib": ["DOM", "ES2019"],
     "paths": {
       "@monogrid/gainmap-js": [ "../dist/decode" ],
-      "@monogrid/gainmap-js/decode/webgpu": [ "../dist/decode/webgpu/index" ],
+      "@monogrid/gainmap-js/webgpu": [ "../dist/decode/webgpu/index" ],
       "@monogrid/gainmap-js/encode": [ "../dist/encode" ],
       "@monogrid/gainmap-js/libultrahdr": [ "../dist/libultrahdr" ],
       "@monogrid/gainmap-js/worker": [ "../dist/worker" ],

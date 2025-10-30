@@ -1,4 +1,4 @@
-import * as decode from '@monogrid/gainmap-js/decode/webgpu'
+import * as decode from '@monogrid/gainmap-js/webgpu'
 import * as THREE from 'three/webgpu'
 
 export const testHDRJpegLoaderInBrowser = async (args: { file: string, exposure?: number, maxDisplayBoost?: number }) => {

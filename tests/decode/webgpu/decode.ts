@@ -1,4 +1,4 @@
-import * as decode from '@monogrid/gainmap-js/decode/webgpu'
+import * as decode from '@monogrid/gainmap-js/webgpu'
 import * as THREE from 'three/webgpu'
 /**
  * test evaluated inside browser

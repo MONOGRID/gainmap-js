@@ -42,7 +42,7 @@
 					"three/webgpu": "https://unpkg.com/three@0.180.0/build/three.webgpu.js",
 					"three/tsl": "https://unpkg.com/three@0.180.0/build/three.tsl.js",
 					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js/dist/decode.js",
-					"@monogrid/gainmap-js/decode/webgpu": "../../dist/decode/webgpu/index.js"
+					"@monogrid/gainmap-js/webgpu": "../../dist/decode.webgpu.js"
 				}
 			}
 		</script>
@@ -57,7 +57,7 @@
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js/decode/webgpu';
+			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js/webgpu';
 
 			const params = {
 				envMap: 'HDR JPG',

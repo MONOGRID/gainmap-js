@@ -13,7 +13,7 @@ import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
  * @category Decoding Functions
  * @group Decoding Functions
  * @example
- * import { decode } from '@monogrid/gainmap-js/decode/webgpu'
+ * import { decode } from '@monogrid/gainmap-js/webgpu'
  * import {
  *   Mesh,
  *   MeshBasicMaterial,

@@ -14,7 +14,7 @@ import { LoaderBase } from './LoaderBase'
  * @group Loaders
  *
  * @example
- * import { GainMapLoader } from '@monogrid/gainmap-js/decode/webgpu'
+ * import { GainMapLoader } from '@monogrid/gainmap-js/webgpu'
  * import {
  *   EquirectangularReflectionMapping,
  *   LinearFilter,
