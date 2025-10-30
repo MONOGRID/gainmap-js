@@ -16,7 +16,7 @@ import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
  * @group Loaders
  *
  * @example
- * import { HDRJPGLoader } from '@monogrid/gainmap-js/decode/webgpu'
+ * import { HDRJPGLoader } from '@monogrid/gainmap-js/webgpu'
  * import {
  *   EquirectangularReflectionMapping,
  *   LinearFilter,
