@@ -11,15 +11,9 @@ import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 
 /**
  * Base class for WebGPU loaders
- *
- * @template TUrl - The URL type for loading
+ * @template TUrl - The type of URL used to load resources
  */
-export abstract class LoaderBase<TUrl = string> extends LoaderBaseShared<
-  WebGPURenderer,
-  QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>,
-  GainMapDecoderMaterial,
-  TUrl
-> {
+export abstract class LoaderBaseWebGPU<TUrl = string> extends LoaderBaseShared<WebGPURenderer, QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, GainMapDecoderMaterial, TUrl> {
   constructor (renderer?: WebGPURenderer, manager?: LoadingManager) {
     super({
       renderer,

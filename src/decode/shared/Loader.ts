@@ -14,6 +14,7 @@ import {
 } from 'three'
 
 import { type GainMapMetadata, QuadRendererTextureOptions } from '../../core/types'
+import { DecodeParameters } from './types'
 import { getHTMLImageFromBlob } from './utils/get-html-image-from-blob'
 
 /**
@@ -22,18 +23,7 @@ import { getHTMLImageFromBlob } from './utils/get-html-image-from-blob'
 export interface LoaderBaseConfig<TRenderer, TQuadRenderer, TMaterial> {
   renderer?: TRenderer
   renderTargetOptions?: QuadRendererTextureOptions
-  createMaterial: (params: {
-    gainMapMax: [number, number, number]
-    gainMapMin: [number, number, number]
-    gamma: [number, number, number]
-    offsetHdr: [number, number, number]
-    offsetSdr: [number, number, number]
-    hdrCapacityMax: number
-    hdrCapacityMin: number
-    maxDisplayBoost: number
-    gainMap: Texture
-    sdr: Texture
-  }) => TMaterial
+  createMaterial: (params: DecodeParameters) => TMaterial
   createQuadRenderer: (params: {
     width: number
     height: number
@@ -100,15 +90,7 @@ export abstract class LoaderBaseShared<TRenderer, TQuadRenderer, TMaterial, TUrl
     })
   }
 
-  protected async processImages (
-    sdrBuffer: ArrayBuffer,
-    gainMapBuffer?: ArrayBuffer,
-    imageOrientation?: 'flipY' | 'from-image'
-  ): Promise<{
-    sdrImage: ImageBitmap | HTMLImageElement
-    gainMapImage: ImageBitmap | HTMLImageElement | undefined
-    needsFlip: boolean
-  }> {
+  protected async processImages (sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer, imageOrientation?: 'flipY' | 'from-image'): Promise<{ sdrImage: ImageBitmap | HTMLImageElement, gainMapImage: ImageBitmap | HTMLImageElement | undefined, needsFlip: boolean }> {
     const gainMapBlob = gainMapBuffer ? new Blob([gainMapBuffer], { type: 'image/jpeg' }) : undefined
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
@@ -136,11 +118,7 @@ export abstract class LoaderBaseShared<TRenderer, TQuadRenderer, TMaterial, TUrl
     return { sdrImage, gainMapImage, needsFlip }
   }
 
-  protected createTextures (
-    sdrImage: ImageBitmap | HTMLImageElement,
-    gainMapImage: ImageBitmap | HTMLImageElement | undefined,
-    needsFlip: boolean
-  ): { gainMap: Texture, sdr: Texture } {
+  protected createTextures (sdrImage: ImageBitmap | HTMLImageElement, gainMapImage: ImageBitmap | HTMLImageElement | undefined, needsFlip: boolean): { gainMap: Texture, sdr: Texture } {
     const gainMap = new Texture(
       gainMapImage || new ImageData(2, 2),
       UVMapping,

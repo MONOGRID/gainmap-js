@@ -5,14 +5,14 @@ import {
 } from 'three'
 
 import { Constructor, QuadRendererTextureOptions } from '../../core'
-import { DecodeParameters } from './types'
+import { DecodeParametersWithRenderer } from './types'
 
 /**
  * Configuration for decode function
  */
 export interface DecodeConfig<TRenderer extends Constructor, TQuadRenderer, TMaterial> {
   renderer: TRenderer
-  createMaterial: (params: DecodeParameters<InstanceType<TRenderer>>) => TMaterial
+  createMaterial: (params: DecodeParametersWithRenderer<InstanceType<TRenderer>>) => TMaterial
   createQuadRenderer: (params: {
     width: number
     height: number
@@ -29,7 +29,7 @@ export interface DecodeConfig<TRenderer extends Constructor, TQuadRenderer, TMat
  * Creates a decode function that prepares a QuadRenderer with the given parameters
  */
 export function createDecodeFunction<TRenderer extends Constructor, TQuadRenderer, TMaterial> (config: DecodeConfig<TRenderer, TQuadRenderer, TMaterial>) {
-  return (params: DecodeParameters<InstanceType<TRenderer>>): TQuadRenderer => {
+  return (params: DecodeParametersWithRenderer<InstanceType<TRenderer>>): TQuadRenderer => {
     const { sdr, gainMap, renderer } = params
 
     if (sdr.colorSpace !== SRGBColorSpace) {

@@ -7,7 +7,7 @@ import { GainMapMetadata } from '../../../core/types'
 import { extractGainmapFromJPEG, GainMapNotFoundError, XMPMetadataNotFoundError } from '../../shared'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 
 /**
  * A Three.js Loader for a JPEG with embedded gainmap metadata (WebGPU version).
@@ -57,7 +57,7 @@ import { LoaderBase } from './LoaderBase'
  * result.dispose()
  *
  */
-export class HDRJPGLoader extends LoaderBase<string> {
+export class HDRJPGLoader extends LoaderBaseWebGPU<string> {
   /**
    * Loads a JPEG containing gain map metadata
    * Renders a normal SDR image if gainmap data is not found

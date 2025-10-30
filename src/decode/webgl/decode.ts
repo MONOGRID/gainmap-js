@@ -4,7 +4,7 @@ import {
 } from 'three'
 
 import { QuadRenderer } from '../../core/QuadRenderer'
-import { createDecodeFunction, DecodeParameters } from '../shared'
+import { createDecodeFunction, DecodeParametersWithRenderer } from '../shared'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 
 const decodeImpl = createDecodeFunction({
@@ -68,7 +68,7 @@ const decodeImpl = createDecodeFunction({
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
-export const decode = (params: DecodeParameters<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
+export const decode = (params: DecodeParametersWithRenderer<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
   // Ensure renderer is defined for the base function
   if (!params.renderer) {
     throw new Error('Renderer is required for decode function')

@@ -6,7 +6,7 @@ import {
 import { GainMapMetadata } from '../../../core/types'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 /**
  * A Three.js Loader for the gain map format (WebGPU version).
  *
@@ -55,7 +55,7 @@ import { LoaderBase } from './LoaderBase'
  * result.dispose()
  *
  */
-export class GainMapLoader extends LoaderBase<[string, string, string]> {
+export class GainMapLoader extends LoaderBaseWebGPU<[string, string, string]> {
   /**
    * Loads a gainmap using separate data
    * * sdr image

@@ -19,9 +19,9 @@ export type GainmapDecodingParameters = {
 }
 
 /**
- * Parameters for decode function
+ * Parameters for generic decoding
  */
-export type DecodeParameters<TRenderer> = {
+export type DecodeParameters = {
   /**
    * A Texture containing the SDR Rendition
    */
@@ -30,12 +30,20 @@ export type DecodeParameters<TRenderer> = {
    * A Texture containing the GainMap recovery image
    */
   gainMap: Omit<Texture, 'image'> & { image: { width: number, height: number } }
+
+} & GainmapDecodingParameters & GainMapMetadata
+
+/**
+ * Parameters for decode function
+ */
+export type DecodeParametersWithRenderer<TRenderer> = {
   /**
    * The renderer used to decode the GainMap
    */
-  renderer: TRenderer
+  renderer: TRenderer,
   /**
    * Options to use when creating the output renderTarget
    */
   renderTargetOptions?: QuadRendererTextureOptions
-} & GainmapDecodingParameters & GainMapMetadata
+
+} & DecodeParameters & GainmapDecodingParameters & GainMapMetadata

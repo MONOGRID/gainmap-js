@@ -9,12 +9,11 @@ import { type GainMapMetadata } from '../../../core/types'
 import { LoaderBaseShared } from '../../shared'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 
-export abstract class LoaderBase<TUrl = string> extends LoaderBaseShared<
-  WebGLRenderer,
-  QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>,
-  GainMapDecoderMaterial,
-  TUrl
-> {
+/**
+ * Base class for WebGL loaders
+ * @template TUrl - The type of URL used to load resources
+ */
+export abstract class LoaderBaseWebGL<TUrl = string> extends LoaderBaseShared<WebGLRenderer, QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, GainMapDecoderMaterial, TUrl> {
   constructor (renderer?: WebGLRenderer, manager?: LoadingManager) {
     super({
       renderer,
