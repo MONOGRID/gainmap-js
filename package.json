@@ -27,6 +27,10 @@
       "import": "./dist/decode.js",
       "default": "./dist/decode.umd.cjs"
     },
+    "./decode/webgpu": {
+      "types": "./dist/decode/webgpu/index.d.ts",
+      "import": "./dist/decode/webgpu/index.js"
+    },
     "./encode": {
       "types": "./dist/encode.d.ts",
       "import": "./dist/encode.js",
@@ -55,6 +59,9 @@
     "*": {
       ".": [
         "./dist/decode.d.ts"
+      ],
+      "decode/webgpu": [
+        "./dist/decode/webgpu/index.d.ts"
       ],
       "encode": [
         "./dist/encode.d.ts"

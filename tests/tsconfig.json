@@ -10,10 +10,12 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "lib": ["DOM", "ES2019"],
     "paths": {
-      "three": [ "../node_modules/three/build/three.module" ],
       "@monogrid/gainmap-js": [ "../dist/decode" ],
+      "@monogrid/gainmap-js/decode/webgpu": [ "../dist/decode/webgpu/index" ],
       "@monogrid/gainmap-js/encode": [ "../dist/encode" ],
       "@monogrid/gainmap-js/libultrahdr": [ "../dist/libultrahdr" ],
       "@monogrid/gainmap-js/worker": [ "../dist/worker" ],

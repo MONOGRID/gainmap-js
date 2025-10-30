@@ -1,0 +1,169 @@
+import { ConsoleMessage, expect } from '@playwright/test'
+
+import { test } from '../../../testWithCoverage'
+import { testGainMapLoaderInBrowserWebGPU } from './gainmap-loader'
+
+// const matrix = [
+//   '01.jpg',
+//   '02.jpg',
+//   '03.jpg',
+//   '04.jpg',
+//   '05.jpg',
+//   '06.jpg',
+//   '07.jpg',
+//   '08.jpg',
+//   '09.jpg',
+//   '10.jpg',
+//   'pisa-4k.jpg',
+//   'spruit_sunrise_4k.jpg',
+//   'abandoned_bakery_16k.jpg'
+// ]
+
+// for (const testFile of matrix) {
+
+// }
+
+test('loads from webp (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json'
+  })
+
+  await expect(page).toHaveScreenshot('render.png')
+})
+
+test('loads from webp sync (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const logs: string[] = []
+  page.on('console', (m: ConsoleMessage) => {
+    logs.push(m.text())
+  })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+    sync: true,
+    sdr: 'files/spruit_sunrise_4k.webp',
+    gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+    metadata: 'files/spruit_sunrise_4k.json'
+  })
+
+  // test loading progress happens
+  expect(logs.find(mess => mess.match(/loading/gi))).toBeTruthy()
+
+  await expect(page).toHaveScreenshot('render.png')
+})
+
+test('throws with an invalid sdr (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+      sdr: 'files/invalid_image.png',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'files/spruit_sunrise_4k.json'
+    })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/The source image could not be decoded/)
+})
+
+test('throws with an invalid gainmap (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'files/invalid_image.png',
+      metadata: 'files/spruit_sunrise_4k.json'
+    })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/The source image could not be decoded/)
+})
+
+test('throws with it doesn\'t find the sdr (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+      sdr: 'nope',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'files/spruit_sunrise_4k.json'
+    })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/404/)
+})
+
+test('throws with it doesn\'t find the gainmap (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'nope',
+      metadata: 'files/spruit_sunrise_4k.json'
+    })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/404/)
+})
+
+test('throws with it doesn\'t find the metadata (WebGPU)', async ({ page, browserName }) => {
+  // Skip test if WebGPU is not supported
+  test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
+
+  await page.goto('/tests/testbed-webgpu.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const shouldThrow = async () => {
+    await page.evaluate(testGainMapLoaderInBrowserWebGPU, {
+      sdr: 'files/spruit_sunrise_4k.webp',
+      gainmap: 'files/spruit_sunrise_4k-gainmap.webp',
+      metadata: 'nope'
+    })
+  }
+
+  await expect(shouldThrow).rejects.toThrow(/404/)
+})

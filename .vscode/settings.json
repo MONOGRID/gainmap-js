@@ -96,5 +96,14 @@
       "*.incl_cpp": "cpp"
   },
   "C_Cpp.default.compileCommands": "builddir/compile_commands.json",
-  "mesonbuild.configureOnOpen": false
+  "mesonbuild.configureOnOpen": false,
+  "cSpell.words": [
+    "Equirectangular",
+    "gainmap",
+    "glsl",
+    "hdrgm",
+    "HDRJPG",
+    "monogrid",
+    "xmpmeta"
+  ]
 }

@@ -3,8 +3,8 @@ import {
   HalfFloatType
 } from 'three'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapMetadata } from '../../core/types'
+import { QuadRenderer } from '../../../core/QuadRenderer'
+import { GainMapMetadata } from '../../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBase } from './LoaderBase'
 /**

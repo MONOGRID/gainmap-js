@@ -11,62 +11,44 @@ import {
   Texture,
   UnsignedByteType,
   UVMapping,
-  WebGLRenderer
-} from 'three'
+  WebGPURenderer
+} from 'three/webgpu'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { type GainMapMetadata, QuadRendererTextureOptions } from '../../core/types'
+import { type GainMapMetadata, QuadRendererTextureOptions } from '../../../core/types'
+import { getHTMLImageFromBlob } from '../../core/utils/get-html-image-from-blob'
+import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { getHTMLImageFromBlob } from '../utils/get-html-image-from-blob'
 
-export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
-  private _renderer?: WebGLRenderer
+/**
+ * Base class for WebGPU loaders
+ *
+ * @template TMaterial - The material type
+ * @template TUrl - The URL type for loading
+ */
+export abstract class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, TUrl> {
+  private _renderer?: WebGPURenderer
   private _renderTargetOptions?: QuadRendererTextureOptions
-  /**
-   * @private
-   */
   protected _internalLoadingManager: LoadingManager
-  /**
-   *
-   * @param renderer
-   * @param manager
-   */
-  constructor (renderer?: WebGLRenderer, manager?: LoadingManager) {
+
+  constructor (renderer?: WebGPURenderer, manager?: LoadingManager) {
     super(manager)
     if (renderer) this._renderer = renderer
     this._internalLoadingManager = new LoadingManager()
   }
 
-  /**
-   * Specify the renderer to use when rendering the gain map
-   *
-   * @param renderer
-   * @returns
-   */
-  public setRenderer (renderer: WebGLRenderer) {
+  public setRenderer (renderer: WebGPURenderer) {
     this._renderer = renderer
     return this
   }
 
-  /**
-   * Specify the renderTarget options to use when rendering the gain map
-   *
-   * @param options
-   * @returns
-   */
   public setRenderTargetOptions (options: QuadRendererTextureOptions) {
     this._renderTargetOptions = options
     return this
   }
 
-  /**
-   * @private
-   * @returns
-   */
   protected prepareQuadRenderer () {
-    if (!this._renderer) console.warn('WARNING: An existing WebGL Renderer was not passed to this Loader constructor or in setRenderer, the result of this Loader will need to be converted to a Data Texture with toDataTexture() before you can use it in your renderer.')
+    if (!this._renderer) console.warn('WARNING: A WebGPU Renderer was not passed to this Loader constructor or in setRenderer, the result of this Loader will need to be converted to a Data Texture with toDataTexture() before you can use it in your renderer.')
 
-    // temporary values
     const material = new GainMapDecoderMaterial({
       gainMapMax: [1, 1, 1],
       gainMapMin: [0, 0, 0],
@@ -91,22 +73,14 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
     })
   }
 
-  /**
- * @private
- * @param quadRenderer
- * @param metadata
- * @param sdrBuffer
- * @param gainMapBuffer
- */
   protected async render (quadRenderer: QuadRenderer<typeof HalfFloatType, GainMapDecoderMaterial>, metadata: GainMapMetadata, sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer) {
-    // this is optional, will render a black gain-map if not present
     const gainMapBlob = gainMapBuffer ? new Blob([gainMapBuffer], { type: 'image/jpeg' }) : undefined
-
     const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
 
     let sdrImage: ImageBitmap | HTMLImageElement
     let gainMapImage: ImageBitmap | HTMLImageElement | undefined
-
+    // in WebGPU we apparently don't need flipY under any circumstance
+    // except in QuadRenderer.toDataTexture() where we perform it in the texture itself
     let needsFlip = false
 
     if (typeof createImageBitmap === 'undefined') {
@@ -114,17 +88,14 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
         gainMapBlob ? getHTMLImageFromBlob(gainMapBlob) : Promise.resolve(undefined),
         getHTMLImageFromBlob(sdrBlob)
       ])
-
       gainMapImage = res[0]
       sdrImage = res[1]
-
-      needsFlip = true
+      needsFlip = false
     } else {
       const res = await Promise.all([
-        gainMapBlob ? createImageBitmap(gainMapBlob, { imageOrientation: 'flipY' }) : Promise.resolve(undefined),
-        createImageBitmap(sdrBlob, { imageOrientation: 'flipY' })
+        gainMapBlob ? createImageBitmap(gainMapBlob, { imageOrientation: 'from-image' }) : Promise.resolve(undefined),
+        createImageBitmap(sdrBlob, { imageOrientation: 'from-image' })
       ])
-
       gainMapImage = res[0]
       sdrImage = res[1]
     }
@@ -140,7 +111,6 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       1,
       LinearSRGBColorSpace
     )
-
     gainMap.flipY = needsFlip
     gainMap.needsUpdate = true
 
@@ -155,7 +125,6 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
       1,
       SRGBColorSpace
     )
-
     sdr.flipY = needsFlip
     sdr.needsUpdate = true
 
@@ -173,6 +142,6 @@ export class LoaderBase<TUrl = string> extends Loader<QuadRenderer<typeof HalfFl
     quadRenderer.material.maxDisplayBoost = Math.pow(2, metadata.hdrCapacityMax)
     quadRenderer.material.needsUpdate = true
 
-    quadRenderer.render()
+    await quadRenderer.render()
   }
 }

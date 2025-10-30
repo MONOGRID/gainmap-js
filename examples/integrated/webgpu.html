@@ -39,22 +39,25 @@
 				"imports": {
 					"three": "https://unpkg.com/three@0.180.0/build/three.module.js",
 					"three/addons/": "https://unpkg.com/three@0.180.0/examples/jsm/",
-					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js/dist/decode.js"
+					"three/webgpu": "https://unpkg.com/three@0.180.0/build/three.webgpu.js",
+					"three/tsl": "https://unpkg.com/three@0.180.0/build/three.tsl.js",
+					"@monogrid/gainmap-js": "https://unpkg.com/@monogrid/gainmap-js/dist/decode.js",
+					"@monogrid/gainmap-js/decode/webgpu": "../../dist/decode/webgpu/index.js"
 				}
 			}
 		</script>
 
 		<script type="module">
 
-			import * as THREE from 'three';
+			import * as THREE from 'three/webgpu';
 
 			import Stats from 'three/addons/libs/stats.module.js';
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
-			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js';
+			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js/decode/webgpu';
 
 			const params = {
 				envMap: 'HDR JPG',
@@ -75,10 +78,10 @@
 			const fileSizes = {};
 			const resolutions = {};
 
-			init();
+			await init();
 			animate();
 
-			function init() {
+			async function init() {
 
 				const lbl = document.getElementById( 'lbl_left' );
 
@@ -90,7 +93,8 @@
 
 				scene = new THREE.Scene();
 
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGPURenderer();
+				await renderer.init();
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
@@ -128,12 +132,17 @@
 
 
 				hdrJpg = new HDRJPGLoader( renderer )
-					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( ) {
+					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', async function ( ) {
 
 						resolutions[ 'HDR JPG' ] = hdrJpg.width + 'x' + hdrJpg.height;
 						displayStats( 'HDR JPG' );
 
 						hdrJpgEquirectangularMap = hdrJpg.renderTarget.texture;
+						//hdrJpgEquirectangularMap = await hdrJpg.toDataTexture( {
+						//	mapping: THREE.EquirectangularReflectionMapping,
+						//	minFilter: THREE.LinearFilter,
+						//	generateMipmaps: false
+						//} );
 						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrJpgEquirectangularMap );
 
 						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
@@ -170,7 +179,7 @@
 
 					} );
 
-				hdrEquirectangularMap = new RGBELoader()
+				hdrEquirectangularMap = new HDRLoader()
 					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( ) {
 
 						resolutions[ 'HDR' ] = hdrEquirectangularMap.image.width + 'x' + hdrEquirectangularMap.image.height;
@@ -269,7 +278,7 @@
 
 			}
 
-			function render() {
+			async function render() {
 
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
@@ -306,11 +315,16 @@
 
 				planeMesh.visible = params.debug;
 
-				scene.environment = equirectangularMap;
-				scene.background = equirectangularMap;
+				if ( equirectangularMap ) {
+
+					scene.environment = equirectangularMap;
+					scene.background = equirectangularMap;
+
+	      }
+
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.render( scene, camera );
+				await renderer.renderAsync( scene, camera );
 
 			}
 

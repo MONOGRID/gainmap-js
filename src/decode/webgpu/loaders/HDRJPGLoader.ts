@@ -1,24 +1,24 @@
 import {
   FileLoader,
   HalfFloatType
-} from 'three'
+} from 'three/webgpu'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapNotFoundError } from '../errors/GainMapNotFoundError'
-import { XMPMetadataNotFoundError } from '../errors/XMPMetadataNotFoundError'
-import { extractGainmapFromJPEG } from '../extract'
-import { GainMapMetadata } from '../index'
+import { GainMapMetadata } from '../../../core/types'
+import { GainMapNotFoundError } from '../../core/errors/GainMapNotFoundError'
+import { XMPMetadataNotFoundError } from '../../core/errors/XMPMetadataNotFoundError'
+import { extractGainmapFromJPEG } from '../../core/extract'
+import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBase } from './LoaderBase'
 
 /**
- * A Three.js Loader for a JPEG with embedded gainmap metadata.
+ * A Three.js Loader for a JPEG with embedded gainmap metadata (WebGPU version).
  *
  * @category Loaders
  * @group Loaders
  *
  * @example
- * import { HDRJPGLoader } from '@monogrid/gainmap-js'
+ * import { HDRJPGLoader } from '@monogrid/gainmap-js/decode/webgpu'
  * import {
  *   EquirectangularReflectionMapping,
  *   LinearFilter,
@@ -27,10 +27,10 @@ import { LoaderBase } from './LoaderBase'
  *   PerspectiveCamera,
  *   PlaneGeometry,
  *   Scene,
- *   WebGLRenderer
- * } from 'three'
+ *   WebGPURenderer
+ * } from 'three/webgpu'
  *
- * const renderer = new WebGLRenderer()
+ * const renderer = new WebGPURenderer()
  *
  * const loader = new HDRJPGLoader(renderer)
  *

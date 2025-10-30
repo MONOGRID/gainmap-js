@@ -1,6 +1,6 @@
 import { type Texture, type WebGLRenderer } from 'three'
 
-import { type GainMapMetadata, type QuadRendererTextureOptions } from '../core/types'
+import { type GainMapMetadata, type QuadRendererTextureOptions } from '../../core/types'
 
 /**
  * Necessary parameters for decoding a Gainmap

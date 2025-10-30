@@ -4,7 +4,7 @@ import {
   SRGBColorSpace
 } from 'three'
 
-import { QuadRenderer } from '../core/QuadRenderer'
+import { QuadRenderer } from '../../core/QuadRenderer'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 import { DecodeParameters } from './types'
 

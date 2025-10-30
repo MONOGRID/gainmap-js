@@ -1,6 +1,6 @@
 import { NoBlending, ShaderMaterial, Texture, Vector3 } from 'three'
 
-import { GainMapMetadata } from '../../core/types'
+import { GainMapMetadata } from '../../../core/types'
 import { GainmapDecodingParameters } from '../types'
 
 const vertexShader = /* glsl */`

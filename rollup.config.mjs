@@ -22,7 +22,7 @@ const settings = {
 }
 
 const configBase = defineConfig({
-  external: ['three']
+  external: ['three', 'three/webgpu', 'three/tsl']
 })
 
 /** @type {import('rollup').InputPluginOption[]} */
@@ -65,6 +65,7 @@ let configs = [
     input: {
       encode: './src/encode.ts',
       decode: './src/decode.ts',
+      'decode/webgpu/index': './src/decode/webgpu/index.ts',
       libultrahdr: './src/libultrahdr.ts',
       worker: './src/worker.ts',
       'worker-interface': './src/worker-interface.ts'
