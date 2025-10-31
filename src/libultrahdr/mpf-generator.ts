@@ -201,7 +201,7 @@ export function generateMpf (
   view.setUint16(pos, 0, bigEndian) // Dependent image 1
   pos += 2
   view.setUint16(pos, 0, bigEndian) // Dependent image 2
-  pos += 2
+  // pos += 2
 
   return uint8View
 }

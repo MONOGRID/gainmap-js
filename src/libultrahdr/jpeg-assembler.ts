@@ -271,7 +271,7 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions): Uint8Arr
 
   // Write rest of gain map JPEG (skip SOI)
   output.set(gainMap.data.subarray(2), pos)
-  pos += gainMap.data.length - 2
+  // pos += gainMap.data.length - 2
 
   return output
 }
