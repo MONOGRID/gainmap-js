@@ -1,4 +1,2 @@
-export * from '../libultrahdr-wasm/build/libultrahdr'
-export * from './libultrahdr/decode-jpeg-metadata'
+// Pure JavaScript implementation
 export * from './libultrahdr/encode-jpeg-metadata'
-export * from './libultrahdr/library'

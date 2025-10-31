@@ -31,7 +31,6 @@ jobs:
         - name: 'Checkout'
           uses: nschloe/action-cached-lfs-checkout@v1
           with:
-            submodules: recursive
             token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
         - name: 'Download build artifacts'

@@ -1,6 +1,6 @@
-import { type GainMapMetadata } from '../core/types'
+import { GainMapMetadata, GainMapMetadataExtended } from '../core/types'
 import { type CompressedImage } from '../encode/types'
-import { getLibrary } from './library'
+import { assembleJpegWithGainMap } from './jpeg-assembler'
 
 /**
  * Encapsulates a Gainmap into a single JPEG file (aka: JPEG-R) with the base map
@@ -65,7 +65,7 @@ import { getLibrary } from './library'
  *
  * // embed the compressed images + metadata into a single
  * // JPEG file
- * const jpeg = await encodeJPEGMetadata({
+ * const jpeg = encodeJPEGMetadata({
  *   ...encodingResult,
  *   ...metadata,
  *   sdr,
@@ -75,27 +75,43 @@ import { getLibrary } from './library'
  * // `jpeg` will be an `Uint8Array` which can be saved somewhere
  *
  *
- * @param encodingResult
- * @returns an Uint8Array representing a JPEG-R file
+ * @param encodingResult - Encoding result containing SDR image, gain map image, and metadata
+ * @returns A Uint8Array representing a JPEG-R file
  * @throws {Error} If `encodingResult.sdr.mimeType !== 'image/jpeg'`
  * @throws {Error} If `encodingResult.gainMap.mimeType !== 'image/jpeg'`
  */
-export const encodeJPEGMetadata = async (encodingResult: GainMapMetadata & { sdr: CompressedImage, gainMap: CompressedImage }) => {
-  const lib = await getLibrary()
+export const encodeJPEGMetadata = (encodingResult: GainMapMetadata & { sdr: CompressedImage, gainMap: CompressedImage }): Uint8Array<ArrayBuffer> => {
+  // Validate input
+  if (encodingResult.sdr.mimeType !== 'image/jpeg') {
+    throw new Error('This function expects an SDR image compressed in jpeg')
+  }
+  if (encodingResult.gainMap.mimeType !== 'image/jpeg') {
+    throw new Error('This function expects a GainMap image compressed in jpeg')
+  }
 
-  if (encodingResult.sdr.mimeType !== 'image/jpeg') throw new Error('This function expects an SDR image compressed in jpeg')
-  if (encodingResult.gainMap.mimeType !== 'image/jpeg') throw new Error('This function expects a GainMap image compressed in jpeg')
+  // Prepare metadata with proper conversions
+  // The XMP generator handles the log2 conversion internally for gain map min/max values
+  const metadata: GainMapMetadataExtended = {
+    version: '1.0',
+    gainMapMin: encodingResult.gainMapMin,
+    gainMapMax: encodingResult.gainMapMax,
+    gamma: encodingResult.gamma,
+    offsetSdr: encodingResult.offsetSdr,
+    offsetHdr: encodingResult.offsetHdr,
+    hdrCapacityMin: encodingResult.hdrCapacityMin,
+    hdrCapacityMax: encodingResult.hdrCapacityMax,
+    minContentBoost: Array.isArray(encodingResult.gainMapMin)
+      ? Math.pow(2, encodingResult.gainMapMin.reduce((a, b) => a + b, 0) / encodingResult.gainMapMin.length)
+      : Math.pow(2, encodingResult.gainMapMin),
+    maxContentBoost: Array.isArray(encodingResult.gainMapMax)
+      ? Math.pow(2, encodingResult.gainMapMax.reduce((a, b) => a + b, 0) / encodingResult.gainMapMax.length)
+      : Math.pow(2, encodingResult.gainMapMax)
+  }
 
-  return lib.appendGainMap(
-    encodingResult.sdr.width, encodingResult.sdr.height,
-    encodingResult.sdr.data, encodingResult.sdr.data.length,
-    encodingResult.gainMap.data, encodingResult.gainMap.data.length,
-    encodingResult.gainMapMax.reduce((p, n) => p + n, 0) / encodingResult.gainMapMax.length,
-    encodingResult.gainMapMin.reduce((p, n) => p + n, 0) / encodingResult.gainMapMin.length,
-    encodingResult.gamma.reduce((p, n) => p + n, 0) / encodingResult.gamma.length,
-    encodingResult.offsetSdr.reduce((p, n) => p + n, 0) / encodingResult.offsetSdr.length,
-    encodingResult.offsetHdr.reduce((p, n) => p + n, 0) / encodingResult.offsetHdr.length,
-    encodingResult.hdrCapacityMin,
-    encodingResult.hdrCapacityMax
-  ) as Uint8Array
+  // Assemble the JPEG with gain map using pure JavaScript
+  return assembleJpegWithGainMap({
+    sdr: encodingResult.sdr,
+    gainMap: encodingResult.gainMap,
+    metadata
+  })
 }

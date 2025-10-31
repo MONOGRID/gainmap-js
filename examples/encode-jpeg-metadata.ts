@@ -47,7 +47,7 @@ const metadata = encodingResult.getMetadata()
 
 // embed the compressed images + metadata into a single
 // JPEG file
-const jpeg = await encodeJPEGMetadata({
+const jpeg = encodeJPEGMetadata({
   ...encodingResult,
   ...metadata,
   sdr,
