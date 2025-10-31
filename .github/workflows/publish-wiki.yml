@@ -30,6 +30,7 @@ jobs:
           uses: dawidd6/action-download-artifact@v6
           with:
             name: build-artifact
+            path: dist
             run_id: ${{ github.event.workflow_run.id }}
             workflow_conclusion: success
 

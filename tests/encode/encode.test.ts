@@ -26,6 +26,9 @@ test('encodes from exr', async ({ page }) => {
   expect(meta!.gainMapMin, 'gainMapMin is not default value').toEqual([0, 0, 0]) // default value
 
   const extracted = await page.evaluate(testMPFExtractorInBrowser, result.jpeg)
+  // await fs.writeFile('result.jpg', Buffer.from(result.jpeg))
+  // await fs.writeFile('extracted-0.jpg', Buffer.from(extracted[0]))
+  // await fs.writeFile('extracted-1.jpg', Buffer.from(extracted[1]))
 
   const resized = await sharp(Buffer.from(extracted[0]))
     .resize({ width: 500, height: 500, fit: 'inside' })

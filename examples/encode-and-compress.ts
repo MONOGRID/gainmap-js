@@ -20,7 +20,7 @@ const encodingResult = await encodeAndCompress({
 
 // embed the compressed images + metadata into a single
 // JPEG file
-const jpeg = await encodeJPEGMetadata({
+const jpeg = encodeJPEGMetadata({
   ...encodingResult,
   sdr: encodingResult.sdr,
   gainMap: encodingResult.gainMap

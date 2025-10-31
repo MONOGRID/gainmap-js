@@ -40,7 +40,7 @@ export const encodeAndCompressInBrowser = async (args: Omit<encode.EncodingParam
 
   // embed the compressed images + metadata into a single
   // JPEG file
-  const jpeg = await libultrahdr.encodeJPEGMetadata({
+  const jpeg = libultrahdr.encodeJPEGMetadata({
     ...encodingResult,
     sdr: encodingResult.sdr,
     gainMap: encodingResult.gainMap
