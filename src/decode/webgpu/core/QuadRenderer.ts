@@ -86,37 +86,6 @@ export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends
   renderTargetOptions?: QuadRendererTextureOptions
 }
 
-// let _canReadPixelsResult: boolean | undefined
-/**
- * Test if this browser implementation can correctly read pixels from the specified
- * Render target type.
- *
- * Runs only once
- *
- * @param type
- * @param renderer
- * @param camera
- * @param renderTargetOptions
- * @returns
- */
-// const canReadPixels = async (type: TextureDataType, renderer: WebGPURenderer, camera: OrthographicCamera, renderTargetOptions: RenderTargetOptions) => {
-//   if (_canReadPixelsResult !== undefined) return _canReadPixelsResult
-
-//   const testRT = new RenderTarget(1, 1, renderTargetOptions)
-
-//   renderer.setRenderTarget(testRT)
-//   const mesh = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ color: 0xffffff }))
-//   await renderer.renderAsync(mesh, camera)
-//   renderer.setRenderTarget(null)
-
-//   const out = await renderer.readRenderTargetPixelsAsync(testRT, 0, 0, testRT.width, testRT.height)
-//   testRT.dispose()
-//   mesh.geometry.dispose()
-//   mesh.material.dispose()
-//   _canReadPixelsResult = out[0] !== 0
-//   return _canReadPixelsResult
-// }
-
 /**
  * Utility class used for rendering a texture with a material (WebGPU version)
  *
@@ -181,10 +150,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._camera.bottom = -0.5
     this._camera.updateProjectionMatrix()
 
-    // this.checkReadPixelsSupport(rtOptions).catch(e => {
-    //   console.error(e)
-    // })
-
     this._quad = new Mesh(new PlaneGeometry(), this._material)
 
     this._quad.geometry.computeBoundingBox()
@@ -193,24 +158,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     this._renderTarget = new RenderTarget(this.width, this.height, rtOptions)
     this._renderTarget.texture.mapping = options.renderTargetOptions?.mapping !== undefined ? options.renderTargetOptions?.mapping : UVMapping
   }
-
-  // private async checkReadPixelsSupport (rtOptions: RenderTargetOptions) {
-  //   if (!await canReadPixels(this._type, this._renderer, this._camera, rtOptions)) {
-  //     let alternativeType: TextureDataType | undefined
-  //     switch (this._type) {
-  //       case HalfFloatType:
-  //         alternativeType = FloatType
-  //         break
-  //     }
-  //     if (alternativeType !== undefined) {
-  //       console.warn(`This browser does not support reading pixels from ${this._type} RenderTargets, switching to ${FloatType}`)
-  //       this._type = alternativeType as TType
-  //     } else {
-  //       this._supportsReadPixels = false
-  //       console.warn('This browser dos not support toArray or toDataTexture, calls to those methods will result in an error thrown')
-  //     }
-  //   }
-  // }
 
   /**
    * Instantiates a temporary renderer
@@ -325,8 +272,6 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * ```
    */
   public dispose (disposeRenderTarget?: boolean) {
-    this.disposeOnDemandRenderer()
-
     if (disposeRenderTarget) {
       this.renderTarget.dispose()
     }
@@ -344,6 +289,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
 
     this.material.dispose()
     this._quad.geometry.dispose()
+    this.disposeOnDemandRenderer()
   }
 
   /**
