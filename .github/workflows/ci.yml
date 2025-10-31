@@ -20,6 +20,8 @@ jobs:
       steps:
         - name: 'Checkout'
           uses: actions/checkout@v4
+          with:
+            submodules: recursive
 
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
@@ -53,11 +55,14 @@ jobs:
       steps:
         - name: 'Checkout'
           uses: actions/checkout@v4
+          with:
+            submodules: recursive
 
         - name: 'Download build artifacts'
           uses: actions/download-artifact@v4
           with:
             name: build-artifact
+            path: .
 
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
@@ -100,11 +105,13 @@ jobs:
 
         - name: 'Checkout'
           uses: actions/checkout@v4
-
+          with:
+            submodules: recursive
         - name: 'Download build artifacts'
           uses: actions/download-artifact@v4
           with:
             name: build-artifact
+            path: .
 
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
