@@ -32,7 +32,7 @@ import { EncodingParametersBase } from './types'
  * const image = await loader.loadAsync('image.exr')
  *
  * // find RAW RGB Max value of a texture
- * const textureMax = await findTextureMinMax(image)
+ * const textureMax = findTextureMinMax(image)
  *
  * // Encode the gainmap
  * const encodingResult = encode({

@@ -1,34 +1,35 @@
 import {
   FileLoader,
   HalfFloatType
-} from 'three'
+} from 'three/webgpu'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapMetadata } from '../../core/types'
+import { GainMapMetadata } from '../../../core/types'
+import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 /**
- * A Three.js Loader for the gain map format.
+ * A Three.js Loader for the gain map format (WebGPU version).
  *
  * @category Loaders
  * @group Loaders
  *
  * @example
- * import { GainMapLoader } from '@monogrid/gainmap-js'
+ * import { GainMapLoader } from '@monogrid/gainmap-js/webgpu'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
  *   PlaneGeometry,
  *   Scene,
- *   WebGLRenderer
- * } from 'three'
+ *   WebGPURenderer
+ * } from 'three/webgpu'
  *
- * const renderer = new WebGLRenderer()
+ * const renderer = new WebGPURenderer()
+ * await renderer.init()
  *
  * const loader = new GainMapLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
  * // `result` can be used to populate a Texture
@@ -39,7 +40,7 @@ import { LoaderBase } from './LoaderBase'
  *   new MeshBasicMaterial({ map: result.renderTarget.texture })
  * )
  * scene.add(mesh)
- * renderer.render(scene, new PerspectiveCamera())
+ * await renderer.renderAsync(scene, new PerspectiveCamera())
  *
  * // Starting from three.js r159
  * // `result.renderTarget.texture` can
@@ -48,14 +49,13 @@ import { LoaderBase } from './LoaderBase'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it
  * result.dispose()
  *
  */
-export class GainMapLoader extends LoaderBase<[string, string, string]> {
+export class GainMapLoader extends LoaderBaseWebGPU<[string, string, string]> {
   /**
    * Loads a gainmap using separate data
    * * sdr image

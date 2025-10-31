@@ -12,6 +12,7 @@ import {
 const renderer = new WebGLRenderer()
 
 const loader = new HDRJPGLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
 
 const result = await loader.loadAsync('gainmap.jpeg')
 // `result` can be used to populate a Texture
@@ -31,7 +32,6 @@ renderer.render(scene, new PerspectiveCamera())
 // it was previously needed to convert it
 // to a DataTexture with `result.toDataTexture()`
 scene.background = result.renderTarget.texture
-scene.background.mapping = EquirectangularReflectionMapping
 
 // result must be manually disposed
 // when you are done using it

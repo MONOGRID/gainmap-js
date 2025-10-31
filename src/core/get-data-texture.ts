@@ -1,5 +1,6 @@
 import { DataTexture, LinearFilter, LinearSRGBColorSpace, RepeatWrapping, RGBAFormat, UVMapping } from 'three'
 import { EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { HDR } from 'three/examples/jsm/loaders/HDRLoader.js'
 import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 /**
  * Utility function to obtain a `DataTexture` from various input formats
@@ -10,7 +11,7 @@ import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
  * @param image
  * @returns
  */
-export const getDataTexture = (image: EXR | RGBE | DataTexture) => {
+export const getDataTexture = (image: EXR | RGBE | HDR | DataTexture) => {
   let dataTexture: DataTexture
 
   if (image instanceof DataTexture) {

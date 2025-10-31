@@ -1,4 +1,4 @@
-import { GainMapMetadata } from '../../core/types'
+import { GainMapMetadata } from '../../../core/types'
 
 const getXMLValue = (xml: string, tag: string, defaultValue?: string): string | [string, string, string] => {
   // Check for attribute format first: tag="value"

@@ -1,5 +1,9 @@
 import { Mapping, RenderTargetOptions } from 'three'
 
+// TypeScript type for a generic Constructor
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Constructor = new (...args: any[]) => any
+
 /**
  * This is the Metadata stored in an encoded Gainmap which is used
  * to decode it and return an HDR image

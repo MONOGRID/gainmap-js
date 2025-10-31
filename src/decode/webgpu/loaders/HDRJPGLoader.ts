@@ -1,38 +1,37 @@
 import {
   FileLoader,
   HalfFloatType
-} from 'three'
+} from 'three/webgpu'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapNotFoundError } from '../errors/GainMapNotFoundError'
-import { XMPMetadataNotFoundError } from '../errors/XMPMetadataNotFoundError'
-import { extractGainmapFromJPEG } from '../extract'
-import { GainMapMetadata } from '../index'
+import { GainMapMetadata } from '../../../core/types'
+import { extractGainmapFromJPEG, GainMapNotFoundError, XMPMetadataNotFoundError } from '../../shared'
+import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 
 /**
- * A Three.js Loader for a JPEG with embedded gainmap metadata.
+ * A Three.js Loader for a JPEG with embedded gainmap metadata (WebGPU version).
  *
  * @category Loaders
  * @group Loaders
  *
  * @example
- * import { HDRJPGLoader } from '@monogrid/gainmap-js'
+ * import { HDRJPGLoader } from '@monogrid/gainmap-js/webgpu'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
  *   PlaneGeometry,
  *   Scene,
- *   WebGLRenderer
- * } from 'three'
+ *   WebGPURenderer
+ * } from 'three/webgpu'
  *
- * const renderer = new WebGLRenderer()
+ * const renderer = new WebGPURenderer()
+ * await renderer.init()
  *
  * const loader = new HDRJPGLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync('gainmap.jpeg')
  * // `result` can be used to populate a Texture
@@ -43,7 +42,7 @@ import { LoaderBase } from './LoaderBase'
  *   new MeshBasicMaterial({ map: result.renderTarget.texture })
  * )
  * scene.add(mesh)
- * renderer.render(scene, new PerspectiveCamera())
+ * await renderer.renderAsync(scene, new PerspectiveCamera())
  *
  * // Starting from three.js r159
  * // `result.renderTarget.texture` can
@@ -52,19 +51,18 @@ import { LoaderBase } from './LoaderBase'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it
  * result.dispose()
  *
  */
-export class HDRJPGLoader extends LoaderBase<string> {
+export class HDRJPGLoader extends LoaderBaseWebGPU<string> {
   /**
    * Loads a JPEG containing gain map metadata
    * Renders a normal SDR image if gainmap data is not found
    *
-   * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+   * @param url Path to a JPEG file containing embedded gain map metadata
    * @param onLoad Load complete callback, will receive the result
    * @param onProgress Progress callback, will receive a `ProgressEvent`
    * @param onError Error callback

@@ -4,7 +4,7 @@ import * as THREE from 'three'
  *
  * @param args
  */
-export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string, metadata: string, exposure?: number, sync?: boolean } & Partial<decode.GainmapDecodingParameters>) => {
+export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string, metadata: string, exposure?: number, sync?: boolean, pureRTBackground?: boolean } & Partial<decode.GainmapDecodingParameters>) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise<void>(async (resolve, reject) => {
     const renderer = new THREE.WebGLRenderer()
@@ -31,13 +31,17 @@ export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string,
       plane.scale.x = Math.min(1, ratio)
       scene.add(plane)
 
-      scene.background = result.toDataTexture({
-        mapping: THREE.EquirectangularReflectionMapping,
-        minFilter: THREE.LinearFilter,
-        generateMipmaps: false
-      })
-      scene.background.needsUpdate = true
-
+      if (!args.pureRTBackground) {
+        scene.background = result.toDataTexture({
+          mapping: THREE.EquirectangularReflectionMapping,
+          minFilter: THREE.LinearFilter,
+          generateMipmaps: false
+        })
+        scene.background.needsUpdate = true
+      } else {
+        result.renderTarget.texture.mapping = THREE.EquirectangularReflectionMapping
+        scene.background = result.renderTarget.texture
+      }
       // result must be manually disposed
       // when you are done using it
       result.dispose()

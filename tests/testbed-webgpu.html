@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../node_modules/three/build/three.module.js",
+        "three/webgpu": "../node_modules/three/build/three.webgpu.js",
+        "three/tsl": "../node_modules/three/build/three.tsl.js",
+        "three/examples/": "../node_modules/three/examples/",
+
+        "@monogrid/gainmap-js": "../dist/decode.js",
+        "@monogrid/gainmap-js/webgpu": "../dist/decode.webgpu.js",
+        "@monogrid/gainmap-js/encode": "../dist/encode.js",
+        "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js",
+        "@monogrid/gainmap-js/worker-interface": "../dist/worker-interface.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <script type="module" data-testid="script">
+    import * as decode from '@monogrid/gainmap-js/webgpu'
+    import * as encode from '@monogrid/gainmap-js/encode'
+    import * as libultrahdr from '@monogrid/gainmap-js/libultrahdr'
+    import * as workerInterface from '@monogrid/gainmap-js/worker-interface'
+    import * as THREE from 'three/webgpu'
+    import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+    import { HDRLoader } from 'three/examples/jsm/loaders/HDRLoader.js'
+
+    window.decode = decode
+    window.encode = encode
+    window.libultrahdr = libultrahdr
+    window.workerInterface = workerInterface
+    window.THREE = THREE
+    window.EXRLoader = EXRLoader
+    window.HDRLoader = HDRLoader
+  </script>
+</body>
+
+</html>
+
