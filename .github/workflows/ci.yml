@@ -62,7 +62,7 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: build-artifact
-            path: .
+            path: dist
 
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
@@ -111,7 +111,7 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: build-artifact
-            path: .
+            path: dist
 
         - name: 'Setup Nodejs'
           uses: actions/setup-node@v3
