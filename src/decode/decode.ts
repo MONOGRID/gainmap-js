@@ -84,11 +84,7 @@ export const decode = (params: DecodeParameters): InstanceType<typeof QuadRender
     gainMap
   })
   const quadRenderer = new QuadRenderer({
-    // TODO: three types are generic, eslint complains here, see how we can solve
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     width: sdr.image.width,
-    // TODO: three types are generic, eslint complains here, see how we can solve
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     height: sdr.image.height,
     type: HalfFloatType,
     colorSpace: LinearSRGBColorSpace,
