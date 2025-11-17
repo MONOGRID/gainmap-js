@@ -56,7 +56,21 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--font-render-hinting=none', '--enable-unsafe-swiftshader'] }, viewport: { width: 500, height: 500 } }
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--font-render-hinting=none',
+            '--use-angle=gl-egl',
+            '--enable-features=Vulkan,UseSkiaRenderer',
+            '--use-vulkan=native',
+            '--enable-logging',
+            '--disable-vulkan-fallback-to-gl-for-testing',
+            '--ignore-gpu-blocklist'
+          ]
+        },
+        viewport: { width: 500, height: 500 }
+      }
     }
 
     // {
