@@ -42,7 +42,14 @@ export default defineConfig({
 
   // expect timeout to 40 seconds
   expect: {
-    timeout: 40 * 1000
+    timeout: 40 * 1000,
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.025
+    },
+    toMatchSnapshot: {
+      maxDiffPixelRatio: 0.025,
+    }
+
   },
 
   // test timeout to 60 seconds
@@ -56,7 +63,21 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--font-render-hinting=none', '--enable-unsafe-swiftshader'] }, viewport: { width: 500, height: 500 } }
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--font-render-hinting=none',
+            '--use-angle=gl-egl',
+            '--enable-features=Vulkan,UseSkiaRenderer',
+            '--use-vulkan=native',
+            '--enable-logging',
+            '--disable-vulkan-fallback-to-gl-for-testing',
+            '--ignore-gpu-blocklist'
+          ]
+        },
+        viewport: { width: 500, height: 500 }
+      }
     }
 
     // {
