@@ -52,7 +52,7 @@ export const testGainMapLoaderInBrowser = (args: { sdr: string, gainmap: string,
 
       const camera = new THREE.PerspectiveCamera()
       camera.position.z = 3
-      await renderer.renderAsync(scene, camera)
+      renderer.render(scene, camera)
 
       resolve()
     }

@@ -198,7 +198,7 @@ const mesh = new Mesh(
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
-await renderer.renderAsync(scene, new PerspectiveCamera())
+renderer.render(scene, new PerspectiveCamera())
 
 // Starting from three.js r159
 // `result.renderTarget.texture` can
@@ -239,7 +239,7 @@ const mesh = new Mesh(
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
-await renderer.renderAsync(scene, new PerspectiveCamera())
+renderer.render(scene, new PerspectiveCamera())
 
 // Starting from three.js r159
 // `result.renderTarget.texture` can
@@ -257,8 +257,7 @@ result.dispose()
 2. **Three.js imports**: Use `three/webgpu` instead of `three`
 3. **Renderer**: Use `WebGPURenderer` instead of `WebGLRenderer`
 4. **Renderer initialization**: Call `await renderer.init()` before using WebGPU renderer
-5. **Async decoding**: The `decode()` function and rendering are async in WebGPU
-6. **Rendering**: Use `await renderer.renderAsync()` instead of `renderer.render()`
+5. **Async decoding**: The `decode()` function is async in WebGPU
 
 ### Encoding
 

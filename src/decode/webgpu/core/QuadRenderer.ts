@@ -179,7 +179,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
     }
     this._renderer.setRenderTarget(this._renderTarget)
     try {
-      await this._renderer.renderAsync(this._scene, this._camera)
+      this._renderer.render(this._scene, this._camera)
     } catch (e) {
       this._renderer.setRenderTarget(null)
       throw e

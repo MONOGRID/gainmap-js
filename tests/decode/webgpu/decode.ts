@@ -59,7 +59,7 @@ export const decodeInBrowserWebGPU = async (args: { file: string }) => {
   camera.position.z = 10
 
   scene.add(plane)
-  await renderer.renderAsync(scene, camera)
+  renderer.render(scene, camera)
 
   result.dispose()
 

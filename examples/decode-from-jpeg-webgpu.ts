@@ -84,7 +84,7 @@ const mesh = new Mesh(
   new MeshBasicMaterial({ map: result.renderTarget.texture })
 )
 scene.add(mesh)
-await renderer.renderAsync(scene, new PerspectiveCamera())
+renderer.render(scene, new PerspectiveCamera())
 
 // result must be manually disposed
 // when you are done using it

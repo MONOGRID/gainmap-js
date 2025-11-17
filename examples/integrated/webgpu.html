@@ -271,7 +271,7 @@
 
 			}
 
-			async function render() {
+			function render() {
 
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
@@ -317,7 +317,7 @@
 
 				renderer.toneMappingExposure = params.exposure;
 
-				await renderer.renderAsync( scene, camera );
+				renderer.render( scene, camera );
 
 			}
 

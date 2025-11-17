@@ -42,5 +42,5 @@ export const testHDRJpegLoaderInBrowser = async (args: { file: string, exposure?
 
   const camera = new THREE.PerspectiveCamera()
   camera.position.z = 3
-  await renderer.renderAsync(scene, camera)
+  renderer.render(scene, camera)
 }

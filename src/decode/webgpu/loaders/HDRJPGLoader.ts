@@ -42,7 +42,7 @@ import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
  *   new MeshBasicMaterial({ map: result.renderTarget.texture })
  * )
  * scene.add(mesh)
- * await renderer.renderAsync(scene, new PerspectiveCamera())
+ * renderer.render(scene, new PerspectiveCamera())
  *
  * // Starting from three.js r159
  * // `result.renderTarget.texture` can
