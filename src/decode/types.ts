@@ -28,11 +28,11 @@ export type DecodeParameters = {
   /**
    * An Texture containing the SDR Rendition
    */
-  sdr: Texture
+  sdr: Omit<Texture, 'image'> & { image: { width: number, height: number } }
   /**
    * An Texture containing the GainMap recovery image
    */
-  gainMap: Texture
+  gainMap: Omit<Texture, 'image'> & { image: { width: number, height: number } }
   /**
    * WebGLRenderer used to decode the GainMap
    */
