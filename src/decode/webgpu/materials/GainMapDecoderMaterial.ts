@@ -1,4 +1,4 @@
-import { add, exp2, float, max, min, mul, pow, ShaderNodeObject, sub, texture, uniform, vec3 } from 'three/tsl'
+import { add, exp2, float, max, min, mul, pow, sub, texture, uniform, vec3 } from 'three/tsl'
 import { MeshBasicNodeMaterial, NoBlending, Texture, TextureNode, Vector3 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
@@ -27,8 +27,8 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
   private _gainMapMinUniform: ReturnType<typeof uniform<Vector3>>
   private _gainMapMaxUniform: ReturnType<typeof uniform<Vector3>>
   private _weightFactorUniform: ReturnType<typeof uniform<number>>
-  private _sdrTexture: ShaderNodeObject<TextureNode>
-  private _gainMapTexture: ShaderNodeObject<TextureNode>
+  private _sdrTexture: TextureNode
+  private _gainMapTexture: TextureNode
 
   /**
    *

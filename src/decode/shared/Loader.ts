@@ -75,8 +75,8 @@ export abstract class LoaderBaseShared<TRenderer, TQuadRenderer, TMaterial, TUrl
       hdrCapacityMax: 1,
       hdrCapacityMin: 0,
       maxDisplayBoost: 1,
-      gainMap: new Texture(),
-      sdr: new Texture()
+      gainMap: new Texture<HTMLImageElement>(),
+      sdr: new Texture<HTMLImageElement>()
     })
 
     return this._config.createQuadRenderer({
