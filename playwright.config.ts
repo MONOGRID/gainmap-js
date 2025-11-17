@@ -56,7 +56,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--font-render-hinting=none'] }, viewport: { width: 500, height: 500 } }
+      use: { ...devices['Desktop Chrome'], launchOptions: { args: ['--font-render-hinting=none', '--enable-unsafe-swiftshader'] }, viewport: { width: 500, height: 500 } }
     }
 
     // {
