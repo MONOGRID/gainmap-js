@@ -11,6 +11,7 @@ permissions:
   pull-requests: write
   checks: write
 
+
 jobs:
   report:
     name: Report
@@ -102,22 +103,31 @@ jobs:
       - name: 'Analyze Src Code Linting Results'
         if: always()
         id: eslint_src
-        uses: ataylorme/eslint-annotate-action@v2
+        uses: ataylorme/eslint-annotate-action@v3
         with:
+          fail-on-warning: true
+          fail-on-error: true
+          markdown-report-on-step-summary: true
           report-json: "reports/eslint-src.json"
 
       - name: 'Analyze Examples Code Linting Results'
         if: always()
         id: eslint_examples
-        uses: ataylorme/eslint-annotate-action@v2
+        uses: ataylorme/eslint-annotate-action@v3
         with:
+          fail-on-warning: true
+          fail-on-error: true
+          markdown-report-on-step-summary: true
           report-json: "reports/eslint-examples.json"
 
       - name: 'Analyze Tests Code Linting Results'
         if: always()
         id: eslint_tests
-        uses: ataylorme/eslint-annotate-action@v2
+        uses: ataylorme/eslint-annotate-action@v3
         with:
+          fail-on-warning: true
+          fail-on-error: true
+          markdown-report-on-step-summary: true
           report-json: "reports/eslint-tests.json"
 
       - name: 'Report Eslint Src'
