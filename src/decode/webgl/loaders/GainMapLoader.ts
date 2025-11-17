@@ -3,10 +3,10 @@ import {
   HalfFloatType
 } from 'three'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapMetadata } from '../../core/types'
+import { QuadRenderer } from '../../../core/QuadRenderer'
+import { GainMapMetadata } from '../../../core/types'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGL } from './LoaderBaseWebGL'
 /**
  * A Three.js Loader for the gain map format.
  *
@@ -17,7 +17,6 @@ import { LoaderBase } from './LoaderBase'
  * import { GainMapLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
@@ -29,6 +28,7 @@ import { LoaderBase } from './LoaderBase'
  * const renderer = new WebGLRenderer()
  *
  * const loader = new GainMapLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
  * // `result` can be used to populate a Texture
@@ -48,14 +48,13 @@ import { LoaderBase } from './LoaderBase'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it
  * result.dispose()
  *
  */
-export class GainMapLoader extends LoaderBase<[string, string, string]> {
+export class GainMapLoader extends LoaderBaseWebGL<[string, string, string]> {
   /**
    * Loads a gainmap using separate data
    * * sdr image

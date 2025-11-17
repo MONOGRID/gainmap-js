@@ -3,13 +3,11 @@ import {
   HalfFloatType
 } from 'three'
 
-import { QuadRenderer } from '../../core/QuadRenderer'
-import { GainMapNotFoundError } from '../errors/GainMapNotFoundError'
-import { XMPMetadataNotFoundError } from '../errors/XMPMetadataNotFoundError'
-import { extractGainmapFromJPEG } from '../extract'
-import { GainMapMetadata } from '../index'
+import { QuadRenderer } from '../../../core/QuadRenderer'
+import { GainMapMetadata } from '../../../core/types'
+import { extractGainmapFromJPEG, GainMapNotFoundError, XMPMetadataNotFoundError } from '../../shared'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
-import { LoaderBase } from './LoaderBase'
+import { LoaderBaseWebGL } from './LoaderBaseWebGL'
 
 /**
  * A Three.js Loader for a JPEG with embedded gainmap metadata.
@@ -21,7 +19,6 @@ import { LoaderBase } from './LoaderBase'
  * import { HDRJPGLoader } from '@monogrid/gainmap-js'
  * import {
  *   EquirectangularReflectionMapping,
- *   LinearFilter,
  *   Mesh,
  *   MeshBasicMaterial,
  *   PerspectiveCamera,
@@ -33,6 +30,7 @@ import { LoaderBase } from './LoaderBase'
  * const renderer = new WebGLRenderer()
  *
  * const loader = new HDRJPGLoader(renderer)
+ *   .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
  *
  * const result = await loader.loadAsync('gainmap.jpeg')
  * // `result` can be used to populate a Texture
@@ -52,19 +50,18 @@ import { LoaderBase } from './LoaderBase'
  * // it was previously needed to convert it
  * // to a DataTexture with `result.toDataTexture()`
  * scene.background = result.renderTarget.texture
- * scene.background.mapping = EquirectangularReflectionMapping
  *
  * // result must be manually disposed
  * // when you are done using it
  * result.dispose()
  *
  */
-export class HDRJPGLoader extends LoaderBase<string> {
+export class HDRJPGLoader extends LoaderBaseWebGL<string> {
   /**
    * Loads a JPEG containing gain map metadata
    * Renders a normal SDR image if gainmap data is not found
    *
-   * @param url An array in the form of [sdr.jpg, gainmap.jpg, metadata.json]
+   * @param url Path to a JPEG file containing embedded gain map metadata
    * @param onLoad Load complete callback, will receive the result
    * @param onProgress Progress callback, will receive a `ProgressEvent`
    * @param onError Error callback

@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/MONOGRID/gainmap-js/compare/v3.1.0...v3.2.0) (2025-11-17)
+
+
+### Features
+
+* WebGPU support ([#72](https://github.com/MONOGRID/gainmap-js/issues/72)) ([0d85bec](https://github.com/MONOGRID/gainmap-js/commit/0d85becd0e8b79fc5adfb5bbd757e35e032ee77e))
+
 # [3.1.0](https://github.com/MONOGRID/gainmap-js/compare/v3.0.6...v3.1.0) (2024-12-05)
 
 

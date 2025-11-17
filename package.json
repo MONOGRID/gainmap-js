@@ -1,6 +1,6 @@
 {
   "name": "@monogrid/gainmap-js",
-  "version": "3.1.0-local",
+  "version": "3.2.0",
   "description": "A Javascript (TypeScript) Port of Adobe Gainmap Technology for storing HDR Images using an SDR Image + a gain map",
   "keywords": [
     "hdr",
@@ -26,6 +26,11 @@
       "types": "./dist/decode.d.ts",
       "import": "./dist/decode.js",
       "default": "./dist/decode.umd.cjs"
+    },
+    "./webgpu": {
+      "types": "./dist/decode/webgpu/index.d.ts",
+      "import": "./dist/decode.webgpu.js",
+      "default": "./dist/decode.webgpu.umd.cjs"
     },
     "./encode": {
       "types": "./dist/encode.d.ts",
@@ -55,6 +60,12 @@
     "*": {
       ".": [
         "./dist/decode.d.ts"
+      ],
+      "decode/webgpu": [
+        "./dist/decode/webgpu/index.d.ts"
+      ],
+      "decode/webgl": [
+        "./dist/decode/webgl/index.d.ts"
       ],
       "encode": [
         "./dist/encode.d.ts"

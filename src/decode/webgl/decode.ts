@@ -1,15 +1,20 @@
 import {
   HalfFloatType,
-  LinearSRGBColorSpace,
-  SRGBColorSpace
+  WebGLRenderer
 } from 'three'
 
-import { QuadRenderer } from '../core/QuadRenderer'
+import { QuadRenderer } from '../../core/QuadRenderer'
+import { createDecodeFunction, DecodeParametersWithRenderer } from '../shared'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
-import { DecodeParameters } from './types'
+
+const decodeImpl = createDecodeFunction({
+  renderer: WebGLRenderer,
+  createMaterial: (params) => new GainMapDecoderMaterial(params),
+  createQuadRenderer: (params) => new QuadRenderer(params)
+})
 
 /**
- * Decodes a gain map using a WebGLRenderTarget
+ * Decodes a gain map using a WebGL RenderTarget
  *
  * @category Decoding Functions
  * @group Decoding Functions
@@ -36,7 +41,7 @@ import { DecodeParameters } from './types'
  * // load metadata
  * const metadata = await (await fetch('metadata.json')).json()
  *
- * const result = await decode({
+ * const result = decode({
  *   sdr,
  *   gainMap,
  *   // this allows to use `result.renderTarget.texture` directly
@@ -63,34 +68,15 @@ import { DecodeParameters } from './types'
  * @returns
  * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
-export const decode = (params: DecodeParameters): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
-  const { sdr, gainMap, renderer } = params
-
-  if (sdr.colorSpace !== SRGBColorSpace) {
-    console.warn('SDR Colorspace needs to be *SRGBColorSpace*, setting it automatically')
-    sdr.colorSpace = SRGBColorSpace
+export const decode = (params: DecodeParametersWithRenderer<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
+  // Ensure renderer is defined for the base function
+  if (!params.renderer) {
+    throw new Error('Renderer is required for decode function')
   }
-  sdr.needsUpdate = true
 
-  if (gainMap.colorSpace !== LinearSRGBColorSpace) {
-    console.warn('Gainmap Colorspace needs to be *LinearSRGBColorSpace*, setting it automatically')
-    gainMap.colorSpace = LinearSRGBColorSpace
-  }
-  gainMap.needsUpdate = true
-
-  const material = new GainMapDecoderMaterial({
+  const quadRenderer = decodeImpl({
     ...params,
-    sdr,
-    gainMap
-  })
-  const quadRenderer = new QuadRenderer({
-    width: sdr.image.width,
-    height: sdr.image.height,
-    type: HalfFloatType,
-    colorSpace: LinearSRGBColorSpace,
-    material,
-    renderer,
-    renderTargetOptions: params.renderTargetOptions
+    renderer: params.renderer
   })
   try {
     quadRenderer.render()

@@ -52,7 +52,7 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-			import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+			import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
 
 			import { GainMapLoader, HDRJPGLoader } from '@monogrid/gainmap-js';
 
@@ -122,12 +122,15 @@
 
 					pmremGenerator.dispose();
 
-	};
+				};
 
 
 
 
 				hdrJpg = new HDRJPGLoader( renderer )
+					.setRenderTargetOptions( {
+						mapping: THREE.EquirectangularReflectionMapping
+					 } )
 					.load( 'textures/gainmap/spruit_sunrise_4k.jpg', function ( ) {
 
 						resolutions[ 'HDR JPG' ] = hdrJpg.width + 'x' + hdrJpg.height;
@@ -135,9 +138,6 @@
 
 						hdrJpgEquirectangularMap = hdrJpg.renderTarget.texture;
 						hdrJpgPMREMRenderTarget = pmremGenerator.fromEquirectangular( hdrJpgEquirectangularMap );
-
-						hdrJpgEquirectangularMap.mapping = THREE.EquirectangularReflectionMapping;
-						hdrJpgEquirectangularMap.needsUpdate = true;
 
 						hdrJpg.dispose();
 
@@ -148,6 +148,9 @@
 					} );
 
 				gainMap = new GainMapLoader( renderer )
+					.setRenderTargetOptions( {
+						mapping: THREE.EquirectangularReflectionMapping
+					 } )
 					.load( [
 						'textures/gainmap/spruit_sunrise_4k.webp',
 						'textures/gainmap/spruit_sunrise_4k-gainmap.webp',
@@ -156,11 +159,8 @@
 
 						resolutions[ 'Webp Gain map (separate)' ] = gainMap.width + 'x' + gainMap.height;
 
-						gainMapBackground = hdrJpg.renderTarget.texture;
+						gainMapBackground = gainMap.renderTarget.texture;
 						gainMapPMREMRenderTarget = pmremGenerator.fromEquirectangular( gainMapBackground );
-
-						gainMapBackground.mapping = THREE.EquirectangularReflectionMapping;
-						gainMapBackground.needsUpdate = true;
 
 						gainMap.dispose();
 
@@ -170,7 +170,7 @@
 
 					} );
 
-				hdrEquirectangularMap = new RGBELoader()
+				hdrEquirectangularMap = new HDRLoader()
 					.load( 'textures/gainmap/spruit_sunrise_1k.hdr', function ( ) {
 
 						resolutions[ 'HDR' ] = hdrEquirectangularMap.image.width + 'x' + hdrEquirectangularMap.image.height;
