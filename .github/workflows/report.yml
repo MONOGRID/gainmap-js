@@ -105,6 +105,7 @@ jobs:
         id: eslint_src
         uses: ataylorme/eslint-annotate-action@v3
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           fail-on-warning: true
           fail-on-error: true
           markdown-report-on-step-summary: true
@@ -115,6 +116,7 @@ jobs:
         id: eslint_examples
         uses: ataylorme/eslint-annotate-action@v3
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           fail-on-warning: true
           fail-on-error: true
           markdown-report-on-step-summary: true
@@ -125,6 +127,7 @@ jobs:
         id: eslint_tests
         uses: ataylorme/eslint-annotate-action@v3
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           fail-on-warning: true
           fail-on-error: true
           markdown-report-on-step-summary: true
