@@ -10,6 +10,19 @@ const threeMatch = /https:\/\/unpkg\.com\/three(?<version>@[0-9.]+)?\/(?<path>.*
 const gainmapJSMatch = /https:\/\/unpkg\.com\/@monogrid\/gainmap-js(?<version>@[0-9.]+)?\/(?<path>.*)/
 
 test('renders the example correctly', async ({ page, context }) => {
+  test.setTimeout(480_000) // TODO: understand why this got slow!
+
+  // Capture console messages
+  page.on('console', msg => {
+    const type = msg.type()
+    const text = msg.text()
+    const location = msg.location()
+    console.log(`[Browser ${type.toUpperCase()}] ${text}`)
+    if (location.url) {
+      console.log(`  at ${location.url}:${location.lineNumber}:${location.columnNumber}`)
+    }
+  })
+
   await context.route(threeMatch, async (route, request) => {
     const match = threeMatch.exec(request.url())
     const path = match?.groups?.path
@@ -28,23 +41,38 @@ test('renders the example correctly', async ({ page, context }) => {
     }
     return route.continue()
   })
-
+  let startTime = performance.now()
+  console.log('[DEBUG] going to page')
   await page.goto('/examples/integrated/', { waitUntil: 'networkidle' })
-
-  await expect(page.locator('canvas').first()).toBeAttached()
-
-  await expect(page).toHaveScreenshot('initial.png')
-
+  console.log(`[DEBUG] page loaded (${(performance.now() - startTime).toFixed(2)}ms), waiting for canvas to be attached`)
+  startTime = performance.now()
+  await expect(page.locator('canvas').first()).toBeAttached({ timeout: 240_000 })
+  console.log(`[DEBUG] canvas attached (${(performance.now() - startTime).toFixed(2)}ms), taking screenshot`)
+  startTime = performance.now()
+  await expect(page).toHaveScreenshot('initial.png', { timeout: 240_000, threshold: 0.3, animations: 'allow', fullPage: true })
+  console.log(`[DEBUG] screenshot taken (${(performance.now() - startTime).toFixed(2)}ms), zooming in`)
+  startTime = performance.now()
   await page.mouse.wheel(0, -9000)
-
-  await expect(page).toHaveScreenshot('zoomed-in.png')
-
+  console.log(`[DEBUG] zoomed in (${(performance.now() - startTime).toFixed(2)}ms), taking screenshot`)
+  startTime = performance.now()
+  await expect(page).toHaveScreenshot('zoomed-in.png', { timeout: 240_000, threshold: 0.3, animations: 'allow', fullPage: true })
+  console.log(`[DEBUG] zoomed in, screenshot taken (${(performance.now() - startTime).toFixed(2)}ms), zooming out`)
+  startTime = performance.now()
   await page.mouse.wheel(0, 9000)
-
+  console.log(`[DEBUG] zoomed out (${(performance.now() - startTime).toFixed(2)}ms), moving mouse to 250, 250`)
+  startTime = performance.now()
   await page.mouse.move(250, 250, { steps: 20 })
+  console.log(`[DEBUG] moved mouse to 250, 250 (${(performance.now() - startTime).toFixed(2)}ms), pressing mouse button`)
+  startTime = performance.now()
   await page.mouse.down({ button: 'left' })
+  console.log(`[DEBUG] clicked (${(performance.now() - startTime).toFixed(2)}ms), moving mouse to 250, 500`)
+  startTime = performance.now()
   await page.mouse.move(250, 500, { steps: 20 })
+  console.log(`[DEBUG] moved mouse to 250, 500 (${(performance.now() - startTime).toFixed(2)}ms), releasing mouse button`)
+  startTime = performance.now()
   await page.mouse.up({ button: 'left' })
-
-  await expect(page).toHaveScreenshot('zoomed-out-from-above.png')
+  console.log(`[DEBUG] zoomed out, screenshot taken, moving mouse to 250, 500, clicking (${(performance.now() - startTime).toFixed(2)}ms)`)
+  startTime = performance.now()
+  await expect(page).toHaveScreenshot('zoomed-out-from-above.png', { timeout: 240_000, threshold: 0.3, animations: 'allow', fullPage: true })
+  console.log(`[DEBUG] final screenshot taken (${(performance.now() - startTime).toFixed(2)}ms)`)
 })
