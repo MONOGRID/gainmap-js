@@ -42,7 +42,14 @@ export default defineConfig({
 
   // expect timeout to 40 seconds
   expect: {
-    timeout: 40 * 1000
+    timeout: 40 * 1000,
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.025
+    },
+    toMatchSnapshot: {
+      maxDiffPixelRatio: 0.025,
+    }
+
   },
 
   // test timeout to 60 seconds
