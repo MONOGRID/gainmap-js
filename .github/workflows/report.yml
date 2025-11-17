@@ -72,7 +72,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Typecheck Src
-          conclusion: ${{steps.logscan_src.conclusion}}
+          conclusion: ${{ steps.logscan_src.outputs.conclusion || steps.logscan_src.conclusion }}
           sha: ${{ github.event.workflow_run.head_sha }}
           output: |
             {"summary":"${{ steps.logscan_src.outputs.summary }}"}
@@ -83,7 +83,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Typecheck Examples
-          conclusion: ${{steps.logscan_examples.conclusion}}
+          conclusion: ${{ steps.logscan_examples.outputs.conclusion || steps.logscan_examples.conclusion }}
           sha: ${{ github.event.workflow_run.head_sha }}
           output: |
             {"summary":"${{ steps.logscan_examples.outputs.summary }}"}
@@ -94,7 +94,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           name: Typecheck Tests
-          conclusion: ${{steps.logscan_tests.conclusion}}
+          conclusion: ${{ steps.logscan_tests.outputs.conclusion || steps.logscan_tests.conclusion }}
           sha: ${{ github.event.workflow_run.head_sha }}
           output: |
             {"summary":"${{ steps.logscan_tests.outputs.summary }}"}
