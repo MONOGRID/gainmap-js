@@ -3,7 +3,7 @@
 
 A Javascript (TypeScript) Encoder/Decoder Implementation of Adobe's Gain Map Technology for storing HDR Images using an SDR Image + a "Gain map"
 
-> :warning: This library **is primarily intended** for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
+> :warning: This library is intended for encoding and decoding gain map images for the [three.js](https://github.com/mrdoob/three.js/) 3D Library
 >
 > It can be used for general encode/decode of gain maps but it depends on the three.js library which, in itself, is quite heavy if you only use it to encode/decode gain maps.
 
@@ -16,9 +16,10 @@ Your contributions and creative ideas make our community stronger. We can’t wa
 
 ## Live Demo
 
-https://monogrid.github.io/gainmap-js/
+* [WebGPU Version](https://monogrid.github.io/gainmap-js/webgpu.html)
+* [Legacy WebGL Version](https://monogrid.github.io/gainmap-js/)
 
-Compares loading:
+Both compares loading:
  1. a `JPEG` file with embedded gain map data
  2. a `webp` sdr file + a `webp` gain map + metadata JSON
  3. a comparable size `.hdr` file for comparison
