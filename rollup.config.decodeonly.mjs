@@ -1,6 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
+import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
 import { defineConfig } from 'rollup'
 import del from 'rollup-plugin-delete'
@@ -59,6 +60,19 @@ if (process.env.PLAYWRIGHT_TESTING) {
   )
 }
 
+/** @type {import('rollup').InputPluginOption[]} */
+const pluginsMinified = [
+  ...plugins,
+  terser({
+    format: {
+      comments: (node, comment) => {
+        // Preserve license banner comments
+        return comment.value.includes('With ❤️, by ')
+      }
+    }
+  })
+]
+
 /** @type {import('rollup').RollupOptions[]} */
 let configs = [
   defineConfig({
@@ -74,6 +88,24 @@ let configs = [
     plugins: [
       del({ targets: 'dist/*' }),
       ...plugins
+    ],
+    ...configBase
+  }),
+
+  // ES modules minified
+  defineConfig({
+    input: {
+      decode: './src/decode.ts'
+    },
+    output: {
+      dir: 'dist',
+      entryFileNames: '[name].min.js',
+      name,
+      format: 'es',
+      ...settings
+    },
+    plugins: [
+      ...pluginsMinified
     ],
     ...configBase
   })
@@ -93,6 +125,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
         ...settings
       },
       plugins,
+      ...configBase
+    }),
+
+    // decode UMD minified
+    defineConfig({
+      input: './src/decode.ts',
+      output: {
+        format: 'umd',
+        name,
+        file: 'dist/decode.umd.min.js',
+        ...settings
+      },
+      plugins: pluginsMinified,
       ...configBase
     })
   ])

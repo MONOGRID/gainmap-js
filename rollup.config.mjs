@@ -1,6 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs'
 import json from '@rollup/plugin-json'
 import resolve from '@rollup/plugin-node-resolve'
+import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
 import { defineConfig } from 'rollup'
 import copy from 'rollup-plugin-copy'
@@ -45,6 +46,8 @@ const plugins = [
     sourceMap: !!process.env.PLAYWRIGHT_TESTING
   }),
   license({
+    thirdParty: { output: 'dist/third-party.txt' },
+    sourcemap: !!process.env.PLAYWRIGHT_TESTING,
     banner: `
         ${name} v${version}
         With ❤️, by ${author}
@@ -60,6 +63,19 @@ if (process.env.PLAYWRIGHT_TESTING) {
     })
   )
 }
+
+/** @type {import('rollup').InputPluginOption[]} */
+const pluginsMinified = [
+  ...plugins,
+  terser({
+    format: {
+      comments: (node, comment) => {
+        // Preserve license banner comments
+        return comment.value.includes('With ❤️, by ')
+      }
+    }
+  })
+]
 
 /** @type {import('rollup').RollupOptions[]} */
 let configs = [
@@ -90,6 +106,34 @@ let configs = [
     ...configBase
   }),
 
+  // ES modules minified
+  defineConfig({
+    input: {
+      encode: './src/encode.ts',
+      decode: './src/decode.ts',
+      'decode.webgpu': './src/decode/webgpu/index.ts',
+      libultrahdr: './src/libultrahdr.ts',
+      worker: './src/worker.ts',
+      'worker-interface': './src/worker-interface.ts'
+    },
+    output: {
+      dir: 'dist',
+      entryFileNames: '[name].min.js',
+      name,
+      format: 'es',
+      ...settings
+    },
+    plugins: [
+      copy({
+        targets: [
+          { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist' }
+        ]
+      }),
+      ...pluginsMinified
+    ],
+    ...configBase
+  }),
+
   // worker UMD
   defineConfig({
     input: './src/worker.ts',
@@ -100,6 +144,19 @@ let configs = [
       ...settings
     },
     plugins,
+    ...configBase
+  }),
+
+  // worker UMD minified
+  defineConfig({
+    input: './src/worker.ts',
+    output: {
+      format: 'umd',
+      name: 'worker',
+      file: 'dist/worker.umd.min.cjs',
+      ...settings
+    },
+    plugins: pluginsMinified,
     ...configBase
   })
 ]
@@ -122,6 +179,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       ...configBase
     }),
 
+    // decode UMD minified
+    defineConfig({
+      input: './src/decode.ts',
+      output: {
+        format: 'umd',
+        name,
+        file: 'dist/decode.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
+      ...configBase
+    }),
+
     // decode webgpu UMD
     defineConfig({
       input: './src/decode/webgpu/index.ts',
@@ -132,6 +202,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
         ...settings
       },
       plugins,
+      ...configBase
+    }),
+
+    // decode webgpu UMD minified
+    defineConfig({
+      input: './src/decode/webgpu/index.ts',
+      output: {
+        format: 'umd',
+        name,
+        file: 'dist/decode.webgpu.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
       ...configBase
     }),
 
@@ -148,6 +231,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       ...configBase
     }),
 
+    // encode UMD minified
+    defineConfig({
+      input: './src/encode.ts',
+      output: {
+        format: 'umd',
+        name: 'encode',
+        file: 'dist/encode.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
+      ...configBase
+    }),
+
     // libultrahdr UMD
     defineConfig({
       input: './src/libultrahdr.ts',
@@ -161,6 +257,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
       ...configBase
     }),
 
+    // libultrahdr UMD minified
+    defineConfig({
+      input: './src/libultrahdr.ts',
+      output: {
+        format: 'umd',
+        name: 'libultrahdr',
+        file: 'dist/libultrahdr.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
+      ...configBase
+    }),
+
     // worker interface umd
     defineConfig({
       input: './src/worker-interface.ts',
@@ -171,6 +280,19 @@ if (!process.env.PLAYWRIGHT_TESTING) {
         ...settings
       },
       plugins,
+      ...configBase
+    }),
+
+    // worker interface umd minified
+    defineConfig({
+      input: './src/worker-interface.ts',
+      output: {
+        format: 'umd',
+        name: 'worker-interface',
+        file: 'dist/worker-interface.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
       ...configBase
     })
   ])
