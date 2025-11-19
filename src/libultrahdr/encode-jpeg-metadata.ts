@@ -80,7 +80,7 @@ import { assembleJpegWithGainMap } from './jpeg-assembler'
  * @throws {Error} If `encodingResult.sdr.mimeType !== 'image/jpeg'`
  * @throws {Error} If `encodingResult.gainMap.mimeType !== 'image/jpeg'`
  */
-export const encodeJPEGMetadata = (encodingResult: GainMapMetadata & { sdr: CompressedImage, gainMap: CompressedImage }): Uint8Array<ArrayBuffer> => {
+export const encodeJPEGMetadata = (encodingResult: GainMapMetadata & { sdr: CompressedImage, gainMap: CompressedImage }) => {
   // Validate input
   if (encodingResult.sdr.mimeType !== 'image/jpeg') {
     throw new Error('This function expects an SDR image compressed in jpeg')

@@ -100,12 +100,7 @@ export function calculateMpfSize (): number {
  * @param secondaryImageOffset - Offset of the secondary image from the MP Endian field
  * @returns Uint8Array containing the MPF data
  */
-export function generateMpf (
-  primaryImageSize: number,
-  primaryImageOffset: number,
-  secondaryImageSize: number,
-  secondaryImageOffset: number
-): Uint8Array {
+export function generateMpf (primaryImageSize: number, primaryImageOffset: number, secondaryImageSize: number, secondaryImageOffset: number) {
   const mpfSize = calculateMpfSize()
   const buffer = new ArrayBuffer(mpfSize)
   const view = new DataView(buffer)

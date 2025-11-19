@@ -148,7 +148,7 @@ export type CompressOptions = {
  * @group Compression
  */
 export type CompressedImage = {
-  data: Uint8Array
+  data: Uint8Array<ArrayBuffer>
   mimeType: CompressionMimeType
   width: number
   height: number
@@ -167,7 +167,7 @@ export type CompressParameters = CompressOptions & ({
   /**
    * Encoded Image Data with a mimeType
    */
-  source: Uint8Array | Uint8ClampedArray
+  source: Uint8Array<ArrayBuffer> | Uint8ClampedArray<ArrayBuffer>
   /**
    * mimeType of the encoded input
    */

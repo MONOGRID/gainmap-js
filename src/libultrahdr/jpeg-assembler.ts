@@ -20,9 +20,9 @@ export interface AssembleJpegOptions {
   /** Gain map metadata */
   metadata: GainMapMetadataExtended
   /** Optional EXIF data to embed */
-  exif?: Uint8Array
+  exif?: Uint8Array<ArrayBuffer>
   /** Optional ICC color profile */
-  icc?: Uint8Array
+  icc?: Uint8Array<ArrayBuffer>
 }
 
 /**
@@ -31,7 +31,7 @@ export interface AssembleJpegOptions {
  * @param jpegData - JPEG file data
  * @returns Object containing EXIF data and position, or null if not found
  */
-function extractExif (jpegData: Uint8Array): { data: Uint8Array, pos: number, size: number } | null {
+function extractExif (jpegData: Uint8Array) {
   const view = new DataView(jpegData.buffer, jpegData.byteOffset, jpegData.byteLength)
 
   // Check for JPEG SOI marker
@@ -97,7 +97,7 @@ function extractExif (jpegData: Uint8Array): { data: Uint8Array, pos: number, si
  * @param exifSize - Size of EXIF segment (including marker and length)
  * @returns JPEG data without EXIF
  */
-function copyJpegWithoutExif (jpegData: Uint8Array, exifPos: number, exifSize: number): Uint8Array {
+function copyJpegWithoutExif (jpegData: Uint8Array, exifPos: number, exifSize: number) {
   const newSize = jpegData.length - exifSize
   const result = new Uint8Array(newSize)
 
@@ -119,7 +119,7 @@ function copyJpegWithoutExif (jpegData: Uint8Array, exifPos: number, exifSize: n
  * @param data - Data to write after marker
  * @returns New position after writing
  */
-function writeMarker (buffer: Uint8Array, pos: number, marker: number, data?: Uint8Array): number {
+function writeMarker (buffer: Uint8Array, pos: number, marker: number, data?: Uint8Array) {
   const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength)
 
   // Write marker
@@ -160,7 +160,7 @@ function writeMarker (buffer: Uint8Array, pos: number, marker: number, data?: Ui
  * @param options - Assembly options
  * @returns Complete JPEG-R file as Uint8Array
  */
-export function assembleJpegWithGainMap (options: AssembleJpegOptions): Uint8Array<ArrayBuffer> {
+export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
   const { sdr, gainMap, metadata, exif: externalExif, icc } = options
 
   // Validate input
