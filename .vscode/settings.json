@@ -115,6 +115,8 @@
     "RGBA",
     "RGBE",
     "spruit",
+    "threejs",
+    "webgl",
     "webgpu",
     "xmpmeta"
   ]
