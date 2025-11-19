@@ -117,14 +117,7 @@ let configs = [
       format: 'es',
       ...settings
     },
-    plugins: [
-      copy({
-        targets: [
-          { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist' }
-        ]
-      }),
-      ...pluginsMinified
-    ],
+    plugins: pluginsMinified,
     ...configBase
   }),
 
