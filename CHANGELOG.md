@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/MONOGRID/gainmap-js/compare/v3.2.0...v3.3.0) (2025-11-22)
+
+
+### Features
+
+* removes wasm dependency and implements pure-js JPG encoder ([#73](https://github.com/MONOGRID/gainmap-js/issues/73)) ([00b6e43](https://github.com/MONOGRID/gainmap-js/commit/00b6e43f2ada89e39d76491017ff173574a20873))
+
 # [3.2.0](https://github.com/MONOGRID/gainmap-js/compare/v3.1.0...v3.2.0) (2025-11-17)
 
 
