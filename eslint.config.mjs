@@ -29,8 +29,7 @@ const config = defineConfig([
     ignores: [
       'node_modules/**/*',
       'dist/**/*',
-      '.vscode/**/*',
-      'libultrahdr-wasm/build/**/*'
+      '.vscode/**/*'
     ]
   }
 ])

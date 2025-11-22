@@ -43,7 +43,7 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
 
   let imageBitmapSource: ImageBitmapSource
   if ((source instanceof Uint8Array || source instanceof Uint8ClampedArray) && 'sourceMimeType' in params) {
-    imageBitmapSource = new Blob([source as (Uint8Array<ArrayBuffer> | Uint8ClampedArray<ArrayBuffer>)], { type: params.sourceMimeType })
+    imageBitmapSource = new Blob([source], { type: params.sourceMimeType })
   } else if (source instanceof ImageData) {
     imageBitmapSource = source
   } else {
@@ -61,7 +61,9 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
     canvas.width = width
     canvas.height = height
   }
-  const ctx = canvas.getContext('2d')
+  // apparently we do need to assert the type here for npx tsc to be happy
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null
   if (!ctx) throw new Error('Failed to create canvas Context')
   // flip Y
   if (flipY === true) {

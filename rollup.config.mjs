@@ -4,7 +4,6 @@ import resolve from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import typescript from '@rollup/plugin-typescript'
 import { defineConfig } from 'rollup'
-import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete'
 // @ts-expect-error untyped library
 import istanbul from 'rollup-plugin-istanbul'
@@ -96,11 +95,6 @@ let configs = [
     },
     plugins: [
       del({ targets: 'dist/*' }),
-      copy({
-        targets: [
-          { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist' }
-        ]
-      }),
       ...plugins
     ],
     ...configBase
@@ -123,14 +117,7 @@ let configs = [
       format: 'es',
       ...settings
     },
-    plugins: [
-      copy({
-        targets: [
-          { src: 'libultrahdr-wasm/build/libultrahdr-esm.wasm', dest: 'dist' }
-        ]
-      }),
-      ...pluginsMinified
-    ],
+    plugins: pluginsMinified,
     ...configBase
   }),
 

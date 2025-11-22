@@ -69,6 +69,12 @@ export type GainMapMetadata = {
   gainMapMax: [number, number, number]
 }
 
+export type GainMapMetadataExtended = GainMapMetadata & {
+  version: string
+  maxContentBoost: number
+  minContentBoost: number
+}
+
 /**
  *
  */
