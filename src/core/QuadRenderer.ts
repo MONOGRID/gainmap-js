@@ -34,7 +34,7 @@ import {
   WebGLRenderTarget
 } from 'three'
 
-import { QuadRendererTextureOptions } from './types'
+import { QuadRendererTextureOptions, TextureImageFormat } from './types'
 /**
  * Utility Type that translates `three` texture types to their TypedArray counterparts.
  *
@@ -163,7 +163,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   private _scene: Scene
   private _camera: OrthographicCamera
   private _quad: Mesh<PlaneGeometry>
-  private _renderTarget: WebGLRenderTarget
+  private _renderTarget: WebGLRenderTarget<Texture<TextureImageFormat>>
   private _width: number
   private _height: number
   private _type: TType
@@ -402,7 +402,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
    * The `WebGLRenderTarget` used.
    */
   public get renderTarget () { return this._renderTarget }
-  public set renderTarget (value: WebGLRenderTarget) {
+  public set renderTarget (value: WebGLRenderTarget<Texture<TextureImageFormat>>) {
     this._renderTarget = value
     this._width = value.width
     this._height = value.height

@@ -17,6 +17,7 @@ import {
   RGFormat,
   RGIntegerFormat,
   ShaderMaterial,
+  Texture,
   Vector2,
   WebGLRenderer,
   WebGLRenderTarget
@@ -27,6 +28,7 @@ import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import { getDataTexture } from '../core/get-data-texture'
 import { QuadRenderer } from '../core/QuadRenderer'
+import { TextureImageFormat } from '../core/types'
 const vertexShader = /* glsl */`
 varying vec2 vUv;
 void main() {
@@ -135,12 +137,12 @@ export const findTextureMinMax = (image: EXR | RGBE | HDR | DataTexture, mode: '
     renderer
   })
 
-  const frameBuffers: WebGLRenderTarget[] = []
+  const frameBuffers: WebGLRenderTarget<Texture<TextureImageFormat>>[] = []
 
   while (w > 1 || h > 1) {
     w = Math.max(1, (w + cellSize - 1) / cellSize | 0)
     h = Math.max(1, (h + cellSize - 1) / cellSize | 0)
-    const fb = new WebGLRenderTarget(w, h, {
+    const fb = new WebGLRenderTarget<Texture<TextureImageFormat>>(w, h, {
       type: quadRenderer.type,
       format: srcTex.format,
       colorSpace: quadRenderer.colorSpace,

@@ -88,3 +88,10 @@ export type QuadRendererTextureOptions = Omit<RenderTargetOptions, 'type' | 'for
    */
   anisotropy?: number
 }
+
+/**
+ * Accepted image format for textures.
+ * For many operations we need a texture based on an image with width & height.
+ * It could also be a canvas, the only thing we actually need is a width and a height
+ */
+export type TextureImageFormat = { width: number, height: number }

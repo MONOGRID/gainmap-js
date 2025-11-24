@@ -1,6 +1,6 @@
 import { Texture } from 'three'
 
-import { GainMapMetadata, QuadRendererTextureOptions } from '../../core'
+import { GainMapMetadata, QuadRendererTextureOptions, TextureImageFormat } from '../../core'
 
 /**
  * Parameters related to the display used for decoding
@@ -25,11 +25,11 @@ export type DecodeParameters = {
   /**
    * A Texture containing the SDR Rendition
    */
-  sdr: Omit<Texture, 'image'> & { image: { width: number, height: number } }
+  sdr: Texture<TextureImageFormat>
   /**
    * A Texture containing the GainMap recovery image
    */
-  gainMap: Omit<Texture, 'image'> & { image: { width: number, height: number } }
+  gainMap: Texture<TextureImageFormat>
 
 } & GainmapDecodingParameters & GainMapMetadata
 
