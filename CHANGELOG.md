@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/MONOGRID/gainmap-js/compare/v3.3.0...v3.4.0) (2025-11-24)
+
+
+### Features
+
+* adds AgXToneMapping and NeutralToneMapping to encoding SDR Material shader ([8c163da](https://github.com/MONOGRID/gainmap-js/commit/8c163da5c208412814d3f4ee9e3647d0ad3bba12))
+
 # [3.3.0](https://github.com/MONOGRID/gainmap-js/compare/v3.2.0...v3.3.0) (2025-11-22)
 
 
