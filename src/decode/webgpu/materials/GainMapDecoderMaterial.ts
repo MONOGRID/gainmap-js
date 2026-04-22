@@ -1,5 +1,5 @@
-import { add, exp2, float, max, min, mul, pow, sub, texture, uniform, vec3 } from 'three/tsl'
-import { MeshBasicNodeMaterial, NoBlending, Texture, TextureNode, Vector3 } from 'three/webgpu'
+import { texture, uniform, vec3 } from 'three/tsl'
+import { MeshBasicNodeMaterial, NoBlending, Texture, TextureNode, UniformNode, Vector3 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
 import { type GainmapDecodingParameters } from '../../shared'
@@ -21,12 +21,12 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
   private _hdrCapacityMax: GainMapMetadata['hdrCapacityMax']
 
   // Uniforms for TSL
-  private _gammaUniform: ReturnType<typeof uniform<Vector3>>
-  private _offsetHdrUniform: ReturnType<typeof uniform<Vector3>>
-  private _offsetSdrUniform: ReturnType<typeof uniform<Vector3>>
-  private _gainMapMinUniform: ReturnType<typeof uniform<Vector3>>
-  private _gainMapMaxUniform: ReturnType<typeof uniform<Vector3>>
-  private _weightFactorUniform: ReturnType<typeof uniform<number>>
+  private _gammaUniform: UniformNode<'vec3', Vector3>
+  private _offsetHdrUniform: UniformNode<'vec3', Vector3>
+  private _offsetSdrUniform: UniformNode<'vec3', Vector3>
+  private _gainMapMinUniform: UniformNode<'vec3', Vector3>
+  private _gainMapMaxUniform: UniformNode<'vec3', Vector3>
+  private _weightFactorUniform: UniformNode<'float', number>
   private _sdrTexture: TextureNode
   private _gainMapTexture: TextureNode
 
@@ -45,15 +45,14 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
     this._sdrTexture = texture(sdr)
     this._gainMapTexture = texture(gainMap)
 
-    // Create uniform nodes
-    this._gammaUniform = uniform(vec3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]))
-    this._offsetHdrUniform = uniform(vec3(offsetHdr[0], offsetHdr[1], offsetHdr[2]))
-    this._offsetSdrUniform = uniform(vec3(offsetSdr[0], offsetSdr[1], offsetSdr[2]))
-    this._gainMapMinUniform = uniform(vec3(gainMapMin[0], gainMapMin[1], gainMapMin[2]))
-    this._gainMapMaxUniform = uniform(vec3(gainMapMax[0], gainMapMax[1], gainMapMax[2]))
+    this._gammaUniform = uniform(new Vector3(1.0 / gamma[0], 1.0 / gamma[1], 1.0 / gamma[2]))
+    this._offsetHdrUniform = uniform(new Vector3(offsetHdr[0], offsetHdr[1], offsetHdr[2]))
+    this._offsetSdrUniform = uniform(new Vector3(offsetSdr[0], offsetSdr[1], offsetSdr[2]))
+    this._gainMapMinUniform = uniform(new Vector3(gainMapMin[0], gainMapMin[1], gainMapMin[2]))
+    this._gainMapMaxUniform = uniform(new Vector3(gainMapMax[0], gainMapMax[1], gainMapMax[2]))
 
     const weightFactor = (Math.log2(maxDisplayBoost) - hdrCapacityMin) / (hdrCapacityMax - hdrCapacityMin)
-    this._weightFactorUniform = uniform(weightFactor)
+    this._weightFactorUniform = uniform(weightFactor, 'float')
 
     this._maxDisplayBoost = maxDisplayBoost
     this._hdrCapacityMin = hdrCapacityMin
@@ -61,35 +60,23 @@ export class GainMapDecoderMaterial extends MeshBasicNodeMaterial {
 
     // Build the TSL shader graph
 
-    // Get RGB values
     const rgb = this._sdrTexture.rgb
     const recovery = this._gainMapTexture.rgb
 
-    // Apply gamma correction
-    const logRecovery = pow(recovery, this._gammaUniform)
+    const logRecovery = recovery.pow(this._gammaUniform)
 
-    // Calculate log boost
     // logBoost = gainMapMin * (1.0 - logRecovery) + gainMapMax * logRecovery
-    const oneMinusLogRecovery = sub(float(1.0), logRecovery)
-    const logBoost = add(
-      mul(this._gainMapMinUniform, oneMinusLogRecovery),
-      mul(this._gainMapMaxUniform, logRecovery)
-    )
+    const logBoost = this._gainMapMinUniform.mul(logRecovery.oneMinus())
+      .add(this._gainMapMaxUniform.mul(logRecovery))
 
-    // Calculate HDR color
     // hdrColor = (rgb + offsetSdr) * exp2(logBoost * weightFactor) - offsetHdr
-    const hdrColor = sub(
-      mul(
-        add(rgb, this._offsetSdrUniform),
-        exp2(mul(logBoost, this._weightFactorUniform))
-      ),
-      this._offsetHdrUniform
-    )
+    // Note: standalone exp2() is typed for scalars only in @types/three, so we use
+    // the mathematically equivalent pow(2, x) which has proper vec3 typings.
+    const gain = vec3(2).pow(logBoost.mul(this._weightFactorUniform))
+    const hdrColor = rgb.add(this._offsetSdrUniform).mul(gain).sub(this._offsetHdrUniform)
 
-    // Clamp to half float range
-    const clampedHdrColor = max(HALF_FLOAT_MIN, min(HALF_FLOAT_MAX, hdrColor))
+    const clampedHdrColor = hdrColor.min(HALF_FLOAT_MAX).max(HALF_FLOAT_MIN)
 
-    // Set the color output
     this.colorNode = clampedHdrColor
   }
 
