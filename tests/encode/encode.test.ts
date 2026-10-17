@@ -232,3 +232,53 @@ test('encodes from exr with custom sdr parameters', async ({ page }) => {
 
   expect(resized).toMatchSnapshot('memorial.exr-encode-result-custom-sdr-params.png')
 })
+
+// regression test for https://github.com/MONOGRID/gainmap-js/issues/54
+// images without HDR content (max <= 1) produced an empty gainmap range and invalid metadata
+test('clamps maxContentBoost <= 1 set after encoding and warns', async ({ page }) => {
+  const warnings: string[] = []
+  page.on('console', (m: ConsoleMessage) => {
+    if (m.type() === 'warning') warnings.push(m.text())
+  })
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  const result = await page.evaluate(encodeInBrowser, {
+    file: 'files/memorial.exr',
+    // log2(0.82) < 0, as the max of an SDR image stored in an EXR
+    dynamicGainMapParameters: { maxContentBoost: 0.82 }
+  })
+
+  expect(result.gainMapMaterialValues.maxContentBoost, 'maxContentBoost was not clamped').toBeGreaterThan(1)
+  expect(result.gainMapMaterialValues.gainMapMax[0], 'gainMapMax must be > 0').toBeGreaterThan(0)
+  expect(result.gainMapMaterialValues.hdrCapacityMax, 'hdrCapacityMax must be > 0').toBeGreaterThan(0)
+
+  const meta = await page.evaluate(extractXMPInBrowser, result.jpeg)
+  expect(meta).toBeDefined()
+  expect(meta!.gainMapMax[0], 'written gainMapMax must be > 0').toBeGreaterThan(0)
+  expect(meta!.gainMapMax[0], 'written gainMapMax must be > gainMapMin').toBeGreaterThan(meta!.gainMapMin[0])
+  expect(meta!.hdrCapacityMax, 'written hdrCapacityMax must be > 0').toBeGreaterThan(0)
+
+  expect(warnings.some(w => w.includes('no HDR content')), 'no warning was logged').toBe(true)
+})
+
+test('warns when the boost range is empty', async ({ page }) => {
+  const warnings: string[] = []
+  page.on('console', (m: ConsoleMessage) => {
+    if (m.type() === 'warning') warnings.push(m.text())
+  })
+  await page.goto('/tests/testbed.html', { waitUntil: 'networkidle' })
+
+  const script = page.getByTestId('script')
+  await expect(script).toBeAttached()
+
+  await page.evaluate(encodeInBrowser, {
+    file: 'files/memorial.exr',
+    maxContentBoost: 2,
+    dynamicGainMapParameters: { minContentBoost: 4 }
+  })
+
+  expect(warnings.some(w => w.includes('minContentBoost')), 'no warning was logged').toBe(true)
+})
