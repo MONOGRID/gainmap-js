@@ -1,3 +1,10 @@
+## [3.4.1](https://github.com/MONOGRID/gainmap-js/compare/v3.4.0...v3.4.1) (2026-10-17)
+
+
+### Bug Fixes
+
+* maxContentBoost setter now clamps to 1.0001, fix encode for non HDR inputs ([1b8d929](https://github.com/MONOGRID/gainmap-js/commit/1b8d9297a74bfd8a4c88d0a7cae8733322958056))
+
 # [3.4.0](https://github.com/MONOGRID/gainmap-js/compare/v3.3.0...v3.4.0) (2025-11-24)
 
 
