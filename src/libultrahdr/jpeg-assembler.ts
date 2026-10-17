@@ -3,6 +3,7 @@
  * Based on libultrahdr jpegr.cpp implementation
  */
 
+import { encodeISOGainMapMetadata, ISO_NAMESPACE, ISO_VERSION_ONLY } from '../core/iso-gainmap-metadata'
 import { GainMapMetadataExtended } from '../core/types'
 import { type CompressedImage } from '../encode/types'
 import { MARKER_PREFIX, MARKERS, XMP_NAMESPACE } from './jpeg-markers'
@@ -111,6 +112,16 @@ function copyJpegWithoutExif (jpegData: Uint8Array, exifPos: number, exifSize: n
 }
 
 /**
+ * Concatenate two byte arrays
+ */
+function concat (a: Uint8Array, b: Uint8Array) {
+  const result = new Uint8Array(a.length + b.length)
+  result.set(a, 0)
+  result.set(b, a.length)
+  return result
+}
+
+/**
  * Write a JPEG marker and its data
  *
  * @param buffer - Target buffer
@@ -150,11 +161,13 @@ function writeMarker (buffer: Uint8Array, pos: number, marker: number, data?: Ui
  *    - APP1 (EXIF if present)
  *    - APP1 (XMP with gain map metadata)
  *    - APP2 (ICC profile if present)
+ *    - APP2 (ISO 21496-1 version)
  *    - APP2 (MPF data)
  *    - Rest of primary JPEG data
  * 2. Secondary image (gain map):
  *    - SOI
  *    - APP1 (XMP with gain map parameters)
+ *    - APP2 (ISO 21496-1 gain map parameters)
  *    - Rest of gain map JPEG data
  *
  * @param options - Assembly options
@@ -191,10 +204,19 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
   const xmpSecondary = generateXmpForSecondaryImage(metadata)
   const xmpSecondaryBytes = new TextEncoder().encode(xmpSecondary)
 
-  // Calculate secondary image size
-  // 2 bytes SOI + 2 bytes marker + 2 bytes length field + namespace + XMP data + gain map data (without SOI)
   const namespaceBytes = new TextEncoder().encode(XMP_NAMESPACE)
-  const secondaryImageSize = 2 + 2 + 2 + namespaceBytes.length + xmpSecondaryBytes.length + (gainMap.data.length - 2)
+  const xmpSecondaryData = new Uint8Array(namespaceBytes.length + xmpSecondaryBytes.length)
+  xmpSecondaryData.set(namespaceBytes, 0)
+  xmpSecondaryData.set(xmpSecondaryBytes, namespaceBytes.length)
+
+  // ISO 21496-1 metadata: version only in the primary image, full metadata in the gain map image
+  const isoNamespaceBytes = new TextEncoder().encode(ISO_NAMESPACE)
+  const isoPrimaryData = concat(isoNamespaceBytes, ISO_VERSION_ONLY)
+  const isoSecondaryData = concat(isoNamespaceBytes, encodeISOGainMapMetadata(metadata))
+
+  // Calculate secondary image size
+  // SOI + APP1 (XMP) + APP2 (ISO) + gain map data (without SOI)
+  const secondaryImageSize = 2 + 2 + 2 + xmpSecondaryData.length + 2 + 2 + isoSecondaryData.length + (gainMap.data.length - 2)
 
   // Generate XMP for primary image
   const xmpPrimary = generateXmpForPrimaryImage(secondaryImageSize, metadata)
@@ -211,6 +233,7 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
   if (exifData) totalSize += 2 + 2 + exifData.length // APP1 + length + EXIF
   totalSize += 2 + 2 + xmpPrimaryData.length // APP1 + length + XMP primary
   if (icc) totalSize += 2 + 2 + icc.length // APP2 + length + ICC
+  totalSize += 2 + 2 + isoPrimaryData.length // APP2 + length + ISO version
   totalSize += 2 + 2 + mpfLength // APP2 + length + MPF
   totalSize += primaryJpegData.length - 2 // Primary JPEG without SOI
   totalSize += secondaryImageSize // Secondary image
@@ -223,6 +246,7 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
     (exifData ? 2 + 2 + exifData.length : 0) +
     2 + 2 + xmpPrimaryData.length +
     (icc ? 2 + 2 + icc.length : 0) +
+    2 + 2 + isoPrimaryData.length +
     2 + 2 + 4 // APP2 marker + length + MPF signature
   )
 
@@ -251,6 +275,9 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
     pos = writeMarker(output, pos, MARKERS.APP2, icc)
   }
 
+  // Write ISO 21496-1 version
+  pos = writeMarker(output, pos, MARKERS.APP2, isoPrimaryData)
+
   // Write MPF
   pos = writeMarker(output, pos, MARKERS.APP2, mpfDataActual)
 
@@ -264,10 +291,10 @@ export function assembleJpegWithGainMap (options: AssembleJpegOptions) {
   pos = writeMarker(output, pos, MARKERS.SOI)
 
   // Write XMP for secondary image
-  const xmpSecondaryData = new Uint8Array(namespaceBytes.length + xmpSecondaryBytes.length)
-  xmpSecondaryData.set(namespaceBytes, 0)
-  xmpSecondaryData.set(xmpSecondaryBytes, namespaceBytes.length)
   pos = writeMarker(output, pos, MARKERS.APP1, xmpSecondaryData)
+
+  // Write ISO 21496-1 metadata for secondary image
+  pos = writeMarker(output, pos, MARKERS.APP2, isoSecondaryData)
 
   // Write rest of gain map JPEG (skip SOI)
   output.set(gainMap.data.subarray(2), pos)
