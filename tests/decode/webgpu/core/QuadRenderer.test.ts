@@ -70,7 +70,7 @@ test('QuadRenderer getters and setters (WebGPU)', async ({ page, browserName }) 
     const finalHeight = result.height
 
     result.dispose()
-    renderer.dispose()
+    await renderer.dispose()
 
     return {
       initialWidth,
@@ -167,7 +167,7 @@ test('QuadRenderer toDataTexture with various options (WebGPU)', async ({ page, 
     })
 
     quadRenderer.dispose()
-    renderer.dispose()
+    await renderer.dispose()
 
     return {
       dataTexture1Created: dataTexture1 !== undefined,
@@ -236,7 +236,7 @@ test('QuadRenderer dispose with renderTarget disposal (WebGPU)', async ({ page, 
 
       // Test dispose with renderTarget disposal
       result.dispose(true)
-      renderer.dispose()
+      await renderer.dispose()
 
       return true
     } catch (error) {
@@ -394,7 +394,7 @@ test('QuadRenderer render with various renderTarget options (WebGPU)', async ({ 
       await quadRenderer.render()
 
       quadRenderer.dispose()
-      renderer.dispose()
+      await renderer.dispose()
       return true
     } catch (error) {
       return false

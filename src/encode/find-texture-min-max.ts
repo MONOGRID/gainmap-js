@@ -3,6 +3,7 @@ import {
   ClampToEdgeWrapping,
   ColorSpace,
   DataTexture,
+  DataTextureLoaderTexData,
   DataUtils,
   DepthFormat,
   DepthStencilFormat,
@@ -22,9 +23,6 @@ import {
   WebGLRenderer,
   WebGLRenderTarget
 } from 'three'
-import { EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
-import { HDR } from 'three/examples/jsm/loaders/HDRLoader.js'
-import { RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
 
 import { getDataTexture } from '../core/get-data-texture'
 import { QuadRenderer } from '../core/QuadRenderer'
@@ -88,7 +86,7 @@ void main() {
  * @param renderer
  * @returns
  */
-export const findTextureMinMax = (image: EXR | RGBE | HDR | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
+export const findTextureMinMax = (image: DataTextureLoaderTexData | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
   const srcTex = getDataTexture(image)
 
   // check if texture has a valid format
