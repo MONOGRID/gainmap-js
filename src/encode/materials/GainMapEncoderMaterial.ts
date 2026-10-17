@@ -36,6 +36,17 @@ void main() {
   gl_FragColor = vec4(pow(clampedRecovery, gamma), 1.0);
 }
 `
+// maxContentBoost must be > 1, a gain map can't encode an empty boost range
+const MIN_MAX_CONTENT_BOOST = 1.0001
+
+const warnNoHDRContent = (maxContentBoost: number) => {
+  console.warn(`gainmap-js: maxContentBoost is ${maxContentBoost} (<= 1), the source image has no HDR content. It will be clamped to ${MIN_MAX_CONTENT_BOOST} and the result will be equivalent to an SDR image.`)
+}
+
+const warnEmptyRange = (minContentBoost: number, maxContentBoost: number) => {
+  console.warn(`gainmap-js: minContentBoost (${minContentBoost}) must be lower than maxContentBoost (${maxContentBoost}), the resulting gain map will be invalid.`)
+}
+
 /**
  * A Material which is able to encode a gainmap
  *
@@ -60,8 +71,10 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
     const _gamma = gamma || [1, 1, 1]
     const _offsetSdr = offsetSdr || [1 / 64, 1 / 64, 1 / 64]
     const _offsetHdr = offsetHdr || [1 / 64, 1 / 64, 1 / 64]
+    if (maxContentBoost <= 1) warnNoHDRContent(maxContentBoost)
     const _minContentBoost = minContentBoost || 1
-    const _maxContentBoost = Math.max(maxContentBoost, 1.0001)
+    const _maxContentBoost = Math.max(maxContentBoost, MIN_MAX_CONTENT_BOOST)
+    if (_minContentBoost >= _maxContentBoost) warnEmptyRange(_minContentBoost, _maxContentBoost)
 
     super({
       name: 'GainMapEncoderMaterial',
@@ -124,6 +137,7 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
    */
   get minContentBoost () { return this._minContentBoost }
   set minContentBoost (value: number) {
+    if (value >= this._maxContentBoost) warnEmptyRange(value, this._maxContentBoost)
     this._minContentBoost = value
     this.uniforms.minLog2.value = Math.log2(value)
   }
@@ -134,8 +148,11 @@ export class GainMapEncoderMaterial extends ShaderMaterial {
    */
   get maxContentBoost () { return this._maxContentBoost }
   set maxContentBoost (value: number) {
-    this._maxContentBoost = value
-    this.uniforms.maxLog2.value = Math.log2(value)
+    if (value <= 1) warnNoHDRContent(value)
+    const _value = Math.max(value, MIN_MAX_CONTENT_BOOST)
+    if (this._minContentBoost >= _value) warnEmptyRange(this._minContentBoost, _value)
+    this._maxContentBoost = _value
+    this.uniforms.maxLog2.value = Math.log2(_value)
   }
 
   /**
