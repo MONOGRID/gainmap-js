@@ -237,7 +237,7 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   public disposeOnDemandRenderer () {
     this._renderer.setRenderTarget(null)
     if (this._rendererIsDisposable) {
-      this._renderer.dispose()
+      this._renderer.dispose().catch(console.error)
     }
   }
 

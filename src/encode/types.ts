@@ -1,7 +1,4 @@
-import { type DataTexture, ToneMapping, WebGLRenderer } from 'three'
-import { type EXR } from 'three/examples/jsm/loaders/EXRLoader.js'
-import { type HDR } from 'three/examples/jsm/loaders/HDRLoader.js'
-import { type RGBE } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { type DataTexture, type DataTextureLoaderTexData, ToneMapping, WebGLRenderer } from 'three'
 
 import { QuadRendererTextureOptions } from '../decode'
 import { WorkerInterfaceImplementation } from '../worker-types'
@@ -74,7 +71,7 @@ export type EncodingParametersBase = GainmapEncodingParameters & {
   /**
    * Input image for encoding, must be an HDR image
    */
-  image: EXR | RGBE | HDR | DataTexture,
+  image: DataTextureLoaderTexData | DataTexture,
   /**
    * Optional WebGLRenderer
    * @remarks
@@ -106,7 +103,7 @@ export type CompressionMimeType = 'image/png' | 'image/jpeg' | 'image/webp'
  * @category Utility
  * @group Utility
  */
-export type HDRRawImageBuffer = EXR['data'] | RGBE['data']
+export type HDRRawImageBuffer = NonNullable<DataTextureLoaderTexData['data']>
 
 /**
  * Raw HDR image data
