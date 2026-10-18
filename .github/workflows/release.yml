@@ -19,6 +19,7 @@ permissions:
   issues: write # to be able to comment on released issues
   pull-requests: write # to be able to comment on released pull requests
   id-token: write # to enable use of OIDC for trusted publishing and npm provenance
+  actions: read # to download the build artifact from the CI run
 
 jobs:
   release:
@@ -29,24 +30,23 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.RELEASE_GITHUB_TOKEN }}
     steps:
         - name: 'Checkout'
-          uses: nschloe/action-cached-lfs-checkout@v1
+          uses: actions/checkout@v7
           with:
-            submodules: recursive
             token: ${{ secrets.RELEASE_GITHUB_TOKEN }}
 
         - name: 'Download build artifacts'
-          uses: dawidd6/action-download-artifact@v6 # download artifacts
+          uses: actions/download-artifact@v8
           with:
             name: build-artifact
             path: dist
-            run_id: ${{ github.event.workflow_run.id }}
-            workflow_conclusion: success
-
+            run-id: ${{ github.event.workflow_run.id }}
+            github-token: ${{ github.token }}
 
         - name: 'Setup Nodejs'
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v7
           with:
             node-version: 22
+            package-manager-cache: false # no cache in a privileged (publishing) job
 
         - name: 'Install Packages'
           run: npm ci

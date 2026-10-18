@@ -22,23 +22,21 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
         - name: 'Checkout repo'
-          uses: actions/checkout@v3
-          with:
-            submodules: recursive
+          uses: actions/checkout@v7
 
         - name: 'Download build artifacts'
-          uses: dawidd6/action-download-artifact@v6
+          uses: actions/download-artifact@v8
           with:
             name: build-artifact
             path: dist
-            run_id: ${{ github.event.workflow_run.id }}
-            workflow_conclusion: success
-
+            run-id: ${{ github.event.workflow_run.id }}
+            github-token: ${{ github.token }}
 
         - name: 'Setup Nodejs'
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v7
           with:
             node-version: 22
+            package-manager-cache: false # no cache in a privileged (wiki push) job
 
         - name: 'Install Packages'
           run: npm ci
@@ -47,4 +45,6 @@ jobs:
           run: npx typedoc
 
         - name: 'Publish Wiki'
-          uses: Andrew-Chen-Wang/github-wiki-action@v4
+          uses: Andrew-Chen-Wang/github-wiki-action@v5
+          with:
+            preprocess: false # v5 default (true) renames README.md->Home.md and rewrites links; keep v4 behaviour

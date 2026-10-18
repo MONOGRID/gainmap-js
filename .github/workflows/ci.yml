@@ -22,12 +22,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       steps:
         - name: 'Checkout'
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
+          uses: actions/checkout@v7
 
         - name: 'Setup Nodejs'
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v7
           with:
             node-version: 22
 
@@ -39,7 +37,7 @@ jobs:
 
         - name: 'Upload Build artifacts'
           if: always()
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: build-artifact
             if-no-files-found: error
@@ -48,7 +46,8 @@ jobs:
 
     ################################
     ##
-    ## CHECKS
+    ## CHECKS (typecheck + lint)
+    ## failures fail the job directly, no separate report workflow needed
     ##
     ################################
     Check:
@@ -57,36 +56,24 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - name: 'Checkout'
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
+          uses: actions/checkout@v7
 
         - name: 'Download build artifacts'
-          uses: actions/download-artifact@v4
+          uses: actions/download-artifact@v8
           with:
             name: build-artifact
             path: dist
 
         - name: 'Setup Nodejs'
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v7
           with:
             node-version: 22
 
         - name: 'Install dependencies'
           run: npm ci
 
-        - name: 'Produce Reports & Logs'
-          if: always()
-          run: npm run ci:check
-
-        - name: 'Upload Check artifacts'
-          if: always()
-          uses: actions/upload-artifact@v4
-          with:
-            name: check-artifact
-            if-no-files-found: error
-            path: |
-              reports/
+        - name: 'Typecheck & Lint'
+          run: npm run check
 
     ################################
     ##
@@ -97,27 +84,18 @@ jobs:
       name: Test
       needs: Build
       runs-on: ubuntu-latest
-      # container:
-      #   image: mcr.microsoft.com/playwright:v1.40.0-jammy
       steps:
-        # - name: 'Initialize Git LFS'
-        #   run: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
-
-        # - name: 'Install Git LFS'
-        #   run: apt-get install -y git-lfs
-
         - name: 'Checkout'
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
+          uses: actions/checkout@v7
+
         - name: 'Download build artifacts'
-          uses: actions/download-artifact@v4
+          uses: actions/download-artifact@v8
           with:
             name: build-artifact
             path: dist
 
         - name: 'Setup Nodejs'
-          uses: actions/setup-node@v3
+          uses: actions/setup-node@v7
           with:
             node-version: 22
 
@@ -129,12 +107,10 @@ jobs:
 
         - name: 'Run Playwright Tests'
           run: npm test
-          # env:
-          #   HOME: /root
 
         - name: 'Upload Test artifacts'
           if: always()
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: test-artifact
             if-no-files-found: error
@@ -144,3 +120,11 @@ jobs:
               coverage/
               playwright-report/
               tests/__snapshots__/
+
+        # Runs in the PR's own context: works for forks too (tokenless upload),
+        # no workflow_run / write token needed.
+        - name: 'Upload coverage reports to Codecov'
+          if: ${{ !cancelled() }}
+          uses: codecov/codecov-action@v7
+          with:
+            directory: ./coverage/
