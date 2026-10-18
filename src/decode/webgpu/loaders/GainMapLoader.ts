@@ -1,16 +1,19 @@
 import {
   FileLoader,
-  HalfFloatType
+  HalfFloatType,
+  LoadingManager,
+  WebGPURenderer
 } from 'three/webgpu'
 
 import { GainMapMetadata } from '../../../core/types'
+import { warnDeprecated } from '../../shared/utils/warn-deprecated'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 /**
  * A Three.js Loader for the gain map format (WebGPU version).
  *
- * @deprecated Use {@link GainMapNodeLoader} instead. Will be removed in the next major release.
+ * @deprecated Will be removed in v4.0.0. Use {@link GainMapNodeLoader} instead: it is **not a drop-in replacement**, it returns a {@link GainMapNode} instead of a render target, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  * @category Loaders
  * @group Loaders
  *
@@ -57,6 +60,11 @@ import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
  *
  */
 export class GainMapLoader extends LoaderBaseWebGPU<[string, string, string]> {
+  constructor (renderer?: WebGPURenderer, manager?: LoadingManager) {
+    super(renderer, manager)
+    warnDeprecated('GainMapLoader', '@monogrid/gainmap-js/webgpu', 'GainMapNodeLoader')
+  }
+
   /**
    * Loads a gainmap using separate data
    * * sdr image
