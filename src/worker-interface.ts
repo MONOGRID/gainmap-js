@@ -32,6 +32,6 @@ export const getPromiseWorker = (worker: Worker) => {
  */
 export const getWorkerInterface = (worker: PromiseWorkerType): WorkerInterfaceImplementation => {
   return {
-    compress: (payload: WorkerInterface['compress']['request']['payload']) => worker.postMessage({ type: 'compress', payload } as WorkerInterface['compress']['request'])
+    compress: (payload: WorkerInterface['compress']['request']['payload']) => worker.postMessage({ type: 'compress', payload })
   }
 }

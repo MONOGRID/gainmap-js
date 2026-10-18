@@ -124,8 +124,8 @@ export class HDRJPGLoader extends LoaderBaseWebGPU<string> {
       if (typeof onLoad === 'function') onLoad(quadRenderer)
       this.manager.itemEnd(url)
       quadRenderer.disposeOnDemandRenderer()
-    }, onProgress
-    , (error: unknown) => {
+    }, onProgress,
+    (error: unknown) => {
       this.manager.itemError(url)
       if (typeof onError === 'function') onError(error)
     })

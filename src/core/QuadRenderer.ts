@@ -42,20 +42,20 @@ import { QuadRendererTextureOptions, TextureImageFormat } from './types'
  * @group Utility
  */
 export type TextureDataTypeToBufferType<TType extends TextureDataType> =
-  TType extends typeof UnsignedByteType ? Uint8ClampedArray<ArrayBuffer> :
-    TType extends typeof ByteType ? Int8Array<ArrayBuffer> :
-      TType extends typeof ShortType ? Int16Array<ArrayBuffer> :
-        TType extends typeof UnsignedShortType ? Uint16Array<ArrayBuffer> :
-          TType extends typeof IntType ? Int32Array<ArrayBuffer> :
-            TType extends typeof UnsignedIntType ? Uint32Array<ArrayBuffer> :
-              TType extends typeof FloatType ? Float32Array<ArrayBuffer> :
-                TType extends typeof HalfFloatType ? Uint16Array<ArrayBuffer> :
-                  TType extends typeof UnsignedShort4444Type ? Uint16Array<ArrayBuffer> :
-                    TType extends typeof UnsignedShort5551Type ? Uint16Array<ArrayBuffer> :
-                      TType extends typeof UnsignedInt248Type ? Uint32Array<ArrayBuffer> :
-                        TType extends typeof UnsignedInt5999Type ? Uint32Array<ArrayBuffer> :
-                          TType extends typeof UnsignedInt101111Type ? Uint32Array<ArrayBuffer> :
-                            never
+  TType extends typeof UnsignedByteType ? Uint8ClampedArray<ArrayBuffer>
+    : TType extends typeof ByteType ? Int8Array<ArrayBuffer>
+      : TType extends typeof ShortType ? Int16Array<ArrayBuffer>
+        : TType extends typeof UnsignedShortType ? Uint16Array<ArrayBuffer>
+          : TType extends typeof IntType ? Int32Array<ArrayBuffer>
+            : TType extends typeof UnsignedIntType ? Uint32Array<ArrayBuffer>
+              : TType extends typeof FloatType ? Float32Array<ArrayBuffer>
+                : TType extends typeof HalfFloatType ? Uint16Array<ArrayBuffer>
+                  : TType extends typeof UnsignedShort4444Type ? Uint16Array<ArrayBuffer>
+                    : TType extends typeof UnsignedShort5551Type ? Uint16Array<ArrayBuffer>
+                      : TType extends typeof UnsignedInt248Type ? Uint32Array<ArrayBuffer>
+                        : TType extends typeof UnsignedInt5999Type ? Uint32Array<ArrayBuffer>
+                          : TType extends typeof UnsignedInt101111Type ? Uint32Array<ArrayBuffer>
+                            : never
 
 export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends Material> = {
   /**

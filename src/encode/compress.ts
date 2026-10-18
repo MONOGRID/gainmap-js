@@ -62,8 +62,8 @@ export const compress = async (params: CompressParameters): Promise<CompressedIm
     canvas.height = height
   }
   // apparently we do need to assert the type here for npx tsc to be happy
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D | null
+
+  const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('Failed to create canvas Context')
   // flip Y
   if (flipY === true) {

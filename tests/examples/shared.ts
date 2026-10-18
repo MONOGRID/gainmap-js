@@ -2,9 +2,7 @@ import type { BrowserContext } from '@playwright/test'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
-// @ts-expect-error tsc throws "Named capturing groups are only available when targeting 'ES2018' or later." here
 export const threeMatch = /https:\/\/unpkg\.com\/three(?<version>@[0-9.]+)?\/(?<path>.*)/
-// @ts-expect-error tsc throws "Named capturing groups are only available when targeting 'ES2018' or later." here
 export const gainmapJSMatch = /https:\/\/unpkg\.com\/@monogrid\/gainmap-js(?<version>@[0-9.]+)?\/(?<path>.*)/
 
 export async function setupRoutes (context: BrowserContext) {
