@@ -1,3 +1,10 @@
+# [3.6.0](https://github.com/MONOGRID/gainmap-js/compare/v3.5.0...v3.6.0) (2026-10-18)
+
+
+### Features
+
+* **webgpu:** node-based gain map loaders ([#86](https://github.com/MONOGRID/gainmap-js/issues/86)) ([3275ff9](https://github.com/MONOGRID/gainmap-js/commit/3275ff98da4a117adbd115654243bcff152b3d52))
+
 # [3.5.0](https://github.com/MONOGRID/gainmap-js/compare/v3.4.1...v3.5.0) (2026-10-18)
 
 
