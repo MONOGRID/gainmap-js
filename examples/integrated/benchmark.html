@@ -81,7 +81,10 @@
 
 			// url params override the form, `autorun` starts right away
 			const params = new URLSearchParams( location.search );
-			for ( const [ key, value ] of params ) if ( form.elements[ key ] ) form.elements[ key ].value = value;
+			for ( const [ key, value ] of params ) {
+				const field = form.elements.namedItem( key );
+				if ( field && 'value' in field ) field.value = value;
+			}
 
 			const renderer = new THREE.WebGPURenderer();
 			await renderer.init();
