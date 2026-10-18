@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/MONOGRID/gainmap-js/compare/v3.4.1...v3.5.0) (2026-10-18)
+
+
+### Features
+
+* ISO 21496-1 gain map metadata support (encode + decode) ([#85](https://github.com/MONOGRID/gainmap-js/issues/85)) ([6f908f5](https://github.com/MONOGRID/gainmap-js/commit/6f908f54a847e158c3d428ccd106c8ecc1552703)), closes [#76](https://github.com/MONOGRID/gainmap-js/issues/76)
+
 ## [3.4.1](https://github.com/MONOGRID/gainmap-js/compare/v3.4.0...v3.4.1) (2026-10-17)
 
 
