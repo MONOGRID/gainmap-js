@@ -12,6 +12,7 @@ const HALF_FLOAT_MAX = vec3(65504, 65504, 65504)
 /**
  * A Material which is able to decode the Gainmap into a full HDR Representation using TSL (Three.js Shading Language)
  *
+ * @deprecated The decode now happens in {@link GainMapNode}. Will be removed in the next major release.
  * @category Materials
  * @group Materials
  */

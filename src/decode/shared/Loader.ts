@@ -1,21 +1,14 @@
 import {
-  ClampToEdgeWrapping,
   HalfFloatType,
-  LinearFilter,
-  LinearMipMapLinearFilter,
   LinearSRGBColorSpace,
   Loader,
   LoadingManager,
-  RGBAFormat,
-  SRGBColorSpace,
-  Texture,
-  UnsignedByteType,
-  UVMapping
+  Texture
 } from 'three'
 
 import { type GainMapMetadata, QuadRendererTextureOptions } from '../../core/types'
 import { DecodeParameters } from './types'
-import { getHTMLImageFromBlob } from './utils/get-html-image-from-blob'
+import { createTextures, processImages } from './utils/create-textures'
 
 /**
  * Configuration for the loader base class
@@ -90,66 +83,12 @@ export abstract class LoaderBaseShared<TRenderer, TQuadRenderer, TMaterial, TUrl
     })
   }
 
-  protected async processImages (sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer, imageOrientation?: 'flipY' | 'from-image'): Promise<{ sdrImage: ImageBitmap | HTMLImageElement, gainMapImage: ImageBitmap | HTMLImageElement | undefined, needsFlip: boolean }> {
-    const gainMapBlob = gainMapBuffer ? new Blob([gainMapBuffer], { type: 'image/jpeg' }) : undefined
-    const sdrBlob = new Blob([sdrBuffer], { type: 'image/jpeg' })
-
-    let sdrImage: ImageBitmap | HTMLImageElement
-    let gainMapImage: ImageBitmap | HTMLImageElement | undefined
-    let needsFlip = false
-
-    if (typeof createImageBitmap === 'undefined') {
-      const res = await Promise.all([
-        gainMapBlob ? getHTMLImageFromBlob(gainMapBlob) : Promise.resolve(undefined),
-        getHTMLImageFromBlob(sdrBlob)
-      ])
-      gainMapImage = res[0]
-      sdrImage = res[1]
-      needsFlip = imageOrientation === 'flipY'
-    } else {
-      const res = await Promise.all([
-        gainMapBlob ? createImageBitmap(gainMapBlob, { imageOrientation: imageOrientation || 'flipY' }) : Promise.resolve(undefined),
-        createImageBitmap(sdrBlob, { imageOrientation: imageOrientation || 'flipY' })
-      ])
-      gainMapImage = res[0]
-      sdrImage = res[1]
-    }
-
-    return { sdrImage, gainMapImage, needsFlip }
+  protected processImages (sdrBuffer: ArrayBuffer, gainMapBuffer?: ArrayBuffer, imageOrientation?: 'flipY' | 'from-image') {
+    return processImages(sdrBuffer, gainMapBuffer, imageOrientation)
   }
 
-  protected createTextures (sdrImage: ImageBitmap | HTMLImageElement, gainMapImage: ImageBitmap | HTMLImageElement | undefined, needsFlip: boolean): { gainMap: Texture, sdr: Texture } {
-    const gainMap = new Texture(
-      gainMapImage || new ImageData(2, 2),
-      UVMapping,
-      ClampToEdgeWrapping,
-      ClampToEdgeWrapping,
-      LinearFilter,
-      LinearMipMapLinearFilter,
-      RGBAFormat,
-      UnsignedByteType,
-      1,
-      LinearSRGBColorSpace
-    )
-    gainMap.flipY = needsFlip
-    gainMap.needsUpdate = true
-
-    const sdr = new Texture(
-      sdrImage,
-      UVMapping,
-      ClampToEdgeWrapping,
-      ClampToEdgeWrapping,
-      LinearFilter,
-      LinearMipMapLinearFilter,
-      RGBAFormat,
-      UnsignedByteType,
-      1,
-      SRGBColorSpace
-    )
-    sdr.flipY = needsFlip
-    sdr.needsUpdate = true
-
-    return { gainMap, sdr }
+  protected createTextures (sdrImage: ImageBitmap | HTMLImageElement, gainMapImage: ImageBitmap | HTMLImageElement | undefined, needsFlip: boolean) {
+    return createTextures(sdrImage, gainMapImage, needsFlip)
   }
 
   protected updateQuadRenderer (

@@ -12,6 +12,7 @@ import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 /**
  * A Three.js Loader for a JPEG with embedded gainmap metadata (WebGPU version).
  *
+ * @deprecated Use {@link HDRJPGNodeLoader} instead. Will be removed in the next major release.
  * @category Loaders
  * @group Loaders
  *

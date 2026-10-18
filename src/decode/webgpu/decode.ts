@@ -16,6 +16,7 @@ const decodeImpl = createDecodeFunction({
 /**
  * Decodes a gain map using WebGPU RenderTarget
  *
+ * @deprecated Use {@link gainMapNode} instead. Will be removed in the next major release.
  * @category Decoding Functions
  * @group Decoding Functions
  * @example

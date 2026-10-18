@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Gain map loader benchmark</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style>
+			:root { color-scheme: dark; --bg: #111; --fg: #ddd; --muted: #888; --line: #333; --a: #f0a030; --b: #30a0f0; --win: #4c4; }
+			body { margin: 0; padding: 16px; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
+			h1 { font-size: 18px; margin: 0 0 4px; }
+			p { color: var(--muted); margin: 0 0 12px; max-width: 900px; }
+			form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 12px; }
+			label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: var(--muted); }
+			input, select, button { font: inherit; background: #222; color: var(--fg); border: 1px solid var(--line); padding: 4px 6px; }
+			button { cursor: pointer; padding: 4px 16px; }
+			button:disabled { opacity: .5; cursor: default; }
+			table { border-collapse: collapse; margin: 12px 0; font-variant-numeric: tabular-nums; }
+			th, td { border-bottom: 1px solid var(--line); padding: 4px 12px; text-align: right; }
+			th:first-child, td:first-child { text-align: left; }
+			.a { color: var(--a); } .b { color: var(--b); } .win { color: var(--win); font-weight: bold; }
+			#verdict { font-size: 18px; margin: 12px 0; }
+			#log { font: 12px/1.4 monospace; color: var(--muted); white-space: pre-wrap; max-height: 240px; overflow: auto; border: 1px solid var(--line); padding: 8px; }
+			canvas { display: block; margin-top: 12px; max-width: 100%; }
+		</style>
+	</head>
+
+	<body>
+		<h1>Gain map loader benchmark (WebGPU)</h1>
+		<p>
+			<span class="a">three.js UltraHDRLoader</span> (CPU decode into a HalfFloat DataTexture) vs
+			<span class="b">gainmap-js HDRJPGNodeLoader</span> (GPU decode into a HalfFloat render target).
+			Both receive the same bytes from memory (one blob URL per instance, so nothing is deduplicated or cached).
+			A run ends when every texture is resident on the GPU with mipmaps: <code>renderer.initTexture()</code> for three.js, <code>node.decode()</code> for the node,
+			then <code>device.queue.onSubmittedWorkDone()</code>. A warmup round is discarded, the order alternates every round.
+		</p>
+
+		<form id="form">
+			<label>image
+				<select name="image">
+					<option value="../../tests/files/memorial.jpg">memorial.jpg (512×768)</option>
+					<option value="../../tests/files/08.jpg">08.jpg (3000×1687)</option>
+					<option value="../../tests/files/pisa-4k.jpg">pisa-4k.jpg (4096×2048)</option>
+				</select>
+			</label>
+			<label>instances <input name="count" type="number" min="1" max="1000" value="100"></label>
+			<label>rounds <input name="rounds" type="number" min="1" max="50" value="5"></label>
+			<label>mode
+				<select name="mode">
+					<option value="parallel">parallel (all loads at once)</option>
+					<option value="sequential">sequential (one at a time)</option>
+				</select>
+			</label>
+			<button id="run" type="submit">Run</button>
+		</form>
+
+		<div id="verdict"></div>
+		<div id="results"></div>
+		<div id="log"></div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "../../node_modules/three/build/three.webgpu.js",
+					"three/webgpu": "../../node_modules/three/build/three.webgpu.js",
+					"three/tsl": "../../node_modules/three/build/three.tsl.js",
+					"three/addons/": "../../node_modules/three/examples/jsm/",
+					"@monogrid/gainmap-js/webgpu": "../../dist/decode.webgpu.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three/webgpu';
+			import { texture } from 'three/tsl';
+			import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+			import { HDRJPGNodeLoader } from '@monogrid/gainmap-js/webgpu';
+
+			const form = document.getElementById( 'form' );
+			const runButton = document.getElementById( 'run' );
+			const logEl = document.getElementById( 'log' );
+
+			// url params override the form, `autorun` starts right away
+			const params = new URLSearchParams( location.search );
+			for ( const [ key, value ] of params ) if ( form.elements[ key ] ) form.elements[ key ].value = value;
+
+			const renderer = new THREE.WebGPURenderer();
+			await renderer.init();
+			renderer.setSize( 960, 240 );
+			document.body.appendChild( renderer.domElement );
+
+			const device = renderer.backend.device;
+			if ( ! device ) log( 'WARNING: not running on the WebGPU backend, GPU completion can\'t be awaited, results are not comparable' );
+
+			const gpuIdle = () => device ? device.queue.onSubmittedWorkDone() : Promise.resolve();
+			const nextFrame = () => new Promise( resolve => requestAnimationFrame( () => resolve() ) );
+			const sleep = ms => new Promise( resolve => setTimeout( resolve, ms ) );
+
+			function log( msg ) {
+
+				logEl.textContent += msg + '\n';
+				logEl.scrollTop = logEl.scrollHeight;
+				console.log( msg );
+
+			}
+
+			// main thread blocking: sum of the long task time over 50ms, like Total Blocking Time
+			let blocking = 0;
+			if ( PerformanceObserver.supportedEntryTypes?.includes( 'longtask' ) ) {
+
+				new PerformanceObserver( list => {
+
+					for ( const entry of list.getEntries() ) blocking += Math.max( 0, entry.duration - 50 );
+
+				} ).observe( { type: 'longtask' } );
+
+			}
+
+			// a contender loads one url, resolves with a handle, makes it GPU resident and disposes it
+			const contenders = {
+				three: {
+					name: 'three.js UltraHDRLoader',
+					css: 'a',
+					create: () => new UltraHDRLoader().setDataType( THREE.HalfFloatType ),
+					load: ( loader, url ) => new Promise( ( resolve, reject ) => loader.load( url, tex => resolve( tex ), undefined, reject ) ),
+					upload: tex => renderer.initTexture( tex ),
+					colorNode: tex => texture( tex ),
+					dispose: tex => tex.dispose()
+				},
+				node: {
+					name: 'gainmap-js HDRJPGNodeLoader',
+					css: 'b',
+					create: () => new HDRJPGNodeLoader(),
+					load: ( loader, url ) => new Promise( ( resolve, reject ) => loader.load( url, node => resolve( node ), undefined, reject ) ),
+					upload: node => node.decode( renderer ),
+					colorNode: node => node,
+					dispose: node => node.dispose()
+				}
+			};
+
+			async function run( c, blob, count, mode ) {
+
+				// fresh urls every run, created outside the timed section
+				const urls = Array.from( { length: count }, () => URL.createObjectURL( blob ) );
+				const loader = c.create();
+				await gpuIdle();
+				await nextFrame();
+
+				blocking = 0;
+				let items = [];
+				let loadTime = 0;
+				const t0 = performance.now();
+
+				if ( mode === 'parallel' ) {
+
+					// all loads at once, then everything goes to the GPU
+					items = await Promise.all( urls.map( url => c.load( loader, url ) ) );
+					loadTime = performance.now() - t0;
+					for ( const item of items ) c.upload( item );
+
+				} else {
+
+					// each image is sent to the GPU before the next one starts loading
+					for ( const url of urls ) {
+
+						const tl = performance.now();
+						const item = await c.load( loader, url );
+						loadTime += performance.now() - tl;
+						c.upload( item );
+						items.push( item );
+
+					}
+
+				}
+
+				await gpuIdle();
+				const total = performance.now() - t0;
+				// long tasks are reported asynchronously
+				await sleep( 0 );
+
+				const result = { total, load: loadTime, gpu: total - loadTime, blocking };
+
+				for ( const url of urls ) URL.revokeObjectURL( url );
+				return { result, items };
+
+			}
+
+			// preview of a few instances, not timed
+			const previewScene = new THREE.Scene();
+			const previewCamera = new THREE.OrthographicCamera( 0, 4, 1, 0, - 1, 1 );
+			const quad = new THREE.PlaneGeometry( 0.98, 0.98 );
+			const kept = [];
+
+			function preview( c, items, slot ) {
+
+				for ( let i = 0; i < 2 && i < items.length; i ++ ) {
+
+					const material = new THREE.MeshBasicNodeMaterial( { colorNode: c.colorNode( items[ i ] ) } );
+					const mesh = new THREE.Mesh( quad, material );
+					mesh.position.set( slot * 2 + i + 0.5, 0.5, 0 );
+					previewScene.add( mesh );
+
+				}
+
+			}
+
+			function clearPreview() {
+
+				for ( const mesh of [ ...previewScene.children ] ) {
+
+					mesh.material.dispose();
+					previewScene.remove( mesh );
+
+				}
+
+			}
+
+			const median = a => {
+
+				const s = [ ...a ].sort( ( x, y ) => x - y );
+				const m = s.length >> 1;
+				return s.length % 2 ? s[ m ] : ( s[ m - 1 ] + s[ m ] ) / 2;
+
+			};
+			const fmt = v => v.toFixed( 1 );
+
+			function report( samples, count ) {
+
+				const metrics = [ [ 'total', 'total (ms)' ], [ 'load', 'load / CPU decode (ms)' ], [ 'gpu', 'GPU ready (ms)' ], [ 'blocking', 'main thread blocking (ms)' ] ];
+				const keys = Object.keys( contenders );
+				const stats = {};
+				for ( const k of keys ) {
+
+					stats[ k ] = {};
+					for ( const [ m ] of metrics ) {
+
+						const v = samples[ k ].map( s => s[ m ] );
+						stats[ k ][ m ] = { median: median( v ), min: Math.min( ...v ), max: Math.max( ...v ) };
+
+					}
+
+				}
+
+				let html = '<table><tr><th>median (min – max)</th>' + keys.map( k => `<th class="${contenders[ k ].css}">${contenders[ k ].name}</th>` ).join( '' ) + '</tr>';
+				for ( const [ m, label ] of metrics ) {
+
+					const best = Math.min( ...keys.map( k => stats[ k ][ m ].median ) );
+					html += `<tr><td>${label}</td>` + keys.map( k => {
+
+						const s = stats[ k ][ m ];
+						return `<td class="${s.median === best ? 'win' : ''}">${fmt( s.median )} <small>(${fmt( s.min )} – ${fmt( s.max )})</small></td>`;
+
+					} ).join( '' ) + '</tr>';
+
+				}
+
+				html += '<tr><td>per image (median total / n)</td>' + keys.map( k => `<td>${fmt( stats[ k ].total.median / count )}</td>` ).join( '' ) + '</tr>';
+				html += '</table>';
+				document.getElementById( 'results' ).innerHTML = html;
+
+				const [ winner, loser ] = [ ...keys ].sort( ( a, b ) => stats[ a ].total.median - stats[ b ].total.median );
+				const ratio = stats[ loser ].total.median / stats[ winner ].total.median;
+				document.getElementById( 'verdict' ).innerHTML = `Winner: <span class="${contenders[ winner ].css}">${contenders[ winner ].name}</span>, ${ratio.toFixed( 2 )}× faster (median total)`;
+
+				window.benchmarkResults = { stats, samples };
+
+			}
+
+			async function benchmark() {
+
+				runButton.disabled = true;
+				document.getElementById( 'verdict' ).textContent = 'running…';
+				document.getElementById( 'results' ).innerHTML = '';
+				logEl.textContent = '';
+
+				const image = form.elements.image.value;
+				const count = Number( form.elements.count.value );
+				const rounds = Number( form.elements.rounds.value );
+				const mode = form.elements.mode.value;
+
+				try {
+
+					// fetched once, both contenders get the very same bytes
+					const blob = await ( await fetch( image ) ).blob();
+					log( `${image}, ${( blob.size / 1024 ).toFixed( 0 )} KiB, ${count} instances, ${rounds} rounds + warmup, ${mode}` );
+
+					const samples = { three: [], node: [] };
+
+					for ( let round = 0; round <= rounds; round ++ ) {
+
+						// alternate who goes first, to cancel out ordering effects (thermals, GC, caches)
+						const order = round % 2 ? [ 'node', 'three' ] : [ 'three', 'node' ];
+
+						for ( const k of order ) {
+
+							const c = contenders[ k ];
+							const { result, items } = await run( c, blob, count, mode );
+
+							if ( round === 0 ) {
+
+								log( `warmup ${c.name}: ${fmt( result.total )} ms (discarded)` );
+
+							} else {
+
+								samples[ k ].push( result );
+								log( `round ${round} ${c.name}: total ${fmt( result.total )} ms, load ${fmt( result.load )} ms, gpu ${fmt( result.gpu )} ms, blocking ${fmt( result.blocking )} ms` );
+
+							}
+
+							if ( round === rounds ) {
+
+								// the last round is kept for the preview, until the next benchmark
+								preview( c, items, k === 'three' ? 0 : 1 );
+								kept.push( () => items.forEach( item => c.dispose( item ) ) );
+
+							} else {
+
+								for ( const item of items ) c.dispose( item );
+
+							}
+
+							// let the GPU and the GC settle before the next run
+							await gpuIdle();
+							await sleep( 300 );
+
+						}
+
+
+					}
+
+					report( samples, count );
+					renderer.render( previewScene, previewCamera );
+					await gpuIdle();
+
+				} catch ( e ) {
+
+					document.getElementById( 'verdict' ).textContent = 'error: ' + e;
+					console.error( e );
+
+				}
+
+				runButton.disabled = false;
+
+			}
+
+			form.addEventListener( 'submit', e => {
+
+				e.preventDefault();
+				// release the preview of the previous benchmark
+				clearPreview();
+				kept.splice( 0 ).forEach( dispose => dispose() );
+				benchmark();
+
+			} );
+
+			if ( params.has( 'autorun' ) ) benchmark();
+
+		</script>
+
+	</body>
+</html>

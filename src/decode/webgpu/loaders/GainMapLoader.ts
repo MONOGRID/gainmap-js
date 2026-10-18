@@ -10,6 +10,7 @@ import { LoaderBaseWebGPU } from './LoaderBaseWebGPU'
 /**
  * A Three.js Loader for the gain map format (WebGPU version).
  *
+ * @deprecated Use {@link GainMapNodeLoader} instead. Will be removed in the next major release.
  * @category Loaders
  * @group Loaders
  *
