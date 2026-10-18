@@ -28,3 +28,6 @@ playwright-report
 .nyc_output
 coverage
 playwright-report.json
+
+# local benchmark images
+examples/integrated/textures/benchmark/local/

@@ -89,6 +89,7 @@ export type QuadRendererOptions<TType extends TextureDataType, TMaterial extends
 /**
  * Utility class used for rendering a texture with a material (WebGPU version)
  *
+ * @deprecated Will be removed in v4.0.0. The WebGPU decode now happens in {@link GainMapNode}, use {@link HDRJPGNodeLoader}, {@link GainMapNodeLoader} or {@link gainMapNode}, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  * @category Core
  * @group Core
  */

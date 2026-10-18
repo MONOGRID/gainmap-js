@@ -16,13 +16,17 @@ Your contributions and creative ideas make our community stronger. We can’t wa
 
 ## Live Demo
 
-* [WebGPU Version](https://monogrid.github.io/gainmap-js/webgpu.html)
+* [WebGPU Version (node loaders)](https://monogrid.github.io/gainmap-js/webgpu-node.html)
 * [Legacy WebGL Version](https://monogrid.github.io/gainmap-js/)
 
 Both compares loading:
  1. a `JPEG` file with embedded gain map data
  2. a `webp` sdr file + a `webp` gain map + metadata JSON
  3. a comparable size `.hdr` file for comparison
+
+## Benchmark
+
+[Loader benchmark](https://monogrid.github.io/gainmap-js/benchmark.html): compares `HDRJPGNodeLoader` (GPU decode) against three.js `UltraHDRLoader` (CPU decode), loading the same gain map JPEGs in your browser.
 
 ## [Free online encoder](https://gainmap-creator.monogrid.com)
 
@@ -60,9 +64,18 @@ Refer to the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki) for detailed do
 The main use case of this library is to decode a JPEG file that contains gain map data
 and use it instead of a traditional `.exr` or `.hdr` image.
 
+The recommended way is to use the **node loaders** from the `@monogrid/gainmap-js/webgpu` entry point,
+together with three.js `WebGPURenderer`.
+
+Node loaders return a `GainMapNode`: a [TSL](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language) texture node holding the decoded HDR image.
+
+* **No renderer needed**: `load()` returns the node synchronously (like `TextureLoader` returns a `Texture`), it can be assigned to materials right away.
+* **Decoded on the GPU** into a HalfFloat render target, and only when something changes: sampling the node costs a single texture read.
+* **Every parameter is a uniform**: changing e.g. `maxDisplayBoost` re-decodes the image (and the environment PMREM) once, on the next frame.
+
 > NOTE: Starting from v3.1.0 Decoding also works in a WebWorker, thanks to [Alejandro Romano](https://github.com/Arecsu) for the [contribution](https://github.com/MONOGRID/gainmap-js/pull/59)
 
-### Using a single JPEG with embedded Gain map Metadata
+#### Using a single JPEG with embedded Gain map Metadata
 
 This approach lets you load a single file with an embedded Gain Map.
 
@@ -70,51 +83,58 @@ The advantage is to have a single file to load.
 
 The disadvantages are:
  * No WEBP compression
- * The JPEG cannot be manipulated in Photoshop, GIMP, or any other software that does not support the gain map technology (no photo editing software supports it at the time of writing 06-11-2023).
- * Photo sharing websites and/or services (i.e. sharing with Slack) will likely strip the Gain map metadata and the HDR information will be lost, leaving you with only the SDR Representation.
+ * Editing software that does not support gain maps will only see (and save) the SDR image, discarding the HDR information.
+   Software support is growing: Adobe Lightroom and Camera Raw and Pixelmator Pro can export gain map JPEGs,
+   while others (e.g. GIMP, Affinity) can't yet, and Photoshop needs Camera Raw or third party plugins.
+   You can also use our [free online encoder](https://gainmap-creator.monogrid.com) to create them from `.hdr` and `.exr` files.
+ * Many websites and services (e.g. Facebook, Slack) re-encode uploaded images and strip the gain map, leaving you with only the SDR Representation.
+   Serve the files yourself, unmodified, to keep the HDR information.
 
 ```ts
-import { HDRJPGLoader } from '@monogrid/gainmap-js'
+import { HDRJPGNodeLoader } from '@monogrid/gainmap-js/webgpu'
+import { equirectUV } from 'three/tsl'
 import {
   EquirectangularReflectionMapping,
   Mesh,
-  MeshBasicMaterial,
+  MeshBasicNodeMaterial,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
-  WebGLRenderer
-} from 'three'
+  WebGPURenderer
+} from 'three/webgpu'
 
-const renderer = new WebGLRenderer()
+const renderer = new WebGPURenderer()
+await renderer.init()
 
-const loader = new HDRJPGLoader(renderer)
-  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
-
-const result = await loader.loadAsync('gainmap.jpeg')
-// `result` can be used to populate a Texture
+// no renderer needed, `hdr` is a TSL texture node which can be used right away
+// the image is decoded on the GPU once loaded
+const hdr = new HDRJPGNodeLoader().load('gainmap.jpeg', () => {
+  // `hdr.value` is the decoded HDR texture, for APIs requiring a Texture
+  // it's kept up to date as long as the node is used in a rendered node graph
+  // (here: the plane material and the background), otherwise call `hdr.decode(renderer)`
+  // assign it once loaded: the texture gets its final size on load and PMREMs don't follow resizes
+  hdr.value.mapping = EquirectangularReflectionMapping
+  scene.environment = hdr.value
+})
 
 const scene = new Scene()
-const mesh = new Mesh(
-  new PlaneGeometry(),
-  new MeshBasicMaterial({ map: result.renderTarget.texture })
-)
-scene.add(mesh)
+const material = new MeshBasicNodeMaterial()
+material.colorNode = hdr
+scene.add(new Mesh(new PlaneGeometry(), material))
+
+// sample with different uvs, e.g. as an equirectangular background
+scene.backgroundNode = hdr.sample(equirectUV())
+
+// every parameter is a uniform: changing it re-decodes the image (and the environment PMREM) once
+hdr.maxDisplayBoost.value = 2
+
 renderer.render(scene, new PerspectiveCamera())
 
-// Starting from three.js r159
-// `result.renderTarget.texture` can
-// also be used as Equirectangular scene background
-//
-// it was previously needed to convert it
-// to a DataTexture with `result.toDataTexture()`
-scene.background = result.renderTarget.texture
-
-// result must be manually disposed
-// when you are done using it
-result.dispose()
+// the node must be manually disposed when you are done using it
+hdr.dispose()
 ```
 
-### Using separate files
+#### Using separate files
 
 Using separate files will get rid of the limitations of using a single JPEG file but it will force to use three separate files
 
@@ -122,41 +142,92 @@ Using separate files will get rid of the limitations of using a single JPEG file
 2. A Gainmap file
 3. A JSON containing the gainmap metadata used for decoding
 
-
 ```ts
-import { GainMapLoader } from '@monogrid/gainmap-js'
+import { GainMapNodeLoader } from '@monogrid/gainmap-js/webgpu'
 import {
-  EquirectangularReflectionMapping,
   Mesh,
-  MeshBasicMaterial,
+  MeshBasicNodeMaterial,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
-  WebGLRenderer
-} from 'three'
+  WebGPURenderer
+} from 'three/webgpu'
+
+const renderer = new WebGPURenderer()
+await renderer.init()
+
+const hdr = new GainMapNodeLoader().load([
+  'sdr.webp',
+  'gainmap.webp',
+  'metadata.json'
+])
+
+const scene = new Scene()
+const material = new MeshBasicNodeMaterial()
+material.colorNode = hdr
+scene.add(new Mesh(new PlaneGeometry(), material))
+
+renderer.render(scene, new PerspectiveCamera())
+
+// the node must be manually disposed when you are done using it
+hdr.dispose()
+```
+
+#### Migrating to upcoming v4.0.0
+
+> [!WARNING]
+> All render target based decoding APIs are deprecated and **will be removed in v4.0.0**,
+> both from the main `@monogrid/gainmap-js` entry point (`WebGLRenderer`) and from `@monogrid/gainmap-js/webgpu`:
+> `HDRJPGLoader`, `JPEGRLoader`, `GainMapLoader`, `decode()` and `GainMapDecoderMaterial` (plus the WebGPU `QuadRenderer`).
+> The loaders and `decode()` log a deprecation warning once when used.
+>
+> From v4.0.0 the node loaders are the only way to decode gain maps.
+
+If you are using `WebGLRenderer`, switch to `WebGPURenderer` from `three/webgpu`: it falls back to a WebGL2 backend
+where WebGPU is not available, so the node loaders work in the same browsers. Use `new WebGPURenderer({ forceWebGL: true })`
+to keep the WebGL2 backend everywhere. Materials need to be node materials (`MeshBasicNodeMaterial`, `MeshStandardNodeMaterial`, ...),
+or regular materials using `hdr.value` as a texture.
+
+The node loaders are **not a drop-in replacement**: they return a `GainMapNode` instead of a render target.
+
+| Before (deprecated) | After |
+| --- | --- |
+| `import { ... } from '@monogrid/gainmap-js'` | `import { ... } from '@monogrid/gainmap-js/webgpu'` |
+| `new WebGLRenderer()` | `new WebGPURenderer()` + `await renderer.init()` |
+| `new HDRJPGLoader(renderer)` | `new HDRJPGNodeLoader()`, no renderer |
+| `new GainMapLoader(renderer)` | `new GainMapNodeLoader()`, no renderer |
+| `decode({ sdr, gainMap, renderer, ...metadata })` | `gainMapNode(sdr, gainMap, metadata)` |
+| `await loader.loadAsync(url)` | `loader.load(url)` returns the node right away, `loadAsync` resolves once loaded |
+| `result.renderTarget.texture` | `hdr` in node materials (`material.colorNode = hdr`), `hdr.value` where a `Texture` is needed |
+| `material.map = result.renderTarget.texture` | `material.colorNode = hdr` (or `hdr.sample(uv)`) |
+| `scene.background = result.renderTarget.texture` | `scene.backgroundNode = hdr.sample(equirectUV())` |
+| `setRenderTargetOptions({ mapping })` | `hdr.value.mapping = ...` once loaded |
+| `result.material.maxDisplayBoost = 2; result.render()` | `hdr.maxDisplayBoost.value = 2`, re-decoded on the next frame |
+| `result.toDataTexture()` / `result.toArray()` | `await renderer.readRenderTargetPixelsAsync(hdr.renderTarget, 0, 0, hdr.width, hdr.height)` |
+| `result.dispose()` | `hdr.dispose()` |
+
+When the node is not part of a rendered node graph (e.g. only `scene.environment = hdr.value` is used),
+call `hdr.decode(renderer)` after load to update its texture.
+
+#### Decoding with WebGLRenderer (deprecated)
+
+> [!WARNING]
+> Deprecated, will be removed in v4.0.0, see [Migrating to v4.0.0](#migrating-to-v400).
+
+The main `@monogrid/gainmap-js` entry point exposes `HDRJPGLoader` and `GainMapLoader`, which decode into a `WebGLRenderTarget`.
+
+```ts
+import { HDRJPGLoader } from '@monogrid/gainmap-js'
+import { EquirectangularReflectionMapping, Scene, WebGLRenderer } from 'three'
 
 const renderer = new WebGLRenderer()
-
-const loader = new GainMapLoader(renderer)
-  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
-
-const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
-// `result` can be used to populate a Texture
-
 const scene = new Scene()
-const mesh = new Mesh(
-  new PlaneGeometry(),
-  new MeshBasicMaterial({ map: result.renderTarget.texture })
-)
-scene.add(mesh)
-renderer.render(scene, new PerspectiveCamera())
 
-// Starting from three.js r159
-// `result.renderTarget.texture` can
-// also be used as Equirectangular scene background
-//
-// it was previously needed to convert it
-// to a DataTexture with `result.toDataTexture()`
+const result = await new HDRJPGLoader(renderer)
+  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
+  .loadAsync('gainmap.jpeg')
+// or: await new GainMapLoader(renderer).loadAsync(['sdr.webp', 'gainmap.webp', 'metadata.json'])
+
 scene.background = result.renderTarget.texture
 
 // result must be manually disposed
@@ -164,101 +235,8 @@ scene.background = result.renderTarget.texture
 result.dispose()
 ```
 
-### Decoding with WebGPU
-
-> NOTE: WebGPU decoding requires three.js r163 or higher and a browser that supports WebGPU
-
-The library provides WebGPU-accelerated decoding through the `@monogrid/gainmap-js/webgpu` entry point. WebGPU decoding uses Three.js Shading Language (TSL) and offers improved performance and modern GPU architecture support.
-
-#### Using a single JPEG with embedded Gain map Metadata (WebGPU)
-
-```ts
-import { HDRJPGLoader } from '@monogrid/gainmap-js/webgpu'
-import {
-  EquirectangularReflectionMapping,
-  Mesh,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  PlaneGeometry,
-  Scene,
-  WebGPURenderer
-} from 'three/webgpu'
-
-const renderer = new WebGPURenderer()
-await renderer.init()
-
-const loader = new HDRJPGLoader(renderer)
-  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
-
-const result = await loader.loadAsync('gainmap.jpeg')
-// `result` can be used to populate a Texture
-
-const scene = new Scene()
-const mesh = new Mesh(
-  new PlaneGeometry(),
-  new MeshBasicMaterial({ map: result.renderTarget.texture })
-)
-scene.add(mesh)
-renderer.render(scene, new PerspectiveCamera())
-
-// Starting from three.js r159
-// `result.renderTarget.texture` can
-// also be used as Equirectangular scene background
-scene.background = result.renderTarget.texture
-
-// result must be manually disposed
-// when you are done using it
-result.dispose()
-```
-
-#### Using separate files (WebGPU)
-
-```ts
-import { GainMapLoader } from '@monogrid/gainmap-js/webgpu'
-import {
-  EquirectangularReflectionMapping,
-  Mesh,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  PlaneGeometry,
-  Scene,
-  WebGPURenderer
-} from 'three/webgpu'
-
-const renderer = new WebGPURenderer()
-await renderer.init()
-
-const loader = new GainMapLoader(renderer)
-  .setRenderTargetOptions({ mapping: EquirectangularReflectionMapping })
-
-const result = await loader.loadAsync(['sdr.jpeg', 'gainmap.jpeg', 'metadata.json'])
-// `result` can be used to populate a Texture
-
-const scene = new Scene()
-const mesh = new Mesh(
-  new PlaneGeometry(),
-  new MeshBasicMaterial({ map: result.renderTarget.texture })
-)
-scene.add(mesh)
-renderer.render(scene, new PerspectiveCamera())
-
-// Starting from three.js r159
-// `result.renderTarget.texture` can
-// also be used as Equirectangular scene background
-scene.background = result.renderTarget.texture
-
-// result must be manually disposed
-// when you are done using it
-result.dispose()
-```
-
-#### Key differences between WebGL and WebGPU
-
-1. **Import path**: Use `@monogrid/gainmap-js/webgpu` instead of `@monogrid/gainmap-js`
-2. **Three.js imports**: Use `three/webgpu` instead of `three`
-3. **Renderer**: Use `WebGPURenderer` instead of `WebGLRenderer`
-4. **Renderer initialization**: Call `await renderer.init()` before using WebGPU renderer
-5. **Async decoding**: The `decode()` function is async in WebGPU
+Other decoding APIs (the `GainMapNode` constructor, the deprecated `decode()` function and render target based
+`HDRJPGLoader` / `GainMapLoader` for `WebGPURenderer`) are documented in the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki).
 
 ### Encoding
 
