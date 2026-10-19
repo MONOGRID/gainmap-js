@@ -221,6 +221,11 @@ export class GainMapNode extends RenderTargetNode {
     return this.render(renderer)
   }
 
+  /**
+   * Calls {@link GainMapNode.decode} once per render, before the node is evaluated.
+   *
+   * @param frame
+   */
   override updateBefore (frame: NodeFrame) {
     if (frame.renderer) this.decode(frame.renderer as WebGPURenderer)
     return undefined
