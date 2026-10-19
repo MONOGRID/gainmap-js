@@ -208,6 +208,29 @@ The node loaders are **not a drop-in replacement**: they return a `GainMapNode` 
 When the node is not part of a rendered node graph (e.g. only `scene.environment = hdr.value` is used),
 call `hdr.decode(renderer)` after load to update its texture.
 
+#### Switching from the WebGL encoder to the node based encoder
+
+The WebGL encoder is not deprecated, you can keep using it. The node based encoder is available as an alternative with `WebGPURenderer`.
+
+With `LinearToneMapping` the node based encoder produces the same images as the WebGL encoder (byte for byte on the WebGL2 backend,
+within 1/255 on a handful of pixels on the WebGPU backend, where shaders compile differently).
+Other tone mappings use the three.js TSL tone mapping functions, so their SDR rendition differs from the one of the WebGL encoder.
+Brightness, contrast and saturation are applied after tone mapping: `LinearToneMapping` now clamps values above 1 before they are applied.
+
+| WebGL encoder (`@monogrid/gainmap-js/encode`) | Node based encoder (`@monogrid/gainmap-js/encode/webgpu`) |
+| --- | --- |
+| `encode({ image, maxContentBoost, ... })` | `new GainMapEncoder(image, { maxContentBoost, ... })`, no renderer |
+| `findTextureMinMax(image)` | `await findTextureMinMax(image, 'max', renderer)`, or `await encoder.fitMaxContentBoost(renderer)` |
+| `result.sdr.material.exposure = 0.9; result.sdr.render()` | `encoder.sdr.exposure.value = 0.9`, re-rendered when next used |
+| `result.sdr.material.toneMapping = AgXToneMapping` | `encoder.sdr.setToneMapping(AgXToneMapping)` |
+| `result.gainMap.material.gamma = [1.1, 1.1, 1.1]` | `encoder.gainMap.gamma.value.setScalar(1.1)` |
+| `result.getMetadata()` | `encoder.metadata` |
+| `result.sdr.renderTarget.texture` | `encoder.sdr` in node materials, `encoder.sdr.value` where a `Texture` is needed |
+| `decode({ sdr: result.sdr.renderTarget.texture, ... })` to preview | `encoder.createPreviewNode()`, it follows parameter changes |
+| `new ImageData(result.sdr.toArray(), ...)` + `compress({ flipY: true })` | `(await encoder.read(renderer)).sdr`, upright, no `flipY` |
+| `await encodeAndCompress({ ... })` | `await encoder.compress(renderer, { mimeType, quality, withWorker })` |
+| `result.sdr.dispose(); result.gainMap.dispose()` | `encoder.dispose()` |
+
 #### Decoding with WebGLRenderer
 
 The main `@monogrid/gainmap-js` entry point exposes `HDRJPGLoader` and `GainMapLoader`, which decode into a `WebGLRenderTarget`.
@@ -235,6 +258,60 @@ Other decoding APIs (the `GainMapNode` constructor, `decode()` and the deprecate
 `HDRJPGLoader` / `GainMapLoader` for `WebGPURenderer`) are documented in the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki).
 
 ### Encoding
+
+Encoding a Gain map starting from an EXR file.
+
+This is generally not useful in a `three.js` site but this library exposes methods
+that allow to encode an `.exr` or `hdr` file into a `jpeg` with an embedded gain map.
+
+`GainMapEncoder` encodes on the GPU with TSL nodes, no renderer is needed until the result is read back.
+`encoder.sdr` (the SDR rendition) and `encoder.gainMap` are live texture nodes: every encoding parameter is a uniform,
+changing one re-renders only the affected nodes, once, the next time they are used.
+This makes it suitable for interactive editors as well.
+
+```ts
+import { GainMapEncoder } from '@monogrid/gainmap-js/encode/webgpu'
+import { encodeJPEGMetadata } from '@monogrid/gainmap-js/libultrahdr'
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js'
+import { AgXToneMapping, LinearToneMapping, WebGPURenderer } from 'three/webgpu'
+
+const renderer = new WebGPURenderer()
+await renderer.init()
+
+// load an HDR file (raw texture data and TSL nodes are accepted too)
+const image = await new EXRLoader().loadAsync('image.exr')
+
+const encoder = new GainMapEncoder(image, { toneMapping: AgXToneMapping })
+// encode the full HDR range
+await encoder.fitMaxContentBoost(renderer)
+
+// optional: live previews, they follow any parameter change
+sdrMaterial.colorNode = encoder.sdr
+gainMapMaterial.colorNode = encoder.gainMap
+hdrMaterial.colorNode = encoder.createPreviewNode() // a GainMapNode decoding the encoded result
+
+// every parameter is a uniform
+encoder.sdr.exposure.value = 0.9
+encoder.sdr.setToneMapping(LinearToneMapping)
+encoder.gainMap.gamma.value.setScalar(1.1)
+
+// read back and compress, no flipY needed
+const result = await encoder.compress(renderer, { mimeType: 'image/jpeg', quality: 0.9 })
+
+// embed the compressed images + metadata into a single JPEG file
+const jpeg = encodeJPEGMetadata(result)
+
+// `jpeg` will be an `Uint8Array` which can be saved somewhere
+
+// the encoder must be manually disposed when no longer needed
+encoder.dispose()
+```
+
+The raw (uncompressed) images and the metadata are available with `await encoder.read(renderer)`,
+`await findTextureMinMax(image, 'max', renderer)` finds the max (or min) value of each channel of an HDR image.
+
+#### Encoding with WebGLRenderer
+
 
 Encoding a Gain map starting from an EXR file.
 

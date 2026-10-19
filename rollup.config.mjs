@@ -83,6 +83,7 @@ let configs = [
       encode: './src/encode.ts',
       decode: './src/decode.ts',
       'decode.webgpu': './src/decode/webgpu/index.ts',
+      'encode.webgpu': './src/encode/webgpu/index.ts',
       libultrahdr: './src/libultrahdr.ts',
       worker: './src/worker.ts',
       'worker-interface': './src/worker-interface.ts'
@@ -106,6 +107,7 @@ let configs = [
       encode: './src/encode.ts',
       decode: './src/decode.ts',
       'decode.webgpu': './src/decode/webgpu/index.ts',
+      'encode.webgpu': './src/encode/webgpu/index.ts',
       libultrahdr: './src/libultrahdr.ts',
       worker: './src/worker.ts',
       'worker-interface': './src/worker-interface.ts'
@@ -225,6 +227,32 @@ if (!process.env.PLAYWRIGHT_TESTING) {
         format: 'umd',
         name: 'encode',
         file: 'dist/encode.umd.min.cjs',
+        ...settings
+      },
+      plugins: pluginsMinified,
+      ...configBase
+    }),
+
+    // encode webgpu UMD
+    defineConfig({
+      input: './src/encode/webgpu/index.ts',
+      output: {
+        format: 'umd',
+        name: 'encode',
+        file: 'dist/encode.webgpu.umd.cjs',
+        ...settings
+      },
+      plugins,
+      ...configBase
+    }),
+
+    // encode webgpu UMD minified
+    defineConfig({
+      input: './src/encode/webgpu/index.ts',
+      output: {
+        format: 'umd',
+        name: 'encode',
+        file: 'dist/encode.webgpu.umd.min.cjs',
         ...settings
       },
       plugins: pluginsMinified,

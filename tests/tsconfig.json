@@ -17,6 +17,7 @@
       "@monogrid/gainmap-js": [ "../dist/decode" ],
       "@monogrid/gainmap-js/webgpu": [ "../dist/decode/webgpu/index" ],
       "@monogrid/gainmap-js/encode": [ "../dist/encode" ],
+      "@monogrid/gainmap-js/encode/webgpu": [ "../dist/encode/webgpu/index" ],
       "@monogrid/gainmap-js/libultrahdr": [ "../dist/libultrahdr" ],
       "@monogrid/gainmap-js/worker": [ "../dist/worker" ],
       "@monogrid/gainmap-js/worker-interface": [ "../dist/worker-interface" ]
