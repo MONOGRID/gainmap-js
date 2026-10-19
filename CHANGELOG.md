@@ -1,3 +1,15 @@
+# [3.7.0](https://github.com/MONOGRID/gainmap-js/compare/v3.6.1...v3.7.0) (2026-10-19)
+
+
+### Bug Fixes
+
+* **webgl:** legacy WebGLRenderer decode api not deprecated anymore ([6785697](https://github.com/MONOGRID/gainmap-js/commit/6785697200eccd93881868e1d2ffe59beb1f74bf))
+
+
+### Features
+
+* **webgpu:** node-based gain map encoder ([#87](https://github.com/MONOGRID/gainmap-js/issues/87)) ([4bbfdfd](https://github.com/MONOGRID/gainmap-js/commit/4bbfdfd248a3a46af58d1ebdd690cb3c0eeaa849))
+
 ## [3.6.1](https://github.com/MONOGRID/gainmap-js/compare/v3.6.0...v3.6.1) (2026-10-19)
 
 
