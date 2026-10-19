@@ -197,7 +197,20 @@ export class QuadRenderer<TType extends TextureDataType, TMaterial extends Mater
   public async toArray (): Promise<TextureDataTypeToBufferType<TType>> {
     if (!this._supportsReadPixels) throw new Error('Can\'t read pixels in this browser')
     const out = await this._renderer.readRenderTargetPixelsAsync(this._renderTarget, 0, 0, this._width, this._height)
-    return out as TextureDataTypeToBufferType<TType>
+    if (!(this._renderer.backend as { isWebGPUBackend?: boolean }).isWebGPUBackend) {
+      return out as TextureDataTypeToBufferType<TType>
+    }
+    // the WebGPU backend returns rows top-down, each padded to 256 bytes,
+    // the WebGL backend returns tightly packed rows bottom-up:
+    // repack to the WebGL layout so both backends return the same data
+    const rowLength = this._width * 4
+    const paddedRowLength = Math.ceil(rowLength * out.BYTES_PER_ELEMENT / 256) * 256 / out.BYTES_PER_ELEMENT
+    const packed = new (out.constructor as new (length: number) => typeof out)(rowLength * this._height)
+    for (let y = 0; y < this._height; y++) {
+      const start = (this._height - 1 - y) * paddedRowLength
+      packed.set(out.subarray(start, start + rowLength), y * rowLength)
+    }
+    return packed as TextureDataTypeToBufferType<TType>
   }
 
   /**
