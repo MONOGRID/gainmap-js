@@ -15,6 +15,7 @@
         "@monogrid/gainmap-js": "../dist/decode.js",
         "@monogrid/gainmap-js/webgpu": "../dist/decode.webgpu.js",
         "@monogrid/gainmap-js/encode": "../dist/encode.js",
+        "@monogrid/gainmap-js/encode/webgpu": "../dist/encode.webgpu.js",
         "@monogrid/gainmap-js/libultrahdr": "../dist/libultrahdr.js",
         "@monogrid/gainmap-js/worker-interface": "../dist/worker-interface.js"
       }
@@ -26,6 +27,7 @@
   <script type="module" data-testid="script">
     import * as decode from '@monogrid/gainmap-js/webgpu'
     import * as encode from '@monogrid/gainmap-js/encode'
+    import * as encodeWebGPU from '@monogrid/gainmap-js/encode/webgpu'
     import * as libultrahdr from '@monogrid/gainmap-js/libultrahdr'
     import * as workerInterface from '@monogrid/gainmap-js/worker-interface'
     import * as THREE from 'three/webgpu'
@@ -34,6 +36,7 @@
 
     window.decode = decode
     window.encode = encode
+    window.encodeWebGPU = encodeWebGPU
     window.libultrahdr = libultrahdr
     window.workerInterface = workerInterface
     window.THREE = THREE

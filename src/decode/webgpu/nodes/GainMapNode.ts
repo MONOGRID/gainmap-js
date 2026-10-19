@@ -7,18 +7,15 @@ import {
   MeshBasicNodeMaterial,
   type Node,
   type NodeFrame,
-  NodeUpdateType,
-  QuadMesh,
-  RendererUtils,
-  RenderTarget,
   Texture,
-  TextureNode,
+  type TextureNode,
   type UniformNode,
   Vector3,
   type WebGPURenderer
 } from 'three/webgpu'
 
 import { type GainMapMetadata } from '../../../core/types'
+import { RenderTargetNode } from '../../../core/webgpu/RenderTargetNode'
 
 // max half float value
 const HALF_FLOAT_MAX = 65504
@@ -71,7 +68,7 @@ export type GainMapNodeUniforms = {
  * scene.backgroundNode = hdr.sample(equirectUV())
  * hdr.maxDisplayBoost.value = 2 // re-decodes once, on the next frame
  */
-export class GainMapNode extends TextureNode {
+export class GainMapNode extends RenderTargetNode {
   static get type () { return 'GainMapNode' }
 
   /**
@@ -79,30 +76,20 @@ export class GainMapNode extends TextureNode {
    */
   readonly uniforms: GainMapNodeUniforms
 
-  /**
-   * The render target holding the decoded HDR image
-   */
-  readonly renderTarget: RenderTarget
-
-  private _quadMesh: QuadMesh
-  private _material: MeshBasicNodeMaterial
-  // filled by RendererUtils.resetRendererState
-  private _rendererState = {} as RendererUtils.RendererState
-  private _state: number[] = []
+  // set when the textures are produced by other render target nodes (e.g. a gain map encoder)
+  private _sdrSource: RenderTargetNode | null = null
+  private _gainMapSource: RenderTargetNode | null = null
 
   constructor () {
-    const renderTarget = new RenderTarget(1, 1, {
+    const material = new MeshBasicNodeMaterial()
+    material.name = 'GainMapDecoder'
+    super(material, {
       type: HalfFloatType,
       colorSpace: LinearSRGBColorSpace,
-      depthBuffer: false,
       generateMipmaps: true,
       minFilter: LinearMipmapLinearFilter,
       magFilter: LinearFilter
     })
-    super(renderTarget.texture)
-
-    this.renderTarget = renderTarget
-    this.updateBeforeType = NodeUpdateType.RENDER
 
     const u: GainMapNodeUniforms = this.uniforms = {
       sdr: texture(new Texture()),
@@ -122,10 +109,7 @@ export class GainMapNode extends TextureNode {
     const weight = saturate(log2(u.maxDisplayBoost).sub(u.hdrCapacityMin).div(u.hdrCapacityMax.sub(u.hdrCapacityMin)))
     const hdr = u.sdr.rgb.add(u.offsetSdr).mul(exp2(logBoost.mul(weight))).sub(u.offsetHdr)
 
-    this._material = new MeshBasicNodeMaterial()
-    this._material.name = 'GainMapDecoder'
-    this._material.colorNode = vec4(hdr.clamp(-HALF_FLOAT_MAX, HALF_FLOAT_MAX), 1)
-    this._quadMesh = new QuadMesh(this._material)
+    material.colorNode = vec4(hdr.clamp(-HALF_FLOAT_MAX, HALF_FLOAT_MAX), 1)
   }
 
   /** The SDR rendition texture (sRGB) */
@@ -154,20 +138,32 @@ export class GainMapNode extends TextureNode {
   get maxDisplayBoost () { return this.uniforms.maxDisplayBoost }
 
   /** Width of the SDR image, 0 until loaded */
-  get width (): number { return (this.sdr.image as { width?: number } | null)?.width ?? 0 }
+  get width (): number {
+    if (this._sdrSource) return this._sdrSource.width
+    return (this.sdr.image as { width?: number } | null)?.width ?? 0
+  }
+
   /** Height of the SDR image, 0 until loaded */
-  get height (): number { return (this.sdr.image as { height?: number } | null)?.height ?? 0 }
+  get height (): number {
+    if (this._sdrSource) return this._sdrSource.height
+    return (this.sdr.image as { height?: number } | null)?.height ?? 0
+  }
 
   /**
    * Sets the SDR and gain map textures.
    * The SDR texture is expected in sRGB color space, the gain map in linear.
    *
+   * Render target nodes (e.g. the `sdr` and `gainMap` nodes of a `GainMapEncoder`) are accepted as well:
+   * they are rendered before decoding and the image is decoded again whenever they change.
+   *
    * @param sdr
    * @param gainMap
    */
-  setTextures (sdr: Texture, gainMap: Texture) {
-    this.uniforms.sdr.value = sdr
-    this.uniforms.gainMap.value = gainMap
+  setTextures (sdr: Texture | RenderTargetNode, gainMap: Texture | RenderTargetNode) {
+    this._sdrSource = sdr instanceof RenderTargetNode ? sdr : null
+    this._gainMapSource = gainMap instanceof RenderTargetNode ? gainMap : null
+    this.uniforms.sdr.value = sdr instanceof RenderTargetNode ? sdr.value : sdr
+    this.uniforms.gainMap.value = gainMap instanceof RenderTargetNode ? gainMap.value : gainMap
     // size the render target right away, so `value` has its final size before the first decode
     if (this.width > 0 && this.height > 0) this.renderTarget.setSize(this.width, this.height)
     return this
@@ -192,7 +188,7 @@ export class GainMapNode extends TextureNode {
     return this
   }
 
-  private _currentState () {
+  protected override _getState () {
     const u = this.uniforms
     return [
       this.sdr.id, this.sdr.version, this.gainMap.id, this.gainMap.version,
@@ -200,6 +196,17 @@ export class GainMapNode extends TextureNode {
       ...u.gainMapMin.value.toArray(), ...u.gainMapMax.value.toArray(),
       u.hdrCapacityMin.value, u.hdrCapacityMax.value, u.maxDisplayBoost.value
     ]
+  }
+
+  protected override _getDependencies () {
+    const dependencies: RenderTargetNode[] = []
+    if (this._sdrSource) dependencies.push(this._sdrSource)
+    if (this._gainMapSource) dependencies.push(this._gainMapSource)
+    return dependencies
+  }
+
+  protected override _onRender () {
+    this.value.needsPMREMUpdate = true
   }
 
   /**
@@ -211,20 +218,7 @@ export class GainMapNode extends TextureNode {
    * @returns `true` if the image was decoded
    */
   decode (renderer: WebGPURenderer) {
-    // not loaded yet
-    if (this.width === 0 || this.height === 0) return false
-
-    const state = this._currentState()
-    if (state.length === this._state.length && state.every((v, i) => v === this._state[i])) return false
-    this._state = state
-
-    RendererUtils.resetRendererState(renderer, this._rendererState)
-    renderer.setRenderTarget(this.renderTarget)
-    this._quadMesh.render(renderer)
-    RendererUtils.restoreRendererState(renderer, this._rendererState)
-
-    this.value.needsPMREMUpdate = true
-    return true
+    return this.render(renderer)
   }
 
   override updateBefore (frame: NodeFrame) {
@@ -232,36 +226,13 @@ export class GainMapNode extends TextureNode {
     return undefined
   }
 
-  override set value (value: Texture) {
-    if (this.renderTarget && value !== this.renderTarget.texture) {
-      throw new Error('GainMapNode: the value of this node is its render target texture and can\'t be replaced')
-    }
-  }
-
-  override get value (): Texture {
-    return this.renderTarget?.texture
-  }
-
-  /**
-   * Clones created by `sample()` & co. are plain TextureNodes reading this node's texture,
-   * they keep it updated before rendering as well
-   */
-  override clone () {
-    const node = new TextureNode(this.value, this.uvNode, this.levelNode, this.biasNode)
-    node.sampler = this.sampler
-    node.updateBeforeType = NodeUpdateType.RENDER
-    node.updateBefore = (frame: NodeFrame) => this.updateBefore(frame)
-    return node as unknown as this
-  }
-
   /**
    * Disposes the render target, the SDR and gain map textures
+   * (unless they belong to other render target nodes)
    */
   override dispose () {
-    this.renderTarget.dispose()
-    this._material.dispose()
-    this.sdr.dispose()
-    this.gainMap.dispose()
+    if (!this._sdrSource) this.sdr.dispose()
+    if (!this._gainMapSource) this.gainMap.dispose()
     super.dispose()
   }
 }

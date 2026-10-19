@@ -27,6 +27,7 @@ import {
 import { getDataTexture } from '../core/get-data-texture'
 import { QuadRenderer } from '../core/QuadRenderer'
 import { TextureImageFormat } from '../core/types'
+import { warnDeprecated } from '../decode/shared/utils/warn-deprecated'
 const vertexShader = /* glsl */`
 varying vec2 vUv;
 void main() {
@@ -77,6 +78,9 @@ void main() {
 }
 `
 /**
+ * Finds the min or max value of each RGB channel of an HDR image
+ *
+ * @deprecated Will be removed in v4.0.0. Use `findTextureMinMax` from `@monogrid/gainmap-js/encode/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it is async and requires a renderer, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  *
  * @category Utility
  * @group Utility
@@ -87,6 +91,7 @@ void main() {
  * @returns
  */
 export const findTextureMinMax = (image: DataTextureLoaderTexData | DataTexture, mode: 'min' | 'max' = 'max', renderer?: WebGLRenderer) => {
+  warnDeprecated('findTextureMinMax()', '@monogrid/gainmap-js/encode', 'findTextureMinMax()', '@monogrid/gainmap-js/encode/webgpu', 'it is async and requires a renderer')
   const srcTex = getDataTexture(image)
 
   // check if texture has a valid format
