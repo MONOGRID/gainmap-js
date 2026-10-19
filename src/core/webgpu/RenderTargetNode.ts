@@ -121,6 +121,10 @@ export abstract class RenderTargetNode extends TextureNode {
     return true
   }
 
+  /**
+   * Called by three.js before rendering, renders the node when needed
+   * @internal
+   */
   override updateBefore (frame: NodeFrame) {
     if (frame.renderer) this.render(frame.renderer as WebGPURenderer)
     return undefined

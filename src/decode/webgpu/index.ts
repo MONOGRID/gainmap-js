@@ -1,4 +1,5 @@
 export * from '../../core/types'
+export { RenderTargetNode } from '../../core/webgpu/RenderTargetNode'
 export * from '../shared'
 export * from './core/QuadRenderer'
 export * from './decode'
