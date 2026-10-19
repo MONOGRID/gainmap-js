@@ -187,7 +187,8 @@ export class SDRRenditionNode extends RenderTargetNode {
     const color = vec4(this.hdr as Node<'vec4'>)
 
     // exposure is applied here rather than by the tone mapping function, so it works with `NoToneMapping` too
-    const toneMapped = vec4(toneMapping(this._toneMapping, float(1), color.rgb.mul(u.exposure)), color.a)
+    // `.rgb` because ToneMappingNode declares a vec3 but its setup returns a vec4 (colour + alpha) when a tone mapping is set
+    const toneMapped = vec4(toneMapping(this._toneMapping, float(1), color.rgb.mul(u.exposure)).rgb, color.a)
 
     const b = u.brightness
     const brightnessMatrix = mat4(
