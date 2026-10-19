@@ -1,3 +1,10 @@
+## [3.7.1](https://github.com/MONOGRID/gainmap-js/compare/v3.7.0...v3.7.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **webgpu:** avoid TSL vec4() length error in SDR rendition ([60bdf7e](https://github.com/MONOGRID/gainmap-js/commit/60bdf7ea9a936d497611e2373360efcb3a86d1d8))
+
 # [3.7.0](https://github.com/MONOGRID/gainmap-js/compare/v3.6.1...v3.7.0) (2026-10-19)
 
 
