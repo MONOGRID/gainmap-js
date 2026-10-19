@@ -20,6 +20,9 @@ type ParityResult = Awaited<ReturnType<typeof compareEncodersInBrowser>>
  * and implement transcendental functions differently, a few values (well below 0.01%)
  * can land on the other side of a rounding boundary and differ by 1
  *
+ * Software renderers (SwiftShader in docker / CI) are less consistent between the two
+ * compiled shaders, on both backends: values differ by 1 for up to 0.2% of the image
+ *
  * @param result
  * @param exact
  */
@@ -27,13 +30,14 @@ const expectParity = (result: ParityResult, exact: boolean) => {
   expect(result.width).toBe(result.legacyWidth)
   expect(result.height).toBe(result.legacyHeight)
   expect(result.metadata).toEqual(result.legacyMetadata)
+  const maxRatio = result.softwareRenderer ? 0.002 : 0.0001
   for (const image of ['sdr', 'gainMap'] as const) {
     const { maxDifference, differentValues, totalValues } = result[image]
-    if (exact) {
+    if (exact && !result.softwareRenderer) {
       expect(differentValues, `${image} differs from the WebGL encoder (max difference ${maxDifference})`).toBe(0)
     } else {
       expect(maxDifference, `${image} differs from the WebGL encoder by more than 1`).toBeLessThanOrEqual(1)
-      expect(differentValues / totalValues, `too many ${image} values differ from the WebGL encoder (${differentValues})`).toBeLessThan(0.0001)
+      expect(differentValues / totalValues, `too many ${image} values differ from the WebGL encoder (${differentValues})`).toBeLessThan(maxRatio)
     }
   }
 }

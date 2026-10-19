@@ -46,11 +46,17 @@ export const compareEncodersInBrowser = async (args: EncoderParityArgs) => {
   if (args.contrast !== undefined) legacy.sdr.material.contrast = args.contrast
   if (args.saturation !== undefined) legacy.sdr.material.saturation = args.saturation
   legacy.sdr.render()
-  legacy.gainMap.render()
+  // read the SDR back before the gain map samples it again: on SwiftShader, reading
+  // a render target that was re-rendered after being sampled returns the previous content
   const legacySDR = legacy.sdr.toArray()
+  legacy.gainMap.render()
   const legacyGainMap = legacy.gainMap.toArray()
   const legacyMetadata = legacy.getMetadata()
   const { width, height } = legacy.sdr
+  const gl = legacy.sdr.renderer.getContext()
+  const debugInfo = gl.getExtension('WEBGL_debug_renderer_info')
+  const rendererName = String(debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER))
+  const softwareRenderer = /SwiftShader|llvmpipe/i.test(rendererName)
   legacy.sdr.dispose()
   legacy.gainMap.dispose()
 
@@ -111,6 +117,7 @@ export const compareEncodersInBrowser = async (args: EncoderParityArgs) => {
   }
 
   const output = {
+    softwareRenderer,
     width: result.sdr.width,
     height: result.sdr.height,
     legacyWidth: width,
