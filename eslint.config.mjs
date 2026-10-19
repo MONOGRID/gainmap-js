@@ -2,7 +2,6 @@ import { FlatCompat } from '@eslint/eslintrc'
 import { defineConfig } from 'eslint/config'
 // @ts-expect-error untyped lib
 import mdcs from 'eslint-config-mdcs'
-// @ts-expect-error untyped lib
 import htmlPlugin from 'eslint-plugin-html'
 import simpleImportSort from 'eslint-plugin-simple-import-sort'
 import unusedImports from 'eslint-plugin-unused-imports'
