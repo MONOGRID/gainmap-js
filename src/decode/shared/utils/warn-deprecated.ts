@@ -7,7 +7,7 @@ const warned = new Set<string>()
  * @param entry entry point exposing the deprecated API
  * @param replacement node based API replacing it, from `@monogrid/gainmap-js/webgpu`
  */
-export const warnDeprecated = (name: string, entry: '@monogrid/gainmap-js' | '@monogrid/gainmap-js/webgpu', replacement: string) => {
+export const warnDeprecated = (name: string, entry: '@monogrid/gainmap-js/webgpu', replacement: string) => {
   const key = `${entry}:${name}`
   if (warned.has(key)) return
   warned.add(key)

@@ -5,7 +5,6 @@ import {
 
 import { QuadRenderer } from '../../core/QuadRenderer'
 import { createDecodeFunction, DecodeParametersWithRenderer } from '../shared'
-import { warnDeprecated } from '../shared/utils/warn-deprecated'
 import { GainMapDecoderMaterial } from './materials/GainMapDecoderMaterial'
 
 const decodeImpl = createDecodeFunction({
@@ -17,7 +16,6 @@ const decodeImpl = createDecodeFunction({
 /**
  * Decodes a gain map using a WebGL RenderTarget
  *
- * @deprecated Will be removed in v4.0.0. Use `gainMapNode()` from `@monogrid/gainmap-js/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns a `GainMapNode` instead of a render target, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  * @category Decoding Functions
  * @group Decoding Functions
  * @example
@@ -71,7 +69,6 @@ const decodeImpl = createDecodeFunction({
  * @throws {Error} if the WebGLRenderer fails to render the gain map
  */
 export const decode = (params: DecodeParametersWithRenderer<WebGLRenderer>): InstanceType<typeof QuadRenderer<typeof HalfFloatType, InstanceType<typeof GainMapDecoderMaterial>>> => {
-  warnDeprecated('decode()', '@monogrid/gainmap-js', 'gainMapNode()')
   // Ensure renderer is defined for the base function
   if (!params.renderer) {
     throw new Error('Renderer is required for decode function')

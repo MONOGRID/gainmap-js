@@ -173,27 +173,26 @@ renderer.render(scene, new PerspectiveCamera())
 hdr.dispose()
 ```
 
-#### Migrating to upcoming v4.0.0
+#### Migrating to v4.0.0
 
 > [!WARNING]
-> All render target based decoding APIs are deprecated and **will be removed in v4.0.0**,
-> both from the main `@monogrid/gainmap-js` entry point (`WebGLRenderer`) and from `@monogrid/gainmap-js/webgpu`:
-> `HDRJPGLoader`, `JPEGRLoader`, `GainMapLoader`, `decode()` and `GainMapDecoderMaterial` (plus the WebGPU `QuadRenderer`).
+> The render target based decoding APIs of `@monogrid/gainmap-js/webgpu` are deprecated and **will be removed in v4.0.0**:
+> `HDRJPGLoader`, `JPEGRLoader`, `GainMapLoader`, `decode()`, `GainMapDecoderMaterial` and `QuadRenderer`.
 > The loaders and `decode()` log a deprecation warning once when used.
 >
-> From v4.0.0 the node loaders are the only way to decode gain maps.
+> The `WebGLRenderer` APIs of the main `@monogrid/gainmap-js` entry point are **not** deprecated.
+>
+> From v4.0.0 the node loaders are the only way to decode gain maps with `WebGPURenderer`.
 
-If you are using `WebGLRenderer`, switch to `WebGPURenderer` from `three/webgpu`: it falls back to a WebGL2 backend
+If you are using the `WebGPURenderer` render target based APIs, switch to the node loaders. If you are still on `WebGLRenderer` you can keep using `@monogrid/gainmap-js`, or move to `WebGPURenderer` from `three/webgpu`: it falls back to a WebGL2 backend
 where WebGPU is not available, so the node loaders work in the same browsers. Use `new WebGPURenderer({ forceWebGL: true })`
 to keep the WebGL2 backend everywhere. Materials need to be node materials (`MeshBasicNodeMaterial`, `MeshStandardNodeMaterial`, ...),
 or regular materials using `hdr.value` as a texture.
 
 The node loaders are **not a drop-in replacement**: they return a `GainMapNode` instead of a render target.
 
-| Before (deprecated) | After |
+| Before (deprecated, `@monogrid/gainmap-js/webgpu`) | After |
 | --- | --- |
-| `import { ... } from '@monogrid/gainmap-js'` | `import { ... } from '@monogrid/gainmap-js/webgpu'` |
-| `new WebGLRenderer()` | `new WebGPURenderer()` + `await renderer.init()` |
 | `new HDRJPGLoader(renderer)` | `new HDRJPGNodeLoader()`, no renderer |
 | `new GainMapLoader(renderer)` | `new GainMapNodeLoader()`, no renderer |
 | `decode({ sdr, gainMap, renderer, ...metadata })` | `gainMapNode(sdr, gainMap, metadata)` |
@@ -209,10 +208,7 @@ The node loaders are **not a drop-in replacement**: they return a `GainMapNode` 
 When the node is not part of a rendered node graph (e.g. only `scene.environment = hdr.value` is used),
 call `hdr.decode(renderer)` after load to update its texture.
 
-#### Decoding with WebGLRenderer (deprecated)
-
-> [!WARNING]
-> Deprecated, will be removed in v4.0.0, see [Migrating to v4.0.0](#migrating-to-v400).
+#### Decoding with WebGLRenderer
 
 The main `@monogrid/gainmap-js` entry point exposes `HDRJPGLoader` and `GainMapLoader`, which decode into a `WebGLRenderTarget`.
 
@@ -235,7 +231,7 @@ scene.background = result.renderTarget.texture
 result.dispose()
 ```
 
-Other decoding APIs (the `GainMapNode` constructor, the deprecated `decode()` function and render target based
+Other decoding APIs (the `GainMapNode` constructor, `decode()` and the deprecated render target based
 `HDRJPGLoader` / `GainMapLoader` for `WebGPURenderer`) are documented in the [WIKI](https://github.com/MONOGRID/gainmap-js/wiki).
 
 ### Encoding
