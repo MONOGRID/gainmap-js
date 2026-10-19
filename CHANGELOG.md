@@ -1,3 +1,10 @@
+## [3.6.1](https://github.com/MONOGRID/gainmap-js/compare/v3.6.0...v3.6.1) (2026-10-19)
+
+
+### Bug Fixes
+
+* **webgpu:** normalize QuadRenderer.toArray() pixel layout across backends ([e8996f2](https://github.com/MONOGRID/gainmap-js/commit/e8996f2e3bf00fed02054b13a0d1d8c8a0474afe))
+
 # [3.6.0](https://github.com/MONOGRID/gainmap-js/compare/v3.5.0...v3.6.0) (2026-10-18)
 
 

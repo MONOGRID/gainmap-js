@@ -13,8 +13,6 @@ import { SDRMaterial } from './materials/SDRMaterial'
 /**
  * Renders an SDR Representation of an HDR Image
  *
- * @deprecated Will be removed in v4.0.0. Use `SDRRenditionNode` from `@monogrid/gainmap-js/encode/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns live TSL texture nodes, read back asynchronously, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
- *
  * @category Encoding Functions
  * @group Encoding Functions
  *

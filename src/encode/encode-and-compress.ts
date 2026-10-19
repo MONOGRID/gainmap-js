@@ -1,6 +1,5 @@
-import { warnDeprecated } from '../decode/shared/utils/warn-deprecated'
 import { compress } from './compress'
-import { encodeWithoutWarning } from './encode-implementation'
+import { encode } from './encode'
 import { CompressedImage, EncodingParametersWithCompression } from './types'
 
 /**
@@ -12,8 +11,6 @@ import { CompressedImage, EncodingParametersWithCompression } from './types'
  * if a `renderer` parameter is not provided
  * This function will automatically dispose its "disposable"
  * renderer, no need to dispose it manually later
- *
- * @deprecated Will be removed in v4.0.0. Use `GainMapEncoder.compress()` from `@monogrid/gainmap-js/encode/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns live TSL texture nodes, read back asynchronously, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  *
  * @category Encoding Functions
  * @group Encoding Functions
@@ -51,8 +48,7 @@ import { CompressedImage, EncodingParametersWithCompression } from './types'
  * @throws {Error} if the browser does not support [createImageBitmap](https://caniuse.com/createimagebitmap)
  */
 export const encodeAndCompress = async (params: EncodingParametersWithCompression) => {
-  warnDeprecated('encodeAndCompress()', '@monogrid/gainmap-js/encode', 'GainMapEncoder.compress()', '@monogrid/gainmap-js/encode/webgpu', 'it returns live TSL texture nodes, read back asynchronously')
-  const encodingResult = encodeWithoutWarning(params)
+  const encodingResult = encode(params)
 
   const { mimeType, quality, flipY, withWorker } = params
 

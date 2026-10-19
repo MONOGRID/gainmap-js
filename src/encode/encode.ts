@@ -1,5 +1,7 @@
-import { warnDeprecated } from '../decode/shared/utils/warn-deprecated'
-import { encodeWithoutWarning } from './encode-implementation'
+import { getDataTexture } from '../core/get-data-texture'
+import { GainMapMetadata } from '../core/types'
+import { getGainMap } from './get-gainmap'
+import { getSDRRendition } from './get-sdr-rendition'
 import { EncodingParametersBase } from './types'
 
 /**
@@ -17,8 +19,6 @@ import { EncodingParametersBase } from './types'
  * encodingResult.sdr.dispose()
  * encodingResult.gainMap.dispose()
  * ```
- *
- * @deprecated Will be removed in v4.0.0. Use `GainMapEncoder` from `@monogrid/gainmap-js/encode/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns live TSL texture nodes, read back asynchronously, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  *
  * @category Encoding Functions
  * @group Encoding Functions
@@ -58,6 +58,33 @@ import { EncodingParametersBase } from './types'
  * @returns
  */
 export const encode = (params: EncodingParametersBase) => {
-  warnDeprecated('encode()', '@monogrid/gainmap-js/encode', 'GainMapEncoder', '@monogrid/gainmap-js/encode/webgpu', 'it returns live TSL texture nodes, read back asynchronously')
-  return encodeWithoutWarning(params)
+  const { image, renderer } = params
+
+  const dataTexture = getDataTexture(image)
+
+  const sdr = getSDRRendition(dataTexture, renderer, params.toneMapping, params.renderTargetOptions)
+
+  const gainMapRenderer = getGainMap({
+    ...params,
+    image: dataTexture,
+    sdr,
+    renderer: sdr.renderer // reuse the same (maybe disposable?) renderer
+  })
+
+  return {
+    sdr,
+    gainMap: gainMapRenderer,
+    hdr: dataTexture,
+    getMetadata: (): GainMapMetadata => {
+      return {
+        gainMapMax: gainMapRenderer.material.gainMapMax,
+        gainMapMin: gainMapRenderer.material.gainMapMin,
+        gamma: gainMapRenderer.material.gamma,
+        hdrCapacityMax: gainMapRenderer.material.hdrCapacityMax,
+        hdrCapacityMin: gainMapRenderer.material.hdrCapacityMin,
+        offsetHdr: gainMapRenderer.material.offsetHdr,
+        offsetSdr: gainMapRenderer.material.offsetSdr
+      }
+    }
+  }
 }

@@ -42,7 +42,6 @@ void main() {
 /**
  * A Material which is able to decode the Gainmap into a full HDR Representation
  *
- * @deprecated Will be removed in v4.0.0. The decode now happens in `GainMapNode` from `@monogrid/gainmap-js/webgpu`, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  * @category Materials
  * @group Materials
  */

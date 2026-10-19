@@ -50,8 +50,6 @@ const warnEmptyRange = (minContentBoost: number, maxContentBoost: number) => {
 /**
  * A Material which is able to encode a gainmap
  *
- * @deprecated Will be removed in v4.0.0. Use `GainMapEncoderNode` from `@monogrid/gainmap-js/encode/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns live TSL texture nodes, read back asynchronously, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
- *
  * @category Materials
  * @group Materials
  */

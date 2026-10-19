@@ -1,21 +1,17 @@
 import {
   FileLoader,
-  HalfFloatType,
-  LoadingManager,
-  WebGLRenderer
+  HalfFloatType
 } from 'three'
 
 import { QuadRenderer } from '../../../core/QuadRenderer'
 import { GainMapMetadata } from '../../../core/types'
 import { extractGainmapFromJPEG, GainMapNotFoundError, XMPMetadataNotFoundError } from '../../shared'
-import { warnDeprecated } from '../../shared/utils/warn-deprecated'
 import { GainMapDecoderMaterial } from '../materials/GainMapDecoderMaterial'
 import { LoaderBaseWebGL } from './LoaderBaseWebGL'
 
 /**
  * A Three.js Loader for a JPEG with embedded gainmap metadata.
  *
- * @deprecated Will be removed in v4.0.0. Use HDRJPGNodeLoader from `@monogrid/gainmap-js/webgpu` with `WebGPURenderer` (which also has a WebGL2 backend) instead: it is **not a drop-in replacement**, it returns a `GainMapNode` instead of a render target, see the [migration guide](https://github.com/MONOGRID/gainmap-js#migrating-to-v400).
  * @category Loaders
  * @group Loaders
  *
@@ -61,11 +57,6 @@ import { LoaderBaseWebGL } from './LoaderBaseWebGL'
  *
  */
 export class HDRJPGLoader extends LoaderBaseWebGL<string> {
-  constructor (renderer?: WebGLRenderer, manager?: LoadingManager) {
-    super(renderer, manager)
-    warnDeprecated('HDRJPGLoader', '@monogrid/gainmap-js', 'HDRJPGNodeLoader')
-  }
-
   /**
    * Loads a JPEG containing gain map metadata
    * Renders a normal SDR image if gainmap data is not found
