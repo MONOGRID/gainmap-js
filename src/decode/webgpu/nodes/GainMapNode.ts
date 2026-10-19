@@ -227,6 +227,11 @@ export class GainMapNode extends TextureNode {
     return true
   }
 
+  /**
+   * Calls {@link GainMapNode.decode} once per render, before the node is evaluated.
+   *
+   * @param frame
+   */
   override updateBefore (frame: NodeFrame) {
     if (frame.renderer) this.decode(frame.renderer as WebGPURenderer)
     return undefined
