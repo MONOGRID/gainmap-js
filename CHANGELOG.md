@@ -1,3 +1,10 @@
+## [3.7.2](https://github.com/MONOGRID/gainmap-js/compare/v3.7.1...v3.7.2) (2026-10-20)
+
+
+### Bug Fixes
+
+* **encode:** fit the content boost range to the SDR rendition ([0d1ea9d](https://github.com/MONOGRID/gainmap-js/commit/0d1ea9d6eaa89539685f0212b5c28882bd92ac02))
+
 ## [3.7.1](https://github.com/MONOGRID/gainmap-js/compare/v3.7.0...v3.7.1) (2026-10-19)
 
 
