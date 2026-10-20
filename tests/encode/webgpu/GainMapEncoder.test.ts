@@ -3,7 +3,7 @@ import sharp from 'sharp'
 import { ACESFilmicToneMapping, AgXToneMapping, CineonToneMapping, LinearToneMapping, NeutralToneMapping, ReinhardToneMapping } from 'three'
 
 import { test } from '../../testWithCoverage'
-import { compareEncoderInputsInBrowser, compareEncodersInBrowser, countEncoderRendersInBrowser, encodeAndCompressInBrowser, type EncoderParityArgs } from './encode-webgpu'
+import { compareEncoderInputsInBrowser, compareEncodersInBrowser, countEncoderRendersInBrowser, encodeAndCompressInBrowser, type EncoderParityArgs, measureReconstructionInBrowser } from './encode-webgpu'
 
 test.beforeEach(async ({ page, browserName }) => {
   test.skip(browserName === 'firefox' || browserName === 'webkit', 'WebGPU not fully supported in Firefox and WebKit')
@@ -110,6 +110,19 @@ test('finds the exact min and max values (WebGPU node)', async ({ page }) => {
   expect(result.webgpuMax).toEqual(result.cpuMax)
   expect(result.webgpuMin).toEqual(result.cpuMin)
 })
+
+for (const [name, toneMapping] of Object.entries(toneMappings)) {
+  test(`fits the content boost range to the SDR rendition with ${name} (WebGPU node)`, async ({ page }) => {
+    const { fitMax, fitContent, range } = await page.evaluate(measureReconstructionInBrowser, { file, toneMapping })
+    expect(range.min).toBeLessThanOrEqual(1)
+    expect(range.max).toBeGreaterThan(1)
+    // errors are in stops, the gain map restores every pixel of the HDR image
+    // within the 8 bit quantization of the gain map and SDR rendition
+    expect(fitContent.meanError).toBeLessThan(0.02)
+    expect(fitContent.maxError).toBeLessThan(0.05)
+    expect(fitContent.maxError).toBeLessThanOrEqual(fitMax.maxError + 0.005)
+  })
+}
 
 test('renders the nodes only when something changed (WebGPU node)', async ({ page }) => {
   const result = await page.evaluate(countEncoderRendersInBrowser, { file })
