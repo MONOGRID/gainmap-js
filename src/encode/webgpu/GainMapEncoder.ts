@@ -1,3 +1,4 @@
+import { vec4 } from 'three/tsl'
 import { type DataTextureLoaderTexData, Texture, type WebGPURenderer } from 'three/webgpu'
 
 import { getDataTexture } from '../../core/get-data-texture'
@@ -10,6 +11,11 @@ import { findTextureMinMax } from './find-texture-min-max'
 import { GainMapEncoderNode } from './nodes/GainMapEncoderNode'
 import { type HDRInput, SDRRenditionNode, type SDRRenditionNodeOptions } from './nodes/SDRRenditionNode'
 import { readRenderTargetPixels } from './read-render-target-pixels'
+
+// maxContentBoost must be > 1, a gain map can't encode an empty boost range
+const MIN_MAX_CONTENT_BOOST = 1.0001
+// lower bound of a fitted minContentBoost, guards against negative HDR values
+const MIN_MIN_CONTENT_BOOST = 2 ** -16
 
 /**
  * Options of a {@link GainMapEncoder}
@@ -163,6 +169,36 @@ export class GainMapEncoder {
     const max = Math.max(...await findTextureMinMax(this.sdr.hdr, 'max', renderer, this))
     this.gainMap.maxContentBoost.value = max
     return max
+  }
+
+  /**
+   * Finds the actual range of the per pixel gain between the HDR image and its current SDR rendition
+   * and uses it as `minContentBoost` / `maxContentBoost`, so that the gain map can restore the HDR image exactly.
+   *
+   * Unlike {@link GainMapEncoder.fitMaxContentBoost} this takes the SDR rendition into account:
+   * tone mapping operators like Cineon, AgX or ACES make some pixels of the SDR rendition brighter
+   * (or less saturated) than the HDR image, which requires a `minContentBoost` below 1,
+   * and they compress highlights more than a plain clamp, which may require a `maxContentBoost` above the HDR max.
+   * Exposure, brightness, contrast and saturation have the same effect.
+   *
+   * Call it again whenever the SDR rendition or the offsets change.
+   *
+   * @param renderer
+   * @returns the new `minContentBoost` and `maxContentBoost`
+   */
+  async fitContentBoost (renderer: WebGPURenderer) {
+    // the gain is computed from the 8 bit SDR rendition, like the gain map itself
+    this.sdr.render(renderer)
+    const gain = vec4(this.gainMap.pixelGain, 1)
+    const size = { width: this.width, height: this.height }
+    const gainMin = await findTextureMinMax(gain, 'min', renderer, size)
+    const gainMax = await findTextureMinMax(gain, 'max', renderer, size)
+    // pixels where HDR and SDR match (gain 1) must stay encodable, so the range always includes 1
+    const min = Math.max(MIN_MIN_CONTENT_BOOST, Math.min(1, ...gainMin))
+    const max = Math.max(MIN_MAX_CONTENT_BOOST, ...gainMax)
+    this.gainMap.minContentBoost.value = min
+    this.gainMap.maxContentBoost.value = max
+    return { min, max }
   }
 
   /**

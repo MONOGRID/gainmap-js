@@ -64,6 +64,12 @@ export class GainMapEncoderNode extends RenderTargetNode {
    */
   readonly uniforms: GainMapEncoderNodeUniforms
 
+  /**
+   * The linear gain of each pixel, `(hdr + offsetHdr) / (sdr + offsetSdr)`, before it's clamped
+   * to the content boost range and encoded
+   */
+  readonly pixelGain: Node<'vec3'>
+
   private _warned: unknown[] = []
 
   /**
@@ -95,7 +101,7 @@ export class GainMapEncoderNode extends RenderTargetNode {
     const sdrColor = texture(sdr.value).rgb
     const hdrColor = vec4(sdr.hdr as Node<'vec4'>).rgb
 
-    const pixelGain = hdrColor.add(u.offsetHdr).div(sdrColor.add(u.offsetSdr))
+    const pixelGain = this.pixelGain = hdrColor.add(u.offsetHdr).div(sdrColor.add(u.offsetSdr))
     const logRecovery = log2(pixelGain).sub(minLog2).div(maxLog2.sub(minLog2))
     const clampedRecovery = saturate(logRecovery)
 

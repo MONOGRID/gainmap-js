@@ -275,3 +275,64 @@ export const encodeAndCompressInBrowser = async (args: { file: string, mimeType:
   await renderer.dispose()
   return output
 }
+
+/**
+ * Encodes an image with a tone mapping, fitting the content boost range with
+ * `fitMaxContentBoost` and `fitContentBoost`, then decodes it at full HDR capacity
+ * and measures how far each reconstruction is from the original HDR image
+ *
+ * @param args
+ */
+export const measureReconstructionInBrowser = async (args: { file: string, toneMapping: THREE.ToneMapping }) => {
+  const image = await new EXRLoader().loadAsync(args.file)
+  const renderer = new THREE.WebGPURenderer()
+  await renderer.init()
+
+  const encoder = new encodeWebGPU.GainMapEncoder(image, { toneMapping: args.toneMapping })
+  const { width, height } = encoder
+  const renderTarget = new THREE.RenderTarget(width, height, { type: THREE.FloatType, depthBuffer: false })
+  const quad = new THREE.QuadMesh(new THREE.MeshBasicNodeMaterial())
+  const renderToFloat = async (node: THREE.Node) => {
+    const material = new THREE.NodeMaterial()
+    material.fragmentNode = node
+    quad.material = material
+    renderer.setRenderTarget(renderTarget)
+    quad.render(renderer)
+    renderer.setRenderTarget(null)
+    const pixels = await renderer.readRenderTargetPixelsAsync(renderTarget, 0, 0, width, height) as Float32Array
+    material.dispose()
+    return pixels
+  }
+
+  const hdr = await renderToFloat(encoder.sdr.hdr)
+
+  // mean and max error in stops, offsets avoid huge errors on black pixels
+  const measure = async () => {
+    encoder.render(renderer)
+    const preview = encoder.createPreviewNode()
+    preview.maxDisplayBoost.value = 2 ** encoder.metadata.hdrCapacityMax
+    const decoded = await renderToFloat(preview)
+    preview.dispose()
+    let sum = 0
+    let max = 0
+    let count = 0
+    for (let i = 0; i < hdr.length; i++) {
+      if (i % 4 === 3) continue
+      const error = Math.abs(Math.log2((decoded[i] + 1 / 64) / (hdr[i] + 1 / 64)))
+      sum += error
+      max = Math.max(max, error)
+      count++
+    }
+    return { meanError: sum / count, maxError: max, metadata: encoder.metadata }
+  }
+
+  await encoder.fitMaxContentBoost(renderer)
+  const fitMax = await measure()
+  const range = await encoder.fitContentBoost(renderer)
+  const fitContent = await measure()
+
+  encoder.dispose()
+  renderTarget.dispose()
+  await renderer.dispose()
+  return { fitMax, fitContent, range }
+}
