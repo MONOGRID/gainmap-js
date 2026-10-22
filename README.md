@@ -310,6 +310,12 @@ encoder.dispose()
 The raw (uncompressed) images and the metadata are available with `await encoder.read(renderer)`,
 `await findTextureMinMax(image, 'max', renderer)` finds the max (or min) value of each channel of an HDR image.
 
+#### Brightness and color gamut
+
+- **Relative brightness:** input `.hdr` / `.exr` values are linear and relative, `1.0` is SDR (diffuse) white, not an absolute value in nits. The viewer maps `1.0` to the display's current SDR white level, so `2.0` is displayed twice as bright as SDR white, up to the available headroom.
+- **Content boost:** `maxContentBoost` is the maximum per-pixel gain between the HDR image and its SDR rendition (stored as `log2` in the metadata). Use `fitMaxContentBoost()` or `fitContentBoostRange()` to compute it instead of setting it by hand.
+- **No gamut conversion:** input pixels are treated as linear sRGB / BT.709 and gamut metadata in the source file is ignored. The output JPEG carries no ICC profile, so viewers interpret it as sRGB / BT.709.
+
 #### Encoding with WebGLRenderer
 
 
