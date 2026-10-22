@@ -32,19 +32,6 @@ Both compares loading:
 
 Use it to convert `.hdr` and `.exr` files into gain maps. It's free and the whole process happens in your browser.
 
-## Regarding HDR brightness normalisation and color gamuts
-
-### 1. Brightness Normalisation (Nits vs. Relative Luminance values)
-* **Relative Linear Scale:** The input `.exr` and `.hdr` pixel values are not interpreted as absolute luminance (nits), but in a relative linear scale where 1.0 is SDR white. This is because gain map HDR JPEGs are displayed with `relative brightness` instead of absolute nits. After the image viewer applies the gain map, 1.0 in linear gamma is tied to the SDR white of the computer. For example, if your SDR white is at 140 nits (middle brightness 8/16 on a Macbook Pro) then `1.0 exr input` will result in 140 nits when you view the output gain map JPEG in Google Chrome, while `2.0 exr input` will result in 280 nits.
-
-* **Content Boost tag:** The `maxContentBoost` parameter specifies the maximum ratio between the HDR peak luminance and the SDR reference white. For example, if your HDR highlights are 4 times brighter than SDR white, `maxContentBoost` should be set to `4.0` (which is encoded in metadata as `log2(4.0) = 2.0`).
-
-### 2. Color Gamuts
-* **No Automatic Gamut Remapping:** During encoding, `gainmap-js` does not perform any gamut transformations (e.g., converting BT.709 to Rec.2020). 
-
-* It disregards any gamut metadata in the input .exr or .hdr file, and does not tag the output jpeg with any color gamut tag. So Google Chrome will interpret this as a HDR bt709 gamut image.
-
-
 ## Installing
 ```bash
 $ npm install @monogrid/gainmap-js three
@@ -322,6 +309,12 @@ encoder.dispose()
 
 The raw (uncompressed) images and the metadata are available with `await encoder.read(renderer)`,
 `await findTextureMinMax(image, 'max', renderer)` finds the max (or min) value of each channel of an HDR image.
+
+#### Brightness and color gamut
+
+- **Relative brightness:** input `.hdr` / `.exr` values are linear and relative, `1.0` is SDR (diffuse) white, not an absolute value in nits. The viewer maps `1.0` to the display's current SDR white level, so `2.0` is displayed twice as bright as SDR white, up to the available headroom.
+- **Content boost:** `maxContentBoost` is the maximum per-pixel gain between the HDR image and its SDR rendition (stored as `log2` in the metadata). Use `fitMaxContentBoost()` or `fitContentBoostRange()` to compute it instead of setting it by hand.
+- **No gamut conversion:** input pixels are treated as linear sRGB / BT.709 and gamut metadata in the source file is ignored. The output JPEG carries no ICC profile, so viewers interpret it as sRGB / BT.709.
 
 #### Encoding with WebGLRenderer
 
