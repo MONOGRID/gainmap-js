@@ -36,7 +36,8 @@ test('decodes from jpeg', async ({ page }) => {
 
   const result = await page.evaluate(decodeInBrowser, { file: 'files/spruit_sunrise_4k.jpg' })
 
-  expect(JSON.stringify(result.materialValues)).toMatchSnapshot({ name: 'material-values.json' })
+  // uuids/image ids depend on three's internal generation order, so they are excluded
+  expect(JSON.stringify(result.materialValues, (k, v) => (k === 'uuid' || k === 'image') ? undefined : v as unknown)).toMatchSnapshot({ name: 'material-values.json' })
 
   // test conversion to appropriate colorspace happens
   expect(logs.find(m => m.match(/Gainmap Colorspace needs to be/gi))).toBeTruthy()
