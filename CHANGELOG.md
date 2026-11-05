@@ -1,3 +1,10 @@
+## [3.7.3](https://github.com/MONOGRID/gainmap-js/compare/v3.7.2...v3.7.3) (2026-11-05)
+
+
+### Bug Fixes
+
+* **encode:** write the MPF primary image type Chrome expects ([#90](https://github.com/MONOGRID/gainmap-js/issues/90)) ([b3cfd9f](https://github.com/MONOGRID/gainmap-js/commit/b3cfd9f80e0f22d400d4b57707483ee0ac566757)), closes [#89](https://github.com/MONOGRID/gainmap-js/issues/89)
+
 ## [3.7.2](https://github.com/MONOGRID/gainmap-js/compare/v3.7.1...v3.7.2) (2026-10-20)
 
 
