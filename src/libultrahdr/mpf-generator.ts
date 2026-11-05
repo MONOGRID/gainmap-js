@@ -60,14 +60,16 @@ const MPF_TAG_TYPES = {
 } as const
 
 /**
- * MP entry attributes
+ * MP entry individual image attributes (CIPA DC-007 5.2.3.3.1)
+ *
+ * bits 31-27: flags, bits 26-24: image data format, bits 23-0: MP type code
  */
 const MP_ENTRY_ATTRIBUTES = {
   /** JPEG format */
   FORMAT_JPEG: 0x00000000,
 
-  /** Primary image type */
-  TYPE_PRIMARY: 0x20000000
+  /** Baseline MP Primary Image type code, matches libultrahdr kMPEntryAttributeTypePrimary */
+  TYPE_PRIMARY: 0x030000
 } as const
 
 /**
@@ -173,7 +175,7 @@ export function generateMpf (primaryImageSize: number, primaryImageOffset: numbe
   pos += 4
 
   // Write MP entries for primary image
-  // Attribute format: JPEG (0x00000000) | Type: Primary (0x20000000)
+  // Attribute format: JPEG (0x00000000) | Type: Baseline MP Primary Image (0x030000)
   view.setUint32(pos, MP_ENTRY_ATTRIBUTES.FORMAT_JPEG | MP_ENTRY_ATTRIBUTES.TYPE_PRIMARY, bigEndian)
   pos += 4
   view.setUint32(pos, primaryImageSize, bigEndian)

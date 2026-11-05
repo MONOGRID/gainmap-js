@@ -46,6 +46,19 @@ test.describe('JPEG encoding with ISO 21496-1 metadata', () => {
     expect(toHex(isoPayload.subarray(0, 5))).toBe('0000000040')
     expect(toHex(isoPayload)).toMatchSnapshot('iso-gainmap-payload.txt')
 
+    // MP entries (CIPA DC-007) match libultrahdr: primary is a Baseline MP Primary Image
+    // (0x030000), gain map has no type code. Sizes and offsets point at the two images.
+    const mpf = primary[3]
+    const mpfView = new DataView(mpf.payload.buffer, mpf.payload.byteOffset, mpf.payload.byteLength)
+    const entries = mpf.payload.byteLength - 32
+    const mpEndianOffset = mpf.offset + 4 + 4 // marker + length + "MPF\0"
+    expect(mpfView.getUint32(entries)).toBe(0x030000)
+    expect(mpfView.getUint32(entries + 4)).toBe(gainMapOffset)
+    expect(mpfView.getUint32(entries + 8)).toBe(0)
+    expect(mpfView.getUint32(entries + 16)).toBe(0)
+    expect(mpfView.getUint32(entries + 20)).toBe(jpeg.length - gainMapOffset)
+    expect(mpfView.getUint32(entries + 24)).toBe(gainMapOffset - mpEndianOffset)
+
     // both images are decodable JPEGs
     const primaryInfo = await sharp(Buffer.from(jpeg.subarray(0, gainMapOffset))).metadata()
     const gainMapInfo = await sharp(Buffer.from(jpeg.subarray(gainMapOffset))).metadata()
